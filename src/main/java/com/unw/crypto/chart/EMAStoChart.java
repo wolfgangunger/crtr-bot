@@ -6,6 +6,7 @@
 package com.unw.crypto.chart;
 
 import com.unw.crypto.Config;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
@@ -24,7 +25,6 @@ import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TimeSeriesManager;
 import org.ta4j.core.Trade;
-import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 
@@ -34,10 +34,23 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
  */
 public class EMAStoChart extends AbstractChartPanel {
 
-    private  JFreeChart chart2;
+    private JFreeChart chart2;
+    private ChartPanel chartPanel2;
 
-    public EMAStoChart(TimeSeries series,TabPane parent) {
+    public EMAStoChart(TimeSeries series, TabPane parent) {
         super(series, parent);
+    }
+
+    @Override
+    protected void addCharts() {
+        this.add(chartPanel, BorderLayout.CENTER);
+        this.add(chartPanel2, BorderLayout.SOUTH);
+    }
+
+    @Override
+    protected void removeCharts() {
+        this.remove(chartPanel);
+        this.remove(chartPanel2);
     }
 
     @Override
@@ -46,7 +59,7 @@ public class EMAStoChart extends AbstractChartPanel {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
 
         //test
-        EMAIndicator avg14 = new EMAIndicator(closePrice, 180);
+        // EMAIndicator avg14 = new EMAIndicator(closePrice, 180);
         StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(closePrice, 200);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
@@ -61,16 +74,15 @@ public class EMAStoChart extends AbstractChartPanel {
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
 
-        ChartPanel chartPanel1 = new ChartPanel(chart);
+        chartPanel = new ChartPanel(chart);
         //chartPanel1.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        Dimension d1 = new Dimension(Config.WIDTH,(int)((Config.HEIGHT - 110)*0.7));
-        chartPanel1.setPreferredSize(d1);
-        ChartPanel chartPanel2 = new ChartPanel(chart2);
+        Dimension d1 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.7));
+        chartPanel.setPreferredSize(d1);
+
+        chartPanel2 = new ChartPanel(chart2);
         //chartPanel2.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        Dimension d2 = new Dimension(Config.WIDTH,(int)((Config.HEIGHT - 110)*0.3));
+        Dimension d2 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.3));
         chartPanel2.setPreferredSize(d2);
-        this.add(chartPanel1);
-        this.add(chartPanel2);
     }
 
     /**

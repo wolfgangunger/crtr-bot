@@ -6,17 +6,13 @@
 package com.unw.crypto.chart;
 
 import com.unw.crypto.Config;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javafx.scene.Node;
 import javafx.scene.control.TabPane;
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
@@ -25,16 +21,12 @@ import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.ta4j.core.Bar;
-import org.ta4j.core.Decimal;
-import org.ta4j.core.Indicator;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TimeSeriesManager;
 import org.ta4j.core.Trade;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.RSIIndicator;
-import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 
 /**
@@ -43,10 +35,24 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
  */
 public class EMARsiChart extends AbstractChartPanel {
 
-    private  JFreeChart chart2;
+    private JFreeChart chart2;
+    private ChartPanel chartPanel2;
 
-    public EMARsiChart(TimeSeries series,TabPane parent) {
+    public EMARsiChart(TimeSeries series, TabPane parent) {
         super(series, parent);
+    }
+    
+    
+    @Override
+    protected void addCharts() {
+        this.add(chartPanel,BorderLayout.CENTER);
+        this.add(chartPanel2,BorderLayout.SOUTH);
+    }
+
+    @Override
+    protected void removeCharts() {
+        this.remove(chartPanel);
+        this.remove(chartPanel2);
     }
 
     @Override
@@ -70,16 +76,14 @@ public class EMARsiChart extends AbstractChartPanel {
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
 
-        ChartPanel chartPanel1 = new ChartPanel(chart);
+        chartPanel = new ChartPanel(chart);
         //chartPanel1.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        Dimension d1 = new Dimension(Config.WIDTH,(int)((Config.HEIGHT - 110)*0.7));
-        chartPanel1.setPreferredSize(d1);
-        ChartPanel chartPanel2 = new ChartPanel(chart2);
+        Dimension d1 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.7));
+        chartPanel.setPreferredSize(d1);
+        chartPanel2 = new ChartPanel(chart2);
         //chartPanel2.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-        Dimension d2 = new Dimension(Config.WIDTH,(int)((Config.HEIGHT - 110)*0.3));
+        Dimension d2 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.3));
         chartPanel2.setPreferredSize(d2);
-        this.add(chartPanel1);
-        this.add(chartPanel2);
     }
 
 //    private org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries barseries, Indicator<Decimal> indicator, String name) {
@@ -90,7 +94,6 @@ public class EMARsiChart extends AbstractChartPanel {
 //        }
 //        return chartTimeSeries;
 //    }
-
     /**
      * Runs a strategy over a time series and adds the value markers
      * corresponding to buy/sell signals to the plot.

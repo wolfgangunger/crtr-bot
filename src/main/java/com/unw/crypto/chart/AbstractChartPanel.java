@@ -44,15 +44,23 @@ public abstract class AbstractChartPanel extends JPanel {
         initData();
         initUi();
     }
-    protected void init(){
-        
+
+    protected void init() {
+
     }
 
     protected void initUi() {
-        this.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
         initToolbar();
+        addCharts();
+    }
+
+    protected void addCharts() {
         chartPanel = createChartPanel(chart);
-        this.add(chartPanel, BorderLayout.CENTER);
+        add(chartPanel, BorderLayout.CENTER);
+    }
+    protected void removeCharts(){
+        this.remove(chartPanel);
     }
 
     protected void initToolbar() {
@@ -77,11 +85,10 @@ public abstract class AbstractChartPanel extends JPanel {
     }
 
     public void refresh() {
-        this.remove(chartPanel);
+        removeCharts();
         initData();
-        chartPanel = createChartPanel(chart);
-        this.add(chartPanel, BorderLayout.CENTER);
-        this.repaint();
+        addCharts();
+        repaint();
     }
 
     protected abstract void initData();
@@ -114,9 +121,9 @@ public abstract class AbstractChartPanel extends JPanel {
         org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
         for (int i = 0; i < barseries.getBarCount(); i++) {
             Bar bar = barseries.getBar(i);
-            try{
-            chartTimeSeries.add(new Minute(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
-            }catch(Exception e){
+            try {
+                chartTimeSeries.add(new Minute(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
