@@ -30,6 +30,7 @@ public class StrategyPanel extends JPanel {
     private TimeSeries series;
     private final RSI2Strategy rsi2 = new RSI2Strategy();
     private final MovingMomentumStrategy mm = new MovingMomentumStrategy();
+    private final MovingMomentumStrategyUnw mmUnger = new MovingMomentumStrategyUnw();
     private final CCICorrectionStrategy cciCorrectionStrategy = new CCICorrectionStrategy();
     private final GlobalExtremaStrategy globalExtremaStrategy = new GlobalExtremaStrategy();
     private TradingRecord tradingRecord;
@@ -91,6 +92,18 @@ public class StrategyPanel extends JPanel {
         });
         toolbar.add(bttGE);
         
+        JButton bttMmUnger = new JButton();
+        bttMmUnger.setText("Moving Momentumg Strategy Unger");
+        bttMmUnger.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                tradingRecord = mmUnger.execute(series);
+                updateLog(tradingRecord);
+            }
+        });
+        toolbar.add(bttMmUnger);
+        
+        
         this.add(toolbar, BorderLayout.NORTH);
     }
 
@@ -101,7 +114,7 @@ public class StrategyPanel extends JPanel {
         textArea.setBorder(BorderFactory.createRaisedBevelBorder());
         //scrollpanel for log
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(600, 400));
+        scrollPane.setPreferredSize(new Dimension(600, 700));
         mainPanel.add(scrollPane);
         this.add(mainPanel, BorderLayout.CENTER);
     }

@@ -9,7 +9,6 @@ import com.unw.crypto.chart.SimpleClosedPriceChart;
 import com.unw.crypto.data.DataLoader;
 import com.unw.crypto.strategy.StrategyPanel;
 import com.unw.crypto.ui.TabUtil;
-import java.time.Instant;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -127,7 +126,7 @@ public class App extends Application {
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));        
         //strategy
         StrategyPanel strategyPanel = new StrategyPanel(series);
-        tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy 1"));        
+        tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));        
         //root.setCenter(sc);
         root.setCenter(tabPane);
     }
