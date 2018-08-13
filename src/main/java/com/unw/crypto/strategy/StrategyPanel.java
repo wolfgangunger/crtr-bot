@@ -27,12 +27,13 @@ import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
  */
 public class StrategyPanel extends JPanel {
 
-    private TimeSeries series;
+    private final TimeSeries series;
     private final RSI2Strategy rsi2 = new RSI2Strategy();
     private final MovingMomentumStrategy mm = new MovingMomentumStrategy();
     private final MovingMomentumStrategyUnw mmUnger = new MovingMomentumStrategyUnw();
     private final CCICorrectionStrategy cciCorrectionStrategy = new CCICorrectionStrategy();
     private final GlobalExtremaStrategy globalExtremaStrategy = new GlobalExtremaStrategy();
+    private final TestStrategy testStrategy = new TestStrategy();
     private TradingRecord tradingRecord;
     private JTextArea textArea;
     private static final String LB = "\n";
@@ -103,6 +104,16 @@ public class StrategyPanel extends JPanel {
         });
         toolbar.add(bttMmUnger);
         
+        JButton bttTestStrategy = new JButton();
+        bttTestStrategy.setText("Test Strategie");
+        bttTestStrategy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                tradingRecord = testStrategy.execute(series);
+                updateLog(tradingRecord);
+            }
+        });
+        toolbar.add(bttTestStrategy);
         
         this.add(toolbar, BorderLayout.NORTH);
     }
