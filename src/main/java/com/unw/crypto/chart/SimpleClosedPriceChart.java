@@ -6,11 +6,9 @@
 package com.unw.crypto.chart;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javafx.scene.Node;
 import javafx.scene.control.TabPane;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.Marker;
@@ -18,9 +16,6 @@ import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.ta4j.core.Bar;
-import org.ta4j.core.Decimal;
-import org.ta4j.core.Indicator;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TimeSeriesManager;
