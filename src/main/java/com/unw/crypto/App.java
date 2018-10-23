@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 import org.ta4j.core.TimeSeries;
 
 /**
- * Hello world!
+ * main class
  *
  */
 public class App extends Application {
@@ -35,6 +35,7 @@ public class App extends Application {
         //Instant instant = Instant.ofEpochMilli(Long.parseLong("1482410598") * 1000);
         //System.out.println(instant.toString());
         launch(args);
+        
     }
 
     @Override

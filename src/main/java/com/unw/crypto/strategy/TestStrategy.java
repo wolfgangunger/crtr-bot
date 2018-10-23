@@ -1,4 +1,3 @@
-
 package com.unw.crypto.strategy;
 
 import org.ta4j.core.*;
@@ -16,13 +15,13 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
 /**
  * Moving momentum strategy.
- * <p></p>
- * @see <a href="http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum">
- *     http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum</a>
+ * <p>
+ * </p> @see
+ * <a href="http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum">
+ * http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum</a>
  */
 public class TestStrategy {
 
-    
     /**
      * @param series a time series
      * @return a moving momentum strategy
@@ -33,7 +32,7 @@ public class TestStrategy {
         }
 
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-        
+
         // The bias is bullish when the shorter-moving average moves above the longer moving average.
         // The bias is bearish when the shorter-moving average moves below the longer moving average.
         EMAIndicator shortEma = new EMAIndicator(closePrice, 9);
@@ -43,22 +42,25 @@ public class TestStrategy {
 
         MACDIndicator macd = new MACDIndicator(closePrice, 9, 26);
         EMAIndicator emaMacd = new EMAIndicator(macd, 18);
-        
+
         // Entry rule
-        Rule entryRule = new OverIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(20))) // Signal 1
-                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
-        
+        Rule entryRule = new OverIndicatorRule(shortEma, longEma);
+
+        // Rule entryRule = new OverIndicatorRule(shortEma, longEma) // Trend
+        //         .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(20))) // Signal 1
+        //         .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
         // Exit rule
-       // Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-               // .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80))) // Signal 1
-               // .and(new UnderIndicatorRule(macd, emaMacd))
-               // .and(new StopLossRule(closePrice, Decimal.valueOf(3)));
-               // .and(new StopGainRule(closePrice, Decimal.valueOf(-1)));
-                //.and(new IsFallingRule(closePrice, 3));
-        Rule exitRule = new StopLossRule(closePrice,  Decimal.valueOf(2))
-                .or(new StopGainRule(closePrice, Decimal.valueOf(6)));
+        // Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
+        // .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80))) // Signal 1
+        // .and(new UnderIndicatorRule(macd, emaMacd))
+        // .and(new StopLossRule(closePrice, Decimal.valueOf(3)));
+        // .and(new StopGainRule(closePrice, Decimal.valueOf(-1)));
+        //.and(new IsFallingRule(closePrice, 3));
         
+        Rule exitRule = new StopGainRule(closePrice, Decimal.valueOf(6));
+        //Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(2));
+             //   .or(new StopGainRule(closePrice, Decimal.valueOf(6)));
+
         return new BaseStrategy(entryRule, exitRule);
     }
 
