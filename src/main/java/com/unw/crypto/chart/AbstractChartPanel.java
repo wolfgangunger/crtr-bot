@@ -9,27 +9,19 @@ import com.unw.crypto.Config;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.util.Date;
 import javafx.scene.control.TabPane;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.OHLCDataset;
-import org.ta4j.core.Bar;
-import org.ta4j.core.Decimal;
-import org.ta4j.core.Indicator;
 import org.ta4j.core.TimeSeries;
 
 /**
  *
  * @author UNGERW
  */
-public abstract class AbstractChartPanel extends JPanel {
+public abstract class AbstractChartPanel extends AbstractPanel {
 
     protected JFreeChart chart;
     protected ChartPanel chartPanel;
@@ -93,40 +85,5 @@ public abstract class AbstractChartPanel extends JPanel {
 
     protected abstract void initData();
 
-    protected JFreeChart createChart(TimeSeriesCollection dataset, String title, String xAxis, String yAxis, boolean generateLegend) {
-        JFreeChart result = ChartFactory.createTimeSeriesChart(
-                title, // title
-                xAxis, // x-axis label
-                yAxis, // y-axis label
-                dataset, // data
-                generateLegend, // create legend?
-                true, // generate tooltips?
-                false // generate URLs?
-        );
-        return result;
-    }
 
-    protected JFreeChart createCandleStickChart(OHLCDataset dataset, String title, String xAxis, String yAxis) {
-        JFreeChart result = ChartFactory.createCandlestickChart(
-                title, // title
-                xAxis, // x-axis label
-                yAxis, // y-axis label
-                dataset, // data
-                true // create legend?
-        );
-        return result;
-    }
-
-    protected org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries barseries, Indicator<Decimal> indicator, String name) {
-        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
-        for (int i = 0; i < barseries.getBarCount(); i++) {
-            Bar bar = barseries.getBar(i);
-            try {
-                chartTimeSeries.add(new Minute(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return chartTimeSeries;
-    }
 }

@@ -19,7 +19,6 @@ public class TabUtil {
     public static Tab createChartTab(AbstractChartPanel chart, String title) {
         Tab tab = new Tab();
         tab.setText(title);
-        //tab.setContent(new Rectangle(200, 200, Color.LIGHTSTEELBLUE));
         SwingNode node = new SwingNode();
         node.setContent(chart);
         tab.setContent(node);

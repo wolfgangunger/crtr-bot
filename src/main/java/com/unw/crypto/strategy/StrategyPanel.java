@@ -121,12 +121,14 @@ public class StrategyPanel extends JPanel {
     private void initMainPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createEtchedBorder());
+        mainPanel.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setBorder(BorderFactory.createRaisedBevelBorder());
         //scrollpanel for log
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(600, 700));
-        mainPanel.add(scrollPane);
+        mainPanel.add(scrollPane, BorderLayout.WEST);
+        
         this.add(mainPanel, BorderLayout.CENTER);
     }
 

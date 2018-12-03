@@ -31,11 +31,12 @@ public class App extends Application {
     private Scene scene;
     private TextField tf;
 
-    public static void main(String[] args) {
-        //Instant instant = Instant.ofEpochMilli(Long.parseLong("1482410598") * 1000);
-        //System.out.println(instant.toString());
-        launch(args);
-        
+//    public static void main(String[] args) {
+//        launch(args);
+//    }
+    
+    public static void run(){
+        launch(null);
     }
 
     @Override
