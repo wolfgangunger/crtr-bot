@@ -1,19 +1,152 @@
 package com.unw.crypto;
 
-import java.io.IOException;
-
-import org.springframework.beans.BeansException;
+import com.unw.crypto.chart.BollingerBandsChart;
+import com.unw.crypto.chart.CandleChart;
+import com.unw.crypto.chart.EMARsiChart;
+import com.unw.crypto.chart.EMAStoChart;
+import com.unw.crypto.chart.MovingAverageChart;
+import com.unw.crypto.chart.SimpleClosedPriceChart;
+import com.unw.crypto.data.DataLoaderDB;
+import com.unw.crypto.strategy.StrategyPanel;
+import com.unw.crypto.ui.TabUtil;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.ta4j.core.TimeSeries;
 
+/**
+ * main class
+ *
+ */
 @SpringBootApplication
-public class SpringBootApp {
+public class SpringBootApp extends Application {
 
-	public static void main(String[] args) throws BeansException, IOException {
-		ConfigurableApplicationContext context = SpringApplication.run(SpringBootApp.class, args);
-		
-		//context.getBean(CsvToDatabaseWriter.class).importCsvToDatabase();
-               context.getBean(App.class).run();
-	}
+    private BorderPane bp;
+    private Scene scene;
+    private TextField tf;
+    private ConfigurableApplicationContext context;
+
+
+    public static void main(String[] args) {
+        launch(SpringBootApp.class, args);
+    }
+
+    @Override
+    public void stop() throws Exception {
+        context.stop();
+    }
+    @Override
+    public void init() throws Exception {
+        context = SpringApplication.run(SpringBootApp.class);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        initUi(primaryStage);
+    }
+
+    private void initUi(Stage primaryStage) {
+        //System.setProperty("javafx.macosx.embedded", "true");
+        //System.setProperty("javafx.windows.embedded", "true");
+        System.setProperty("java.awt.headless", "false");
+        java.awt.Toolkit.getDefaultToolkit();
+        BorderPane root = createBorderPane();
+        createToolbar(root);
+        //
+        initTabPane(root);
+        //
+        createBottomBar(root);
+
+        scene = new Scene(root, Config.WIDTH, Config.HEIGHT);
+        primaryStage.setTitle("TradingBot");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private BorderPane createBorderPane() {
+        bp = new BorderPane();
+        return bp;
+    }
+
+    private void createToolbar(BorderPane root) {
+        ToolBar tb = new ToolBar();
+        initButtons(tb);
+        root.setTop(tb);
+    }
+
+    private void initButtons(ToolBar tb) {
+        Button bttRecord = new Button();
+        bttRecord.setText("Record");
+        bttRecord.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // recordData();
+                System.out.println("Start");
+            }
+        });
+        Button bttStop = new Button();
+        bttStop.setText("Stop");
+        bttStop.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("Stop");
+                //stopRecord();
+            }
+        });
+
+        Button bttRead = new Button();
+        bttRead.setText("Read");
+        bttRead.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("Read");
+                //readData();
+            }
+        });
+
+        tb.getItems().add(bttRecord);
+        tb.getItems().add(bttStop);
+        tb.getItems().add(bttRead);
+
+    }
+
+    private void createBottomBar(BorderPane root) {
+        tf = new TextField();
+        root.setBottom(tf);
+    }
+
+    private void initTabPane(BorderPane root) {
+        //DataLoader dataLoader =  context.getBean(DataLoader.class);
+        DataLoaderDB dataLoader =  context.getBean(DataLoaderDB.class);
+        TimeSeries series = dataLoader.loadData();        
+        TabPane tabPane = new TabPane();
+        // charts
+        CandleChart candleChart = new CandleChart(series, tabPane);
+        tabPane.getTabs().add(TabUtil.createChartTab(candleChart, "Candle"));
+        SimpleClosedPriceChart simpleClosedPriceChart = new SimpleClosedPriceChart(series, tabPane);
+        tabPane.getTabs().add(TabUtil.createChartTab(simpleClosedPriceChart, "ClosedPrice"));
+        MovingAverageChart movingAverageChart = new MovingAverageChart(series, tabPane);
+        tabPane.getTabs().add(TabUtil.createChartTab(movingAverageChart, "MovingAverage"));
+        EMARsiChart emaRsiChart = new EMARsiChart(series, tabPane);
+        tabPane.getTabs().add(TabUtil.createChartTab(emaRsiChart, "EMA RSI"));
+        EMAStoChart emaStoChart = new EMAStoChart(series, tabPane);
+        tabPane.getTabs().add(TabUtil.createChartTab(emaStoChart, "EMA STO"));
+        BollingerBandsChart bollingerChart = new BollingerBandsChart(series, tabPane);
+        tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
+        //strategy
+        StrategyPanel strategyPanel = new StrategyPanel(series);
+        tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));
+        //root.setCenter(sc);
+        root.setCenter(tabPane);
+    }
 }

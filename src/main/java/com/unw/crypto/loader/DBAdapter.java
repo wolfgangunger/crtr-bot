@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseTimeSeries;
@@ -23,22 +25,27 @@ import org.ta4j.core.TimeSeries;
  *
  * @author UNGERW
  */
-public class DBLoader {
+@Component
+public class DBAdapter {
 
     @Autowired
-    private static TickRepository tickRepository;
+    private  TickRepository tickRepository;
 
-    public static TimeSeries loadBitstampSeries(String filename, Instant from, Instant until) {
-        List<Tick> ticks = tickRepository.findAll();
+    public  TimeSeries loadBitstampSeries(String filename, Instant from, Instant until) {
+        //List<Tick> ticks = tickRepository.findAll();
+        Sort sort = new Sort(Sort.Direction.ASC, "tradeTime");
+        List<Tick> ticks = tickRepository.findAll(sort);
         ZonedDateTime beginTime = null;
         ZonedDateTime endTime = null;
 
-        List<Bar> bars = null;
+        List<Bar> bars = new ArrayList<>();
         if ((ticks != null) && !ticks.isEmpty()) {
 
             // Getting the first and last trades timestamps
-            beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime() * 1000), ZoneId.systemDefault());
-            endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime() * 1000), ZoneId.systemDefault());
+            //beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime() * 1000), ZoneId.systemDefault());
+            //endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime() * 1000), ZoneId.systemDefault());
+            beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime() ), ZoneId.systemDefault());
+            endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime() ), ZoneId.systemDefault());            
             if (beginTime.isAfter(endTime)) {
                 Instant beginInstant = beginTime.toInstant();
                 Instant endInstant = endTime.toInstant();
@@ -48,14 +55,12 @@ public class DBLoader {
                 // Collections.reverse(ticks);
             }
             // build the list of populated bars
-
             bars = buildBars(beginTime, endTime, 300, ticks);
         }
-
         return new BaseTimeSeries("bitstamp_trades", bars);
     }
 
-    private static List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, int duration, List<Tick> ticks) {
+    private  List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, int duration, List<Tick> ticks) {
 
         List<Bar> bars = new ArrayList<>();
 
@@ -68,7 +73,8 @@ public class DBLoader {
             Bar bar = new BaseBar(barDuration, barEndTime);
             for (Tick t : ticks) {
               // get a trade
-                ZonedDateTime tradeTimeStamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(t.getTradeTime().getTime() * 1000), ZoneId.systemDefault());
+               // ZonedDateTime tradeTimeStamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(t.getTradeTime().getTime() * 1000), ZoneId.systemDefault());
+                ZonedDateTime tradeTimeStamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(t.getTradeTime().getTime() ), ZoneId.systemDefault());
                 // if the trade happened during the bar
                 if (bar.inPeriod(tradeTimeStamp)) {
                     // add the trade to the bar

@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.springframework.stereotype.Component;
 import org.ta4j.core.TimeSeries;
 
 /**
@@ -31,13 +32,11 @@ public class App extends Application {
     private Scene scene;
     private TextField tf;
 
-//    public static void main(String[] args) {
-//        launch(args);
-//    }
-    
-    public static void run(){
-        launch(null);
+    public static void main(String[] args) {
+        launch(args);
     }
+    
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -111,7 +110,8 @@ public class App extends Application {
     }
 
     private void initTabPane(BorderPane root) {
-        TimeSeries series = DataLoader.loadData();
+        DataLoader dataLoader = new DataLoader();
+        TimeSeries series = dataLoader.loadData();
         TabPane tabPane = new TabPane();
         // charts
         CandleChart candleChart = new CandleChart(series, tabPane);
