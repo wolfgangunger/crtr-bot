@@ -19,7 +19,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import org.springframework.stereotype.Component;
 import org.ta4j.core.TimeSeries;
 
 /**

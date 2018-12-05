@@ -27,7 +27,7 @@ import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
  */
 public class StrategyPanel extends JPanel {
 
-    private final TimeSeries series;
+    private  TimeSeries series;
     private final RSI2Strategy rsi2 = new RSI2Strategy();
     private final MovingMomentumStrategy mm = new MovingMomentumStrategy();
     private final MovingMomentumStrategyUnw mmUnger = new MovingMomentumStrategyUnw();
@@ -175,5 +175,15 @@ public class StrategyPanel extends JPanel {
         
         textArea.setText(sb.toString());
     }
+
+    public TimeSeries getSeries() {
+        return series;
+    }
+
+    public void setSeries(TimeSeries series) {
+        this.series = series;
+    }
+    
+    
 
 }

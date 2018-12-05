@@ -12,6 +12,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -29,6 +31,7 @@ public class Tick {
 	@Column(updatable = false, nullable = false)
 	private Long id;
 	
+        @Temporal(TemporalType.TIMESTAMP)
 	private Date tradeTime;
         
         private double price;

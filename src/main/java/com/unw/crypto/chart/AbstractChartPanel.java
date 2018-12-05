@@ -85,5 +85,15 @@ public abstract class AbstractChartPanel extends AbstractPanel {
 
     protected abstract void initData();
 
+    public TimeSeries getSeries() {
+        return series;
+    }
+
+    public void setSeries(TimeSeries series) {
+        this.series = series;
+    }
+    
+    
+
 
 }
