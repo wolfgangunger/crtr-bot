@@ -1,17 +1,18 @@
 
 package com.unw.crypto.strategy;
 
+import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.helpers.*;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
-import ta4jexamples.loaders.CsvTradesLoader;
 
 /**
  * Strategies which compares current price to global extrema over a week.
  */
-public class GlobalExtremaStrategy {
+@Component
+public class GlobalExtremaStrategy extends AbstractStrategy{
 
     // We assume that there were at least one trade every 5 minutes during the whole week
     private static final int NB_BARS_PER_WEEK = 12 * 24 * 7;
@@ -21,7 +22,7 @@ public class GlobalExtremaStrategy {
      * @param series a time series
      * @return a global extrema strategy
      */
-    public static Strategy buildStrategy(TimeSeries series) {
+    public  Strategy buildStrategy(TimeSeries series) {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }

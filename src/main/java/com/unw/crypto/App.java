@@ -126,8 +126,8 @@ public class App extends Application {
         BollingerBandsChart bollingerChart = new BollingerBandsChart(series, tabPane);
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));        
         //strategy
-        StrategyPanel strategyPanel = new StrategyPanel(series);
-        tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));        
+       // StrategyPanel strategyPanel = new StrategyPanel(series);
+        //tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));        
         //root.setCenter(sc);
         root.setCenter(tabPane);
     }

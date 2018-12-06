@@ -1,6 +1,7 @@
 
 package com.unw.crypto.strategy;
 
+import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.RSIIndicator;
@@ -17,13 +18,14 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  * @see <a href="http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:rsi2">
  *     http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:rsi2</a>
  */
-public class RSI2Strategy {
+@Component
+public class RSI2Strategy extends AbstractStrategy{
 
     /**
      * @param series a time series
      * @return a 2-period RSI strategy
      */
-    public static Strategy buildStrategy(TimeSeries series) {
+    public  Strategy buildStrategy(TimeSeries series) {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }

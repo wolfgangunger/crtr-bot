@@ -38,22 +38,21 @@ public class TimeSeriesDBLoader {
     private TickRepository tickRepository;
 
     /**
-     * @deprecated 
-     * @return 
+     * @deprecated @return
      */
     public TimeSeries loadData() {
         LocalDate df = LocalDate.parse(Config.fromDate);
         LocalDate du = LocalDate.parse(Config.untilDate);
-       // Instant instantFrom = df.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
+        // Instant instantFrom = df.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
         //Instant instantUntil = du.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadBitstampSeries( df, du, Currency.BTC, Exchange.COINBASE);
+        TimeSeries series = loadBitstampSeries(df, du, Currency.BTC, Exchange.COINBASE);
         return series;
     }
 
     public TimeSeries loadDataWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange) {
         //Instant instantFrom = from.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
         //Instant instantUntil = until.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadBitstampSeries( from, until, currency, exchange);
+        TimeSeries series = loadBitstampSeries(from, until, currency, exchange);
         return series;
     }
 
@@ -63,7 +62,7 @@ public class TimeSeriesDBLoader {
         //List<Tick> ticks = tickRepository.findAll();
         Date df = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date du = Date.from(until.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        List<Tick> ticks = tickRepository.findByExchangeAndCurrencyAndDates(exchange.getStringValue(), currency.getStringValue(),df, du );
+        List<Tick> ticks = tickRepository.findByExchangeAndCurrencyAndDates(exchange.getStringValue(), currency.getStringValue(), df, du);
         ZonedDateTime beginTime = null;
         ZonedDateTime endTime = null;
 
@@ -98,11 +97,13 @@ public class TimeSeriesDBLoader {
      */
     private List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, int duration, List<Tick> ticks) {
         List<Bar> bars = new ArrayList<>();
-//           for (Tick t : ticks) {
-//                    System.out.println("###");
-//                    System.out.println(t.getTradeTime());
-//           }
-//           if(true)return null;
+//        for (Tick t : ticks) {
+//            System.out.println("###");
+//            System.out.println(t.getTradeTime());
+//        }
+//        if (true) {
+//            return null;
+//        }
         Duration barDuration = Duration.ofSeconds(duration);
         ZonedDateTime barEndTime = beginTime;
         int i = 0;

@@ -24,6 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -39,7 +40,7 @@ public class SpringBootApp extends Application {
     private ConfigurableApplicationContext context;
     private BorderPane bp;
     private Scene scene;
-    private TextField tf;
+    private TextField tfBottom = new TextField();
     private DatePicker from;
     private DatePicker until;
     private ComboBox<Currency> cmbCurrency;
@@ -70,7 +71,7 @@ public class SpringBootApp extends Application {
     @Override
     public void init() throws Exception {
         context = SpringApplication.run(SpringBootApp.class);
-       // dataLoader = context.getBean(DataLoaderDB.class);
+        // dataLoader = context.getBean(DataLoaderDB.class);
         timeSeriesDBLoader = context.getBean(TimeSeriesDBLoader.class);
     }
 
@@ -147,14 +148,18 @@ public class SpringBootApp extends Application {
     private void initComboAndDate(ToolBar tb) {
 
         cmbCurrency = new ComboBox();
+        cmbCurrency.getItems().setAll(Currency.values());
         cmbCurrency.setValue(Currency.BTC);
         cmbExchange = new ComboBox();
+        cmbExchange.getItems().setAll(Exchange.values());
         cmbExchange.setValue(Exchange.COINBASE);
-        
+
         from = new DatePicker();
-        from.setValue(LocalDate.now().minusMonths(3));
+        //from.setValue(LocalDate.now().minusMonths(3));
+        from.setValue(LocalDate.now().minusMonths(9));
         until = new DatePicker();
-        until.setValue(LocalDate.now());
+        //until.setValue(LocalDate.now());
+        until.setValue(LocalDate.now().minusMonths(8));
 
         tb.getItems().add(cmbCurrency);
         tb.getItems().add(cmbExchange);
@@ -163,15 +168,15 @@ public class SpringBootApp extends Application {
     }
 
     private void createBottomBar(BorderPane root) {
-        tf = new TextField();
-        root.setBottom(tf);
+        root.setBottom(tfBottom);
     }
 
     private void initTabPane(BorderPane root) {
         //DataLoader dataLoader =  context.getBean(DataLoader.class);
         //DataLoaderDB dataLoader = context.getBean(DataLoaderDB.class);
         //series = dataLoader.loadData();
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(),cmbCurrency.getValue(), cmbExchange.getValue());
+        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue());
+        tfBottom.setText("Loaded " + series.getBarCount() + " Bars");
         TabPane tabPane = new TabPane();
         // charts
         candleChart = new CandleChart(series, tabPane);
@@ -194,12 +199,15 @@ public class SpringBootApp extends Application {
     }
 
     private void refreshData() {
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(),cmbCurrency.getValue(), cmbExchange.getValue());
-        
+        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue());
+        tfBottom.setText("Loaded " + series.getBarCount() + " Bars");
+    
         candleChart.setSeries(series);
+       // candleChart.getChart().fireChartChanged();
         candleChart.refresh();
 
         simpleClosedPriceChart.setSeries(series);
+        //simpleClosedPriceChart.getChart().fireChartChanged();
         simpleClosedPriceChart.refresh();
 
         movingAverageChart.setSeries(series);

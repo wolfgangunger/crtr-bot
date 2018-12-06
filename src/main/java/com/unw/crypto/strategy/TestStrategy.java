@@ -1,17 +1,14 @@
 package com.unw.crypto.strategy;
 
+import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.MACDIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
-import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.StopLossRule;
-import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
 /**
  * Moving momentum strategy.
@@ -20,13 +17,14 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  * <a href="http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum">
  * http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum</a>
  */
-public class TestStrategy {
+@Component
+public class TestStrategy extends AbstractStrategy{
 
     /**
      * @param series a time series
      * @return a moving momentum strategy
      */
-    public static Strategy buildStrategy(TimeSeries series) {
+    public  Strategy buildStrategy(TimeSeries series) {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }

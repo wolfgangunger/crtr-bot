@@ -1,6 +1,7 @@
 
 package com.unw.crypto.strategy;
 
+import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.EMAIndicator;
@@ -18,14 +19,15 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  * @see <a href="http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum">
  *     http://stockcharts.com/school/doku.php?id=chart_school:trading_strategies:moving_momentum</a>
  */
-public class MovingMomentumStrategy {
+@Component
+public class MovingMomentumStrategy extends AbstractStrategy{
 
     
     /**
      * @param series a time series
      * @return a moving momentum strategy
      */
-    public static Strategy buildStrategy(TimeSeries series) {
+    public  Strategy buildStrategy(TimeSeries series) {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }

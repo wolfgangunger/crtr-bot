@@ -53,14 +53,6 @@ public class StrategyResultChart extends AbstractPanel {
         //panel.set
     }
 
-//    private org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries barseries, Indicator<Decimal> indicator, String name) {
-//        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
-//        for (int i = 0; i < barseries.getBarCount(); i++) {
-//            Bar bar = barseries.getBar(i);
-//            chartTimeSeries.add(new Minute(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
-//        }
-//        return chartTimeSeries;
-//    }
     /**
      * Runs a strategy over a time series and adds the value markers
      * corresponding to buy/sell signals to the plot.

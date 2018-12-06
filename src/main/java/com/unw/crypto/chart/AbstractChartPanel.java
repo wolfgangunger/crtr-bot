@@ -24,7 +24,7 @@ import org.ta4j.core.TimeSeries;
 public abstract class AbstractChartPanel extends AbstractPanel {
 
     protected JFreeChart chart;
-    protected ChartPanel chartPanel;
+
     protected TimeSeries series;
     protected TabPane parent;
     protected JPanel toolbar = new JPanel();
@@ -64,17 +64,11 @@ public abstract class AbstractChartPanel extends AbstractPanel {
                 refresh();
             }
         });
-        toolbar.add(bttRefresh);
+        //toolbar.add(bttRefresh);
         this.add(toolbar, BorderLayout.NORTH);
     }
 
-    protected ChartPanel createChartPanel(JFreeChart chart) {
-        ChartPanel result = new ChartPanel(chart);
-        result.setBorder(BorderFactory.createEtchedBorder());
-        Dimension d = new Dimension(Config.WIDTH, Config.HEIGHT - 110);
-        result.setPreferredSize(d);
-        return result;
-    }
+
 
     public void refresh() {
         removeCharts();
@@ -89,8 +83,16 @@ public abstract class AbstractChartPanel extends AbstractPanel {
         return series;
     }
 
-    public void setSeries(TimeSeries series) {
+     public void setSeries(TimeSeries series) {
         this.series = series;
+    }
+
+    public JFreeChart getChart() {
+        return chart;
+    }
+
+    public void setChart(JFreeChart chart) {
+        this.chart = chart;
     }
     
     

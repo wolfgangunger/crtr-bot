@@ -55,7 +55,6 @@ public class BollingerBandsChart extends AbstractChartPanel {
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("yyyy-MM-dd"));
 
-         //panel.add(createChartPanel(chart));
     }
 
 }
