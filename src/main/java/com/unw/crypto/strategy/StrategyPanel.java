@@ -54,6 +54,7 @@ public class StrategyPanel extends AbstractPanel {
     private AbstractStrategy currentStrategy;
     private TradingRecord tradingRecord;
     private JTextArea textArea;
+    private JSplitPane mainPanel;
     protected JFreeChart chart;
     TimeSeriesCollection dataset = new TimeSeriesCollection();
     private XYPlot plot;
@@ -73,7 +74,10 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void update() {
+        mainPanel.remove(chartPanel);
         updateChart();
+        chartPanel = createChartPanelForStrategy(chart);
+        mainPanel.add(chartPanel);
         chart.fireChartChanged();
         chartPanel.repaint();
     }
@@ -177,7 +181,7 @@ public class StrategyPanel extends AbstractPanel {
 
     private void initMainPanel() {
         //JPanel mainPanel = new JPanel();
-        JSplitPane mainPanel = new JSplitPane();
+         mainPanel = new JSplitPane();
         //mainPanel.setBorder(BorderFactory.createEtchedBorder());
         mainPanel.setLayout(new BorderLayout());
         //mainPanel.setLayout(new FlowLayout());

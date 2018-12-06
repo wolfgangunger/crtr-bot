@@ -128,10 +128,11 @@ public class TimeSeriesDBLoader {
 //                    System.out.println(bar.getEndTime());
 //                    System.out.println(tradeTimeStamp);
                 } else {
-//                    System.out.println("### out of period");
-//                    System.out.println(bar.getBeginTime());
-//                    System.out.println(bar.getEndTime());
-//                    System.out.println(tradeTimeStamp);
+                    // should not happen - order problem ?
+                    System.out.println("### out of period");
+                    System.out.println(bar.getBeginTime());
+                    System.out.println(bar.getEndTime());
+                    System.out.println(tradeTimeStamp);
                     // the trade happened after the end of the bar
                     // go to the next bar but stay with the same trade (don't increment i)
                     // this break will drop us after the inner "while", skipping the increment
