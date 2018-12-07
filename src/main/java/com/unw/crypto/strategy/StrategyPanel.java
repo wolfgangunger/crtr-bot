@@ -6,6 +6,7 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.chart.AbstractPanel;
+import com.unw.crypto.chart.ChartUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -91,7 +92,7 @@ public class StrategyPanel extends AbstractPanel {
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
         Strategy str = currentStrategy.buildStrategy(series);
-        addBuySellSignals(series, str, plot);
+        ChartUtil.addBuySellSignals(series, str, plot);
     }
 
     private void initToolbar() {
@@ -250,33 +251,5 @@ public class StrategyPanel extends AbstractPanel {
         this.series = series;
     }
 
-    /**
-     * Runs a strategy over a time series and adds the value markers
-     * corresponding to buy/sell signals to the plot.
-     *
-     * @param series a time series
-     * @param strategy a trading strategy
-     * @param plot the plot
-     */
-    private void addBuySellSignals(TimeSeries series, Strategy strategy, XYPlot plot) {
-        // Running the strategy
-        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
-        List<Trade> trades = seriesManager.run(strategy).getTrades();
-        // Adding markers to plot
-        for (Trade trade : trades) {
-            // Buy signal
-            double buySignalBarTime = new Minute(Date.from(series.getBar(trade.getEntry().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
-            Marker buyMarker = new ValueMarker(buySignalBarTime);
-            buyMarker.setPaint(Color.GREEN);
-            buyMarker.setLabel("B");
-            plot.addDomainMarker(buyMarker);
-            // Sell signal
-            double sellSignalBarTime = new Minute(Date.from(series.getBar(trade.getExit().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
-            Marker sellMarker = new ValueMarker(sellSignalBarTime);
-            sellMarker.setPaint(Color.RED);
-            sellMarker.setLabel("S");
-            plot.addDomainMarker(sellMarker);
-        }
-    }
 
 }

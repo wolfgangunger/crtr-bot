@@ -28,9 +28,16 @@ public class BollingerBandsChart extends AbstractChartPanel {
         super(series, parent);
     }
 
+    public BollingerBandsChart(TimeSeries series, TabPane parent, String currency, String exchange) {
+        super(series, parent);
+        this.currency = currency;
+        this.exchange = exchange;
+        legend = exchange + " " + currency;
+    }
+
     @Override
     protected void initData() {
-       
+
         // Close price
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         EMAIndicator avg14 = new EMAIndicator(closePrice, 14);
@@ -49,7 +56,7 @@ public class BollingerBandsChart extends AbstractChartPanel {
         dataset.addSeries(buildChartTimeSeries(series, lowBBand, "Low Bollinger Band"));
         dataset.addSeries(buildChartTimeSeries(series, upBBand, "High Bollinger Band"));
 
-        chart = createChart(dataset, "Bitstamp BTC", "Date", "Price", true);
+        chart = createChart(dataset, legend, "Date", "Price", true);
 
         XYPlot plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();

@@ -28,6 +28,10 @@ import org.ta4j.core.TimeSeries;
 public class AbstractPanel extends JPanel {
 
     protected ChartPanel chartPanel;
+    
+    protected String currency = "-";
+    protected String exchange = "-";
+    protected String legend = "";
 
     protected ChartPanel createChartPanel(JFreeChart chart) {
         ChartPanel result = new ChartPanel(chart);

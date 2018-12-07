@@ -5,15 +5,11 @@
  */
 package com.unw.crypto.chart;
 
-import com.unw.crypto.Config;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import javafx.scene.control.TabPane;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.ta4j.core.TimeSeries;
 

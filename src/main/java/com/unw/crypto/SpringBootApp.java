@@ -24,7 +24,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -179,17 +178,17 @@ public class SpringBootApp extends Application {
         tfBottom.setText("Loaded " + series.getBarCount() + " Bars");
         TabPane tabPane = new TabPane();
         // charts
-        candleChart = new CandleChart(series, tabPane);
+        candleChart = new CandleChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(candleChart, "Candle"));
-        simpleClosedPriceChart = new SimpleClosedPriceChart(series, tabPane);
+        simpleClosedPriceChart = new SimpleClosedPriceChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(simpleClosedPriceChart, "ClosedPrice"));
-        movingAverageChart = new MovingAverageChart(series, tabPane);
+        movingAverageChart = new MovingAverageChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(movingAverageChart, "MovingAverage"));
-        emaRsiChart = new EMARsiChart(series, tabPane);
+        emaRsiChart = new EMARsiChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(emaRsiChart, "EMA RSI"));
-        emaStoChart = new EMAStoChart(series, tabPane);
+        emaStoChart = new EMAStoChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(emaStoChart, "EMA STO"));
-        bollingerChart = new BollingerBandsChart(series, tabPane);
+        bollingerChart = new BollingerBandsChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
         //strategy
         strategyPanel = new StrategyPanel(series);
@@ -203,11 +202,9 @@ public class SpringBootApp extends Application {
         tfBottom.setText("Loaded " + series.getBarCount() + " Bars");
     
         candleChart.setSeries(series);
-       // candleChart.getChart().fireChartChanged();
         candleChart.refresh();
 
         simpleClosedPriceChart.setSeries(series);
-        //simpleClosedPriceChart.getChart().fireChartChanged();
         simpleClosedPriceChart.refresh();
 
         movingAverageChart.setSeries(series);
@@ -220,6 +217,5 @@ public class SpringBootApp extends Application {
         bollingerChart.refresh();
 
         strategyPanel.setSeries(series);
-        //strategyPanel.refresh();
     }
 }
