@@ -12,7 +12,12 @@ package com.unw.crypto.model;
 public enum Currency {
     
     BTC("Btc"),
-    ETH("Eth");
+    ETH("Eth"),
+    LTC("Ltc"),
+    RXP("Ripple"),
+    STELLAR("Stellar"),
+    BTH("Bitcoin-Cash"),
+    EOS("Eos");
     
    private final String stringValue;
 

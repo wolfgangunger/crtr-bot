@@ -86,4 +86,14 @@ public class AbstractPanel extends JPanel {
         return chartTimeSeries;
     }
 
+    public String getLegend() {
+        return legend;
+    }
+
+    public void setLegend(String legend) {
+        this.legend = legend;
+    }
+    
+    
+
 }

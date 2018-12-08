@@ -12,7 +12,12 @@ package com.unw.crypto.model;
 public enum Exchange {
 
     COINBASE("Coinbase"),
-    BINANCE("Binance");
+    BINANCE("Binance"),
+    BITFINAX("Bitfinax"),
+    KRAKEN ("Kraken"),
+    BITTREX("Bittrex"),
+    GDAX("GDax"),
+    UNKNOWN("Unknown");
 
     private final String stringValue;
 

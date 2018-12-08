@@ -64,9 +64,9 @@ public abstract class AbstractChartPanel extends AbstractPanel {
         this.add(toolbar, BorderLayout.NORTH);
     }
 
+    public abstract void reload(String currency, String exchange);
 
-
-    public void refresh() {
+    protected void refresh() {
         removeCharts();
         initData();
         addCharts();

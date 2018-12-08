@@ -63,5 +63,13 @@ public class BollingerBandsChart extends AbstractChartPanel {
         axis.setDateFormatOverride(new SimpleDateFormat("yyyy-MM-dd"));
 
     }
+    
+    @Override
+    public void reload(String currency, String exchange) {
+        this.currency = currency;
+        this.exchange = exchange;
+        legend = exchange + " " + currency;
+        refresh();
+    }
 
 }

@@ -11,6 +11,7 @@ import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
 import com.unw.crypto.strategy.StrategyPanel;
 import com.unw.crypto.ui.TabUtil;
+import java.awt.FlowLayout;
 import java.time.LocalDate;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -24,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javax.swing.JPanel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -39,7 +41,9 @@ public class SpringBootApp extends Application {
     private ConfigurableApplicationContext context;
     private BorderPane bp;
     private Scene scene;
-    private TextField tfBottom = new TextField();
+    private BorderPane bpBottom;
+    private TextField tfBottomLeft = new TextField();
+    private TextField tfBottomRight = new TextField();
     private DatePicker from;
     private DatePicker until;
     private ComboBox<Currency> cmbCurrency;
@@ -167,15 +171,22 @@ public class SpringBootApp extends Application {
     }
 
     private void createBottomBar(BorderPane root) {
-        root.setBottom(tfBottom);
+        bpBottom = new BorderPane();
+//        tfBottomLeft.setPrefWidth(root.getWidth() / 2);
+//        tfBottomRight.setPrefWidth(root.getWidth() / 2);
+        tfBottomLeft.setPrefWidth(700);
+        tfBottomRight.setPrefWidth(700);
+        bpBottom.setLeft(tfBottomLeft);
+        bpBottom.setRight(tfBottomRight);
+        root.setBottom(bpBottom);
     }
 
     private void initTabPane(BorderPane root) {
-        //DataLoader dataLoader =  context.getBean(DataLoader.class);
-        //DataLoaderDB dataLoader = context.getBean(DataLoaderDB.class);
-        //series = dataLoader.loadData();
         series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue());
-        tfBottom.setText("Loaded " + series.getBarCount() + " Bars");
+        String txtLeft = createBottomTextLeft();
+        String txtRight = createBottomTextRight();
+        setBottomText(txtLeft, txtRight);
+
         TabPane tabPane = new TabPane();
         // charts
         candleChart = new CandleChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
@@ -197,24 +208,48 @@ public class SpringBootApp extends Application {
         root.setCenter(tabPane);
     }
 
+    private void setBottomText(String textLeft, String textRight) {
+        tfBottomLeft.setText(textLeft);
+        tfBottomRight.setText(textRight);
+    }
+
+    private String createBottomTextRight() {
+        if (timeSeriesDBLoader.loadFirstEntry(cmbCurrency.getValue(), cmbExchange.getValue()) == null) {
+            return "- ";
+        }
+        return "Total data from " + timeSeriesDBLoader.loadFirstEntry(cmbCurrency.getValue(), cmbExchange.getValue()).getTradeTime()
+                + " until " + timeSeriesDBLoader.loadLastEntry(cmbCurrency.getValue(), cmbExchange.getValue()).getTradeTime()+ "(" + cmbCurrency.getValue().toString() + ")";
+    }
+
+    private String createBottomTextLeft() {
+        if (timeSeriesDBLoader.loadFirstEntry(cmbCurrency.getValue(), cmbExchange.getValue()) == null) {
+            return "- ";
+        }
+        return "Loaded " + series.getBarCount() + " Bars from " + series.getFirstBar().getBeginTime().toLocalDateTime()
+                + " until " + series.getLastBar().getBeginTime().toLocalDateTime() + "(" + cmbCurrency.getValue().toString() + ")";
+    }
+
     private void refreshData() {
+        System.out.println(" Load data for " + from.getValue() + " " + until.getValue() + " " + cmbCurrency.getValue() + " " + cmbExchange.getValue());
         series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue());
-        tfBottom.setText("Loaded " + series.getBarCount() + " Bars");
-    
+        String txtLeft = createBottomTextLeft();
+        String txtRight = createBottomTextRight();
+        setBottomText(txtLeft, txtRight);
+
         candleChart.setSeries(series);
-        candleChart.refresh();
+        candleChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         simpleClosedPriceChart.setSeries(series);
-        simpleClosedPriceChart.refresh();
+        simpleClosedPriceChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         movingAverageChart.setSeries(series);
-        movingAverageChart.refresh();
+        movingAverageChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         emaRsiChart.setSeries(series);
-        emaRsiChart.refresh();
+        emaRsiChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         bollingerChart.setSeries(series);
-        bollingerChart.refresh();
+        bollingerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         strategyPanel.setSeries(series);
     }

@@ -45,18 +45,28 @@ public class TimeSeriesDBLoader {
         LocalDate du = LocalDate.parse(Config.untilDate);
         // Instant instantFrom = df.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
         //Instant instantUntil = du.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadBitstampSeries(df, du, Currency.BTC, Exchange.COINBASE);
+        TimeSeries series = loadSeries(df, du, Currency.BTC, Exchange.COINBASE);
         return series;
     }
 
     public TimeSeries loadDataWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange) {
         //Instant instantFrom = from.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
         //Instant instantUntil = until.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadBitstampSeries(from, until, currency, exchange);
+        TimeSeries series = loadSeries(from, until, currency, exchange);
         return series;
     }
 
-    public TimeSeries loadBitstampSeries(LocalDate from, LocalDate until, Currency currency, Exchange exchange) {
+    public Tick loadFirstEntry(Currency currency, Exchange exchange){
+      // return tickRepository.findByExchangeAndCurrencyFirst(exchange.getStringValue(), currency.getStringValue());
+       return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeAsc(currency.getStringValue(), exchange.getStringValue());
+    }
+
+    public Tick loadLastEntry(Currency currency, Exchange exchange){
+       //return tickRepository.findByExchangeAndCurrencyLast(exchange.getStringValue(), currency.getStringValue());
+       return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeDesc(currency.getStringValue(), exchange.getStringValue());
+    }    
+    
+    private TimeSeries loadSeries(LocalDate from, LocalDate until, Currency currency, Exchange exchange) {
         Sort sort = new Sort(Sort.Direction.ASC, "tradeTime");
         //List<Tick> ticks = tickRepository.findAll(sort);
         //List<Tick> ticks = tickRepository.findAll();
@@ -129,10 +139,10 @@ public class TimeSeriesDBLoader {
 //                    System.out.println(tradeTimeStamp);
                 } else {
                     // should not happen - order problem ?
-                    System.out.println("### out of period");
-                    System.out.println(bar.getBeginTime());
-                    System.out.println(bar.getEndTime());
-                    System.out.println(tradeTimeStamp);
+//                    System.out.println("### out of period");
+//                    System.out.println(bar.getBeginTime());
+//                    System.out.println(bar.getEndTime());
+//                    System.out.println(tradeTimeStamp);
                     // the trade happened after the end of the bar
                     // go to the next bar but stay with the same trade (don't increment i)
                     // this break will drop us after the inner "while", skipping the increment
