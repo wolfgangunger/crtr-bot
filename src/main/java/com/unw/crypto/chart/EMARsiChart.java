@@ -6,6 +6,7 @@
 package com.unw.crypto.chart;
 
 import com.unw.crypto.Config;
+import com.unw.crypto.ui.NumericTextField;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
@@ -28,6 +29,8 @@ public class EMARsiChart extends AbstractChartPanel {
 
     private JFreeChart chart2;
     private ChartPanel chartPanel2;
+    private int timeFrame;
+    private NumericTextField inputTimeframe;
 
     public EMARsiChart(TimeSeries series, TabPane parent) {
         super(series, parent);
@@ -38,6 +41,34 @@ public class EMARsiChart extends AbstractChartPanel {
         this.currency = currency;
         this.exchange = exchange;
         legend = exchange + " " + currency;
+    }
+
+    @Override
+    public void refresh() {
+        timeFrame = Integer.valueOf(inputTimeframe.getText());
+        super.refresh();
+    }
+
+    @Override
+    public void reload(String currency, String exchange) {
+        this.currency = currency;
+        this.exchange = exchange;
+        legend = exchange + " " + currency;
+        refresh();
+    }
+
+    @Override
+    protected void init() {
+        timeFrame = 10;
+    }
+
+    @Override
+    protected void initToolbar() {
+        super.initToolbar();
+        inputTimeframe = new NumericTextField();
+        inputTimeframe.setText(String.valueOf(timeFrame));
+        inputTimeframe.setColumns(10);
+        toolbar.add(inputTimeframe);
     }
 
     @Override
@@ -59,7 +90,7 @@ public class EMARsiChart extends AbstractChartPanel {
 
         //test
         EMAIndicator avg14 = new EMAIndicator(closePrice, 180);
-        RSIIndicator rsi = new RSIIndicator(closePrice, 10);
+        RSIIndicator rsi = new RSIIndicator(closePrice, timeFrame);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
         TimeSeriesCollection dataset2 = new TimeSeriesCollection();
@@ -73,21 +104,11 @@ public class EMARsiChart extends AbstractChartPanel {
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
 
         chartPanel = new ChartPanel(chart);
-        //chartPanel1.setBorder(BorderFactory.createLineBorder(Color.BLUE));
         Dimension d1 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.7));
         chartPanel.setPreferredSize(d1);
         chartPanel2 = new ChartPanel(chart2);
-        //chartPanel2.setBorder(BorderFactory.createLineBorder(Color.BLUE));
         Dimension d2 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.3));
         chartPanel2.setPreferredSize(d2);
     }
 
-
-    @Override
-    public void reload(String currency, String exchange) {
-        this.currency = currency;
-        this.exchange = exchange;
-        legend = exchange + " " + currency;
-        refresh();
-    }
 }

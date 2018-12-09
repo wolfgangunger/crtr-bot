@@ -8,6 +8,7 @@ package com.unw.crypto.chart;
 import com.unw.crypto.ui.NumericTextField;
 import java.text.SimpleDateFormat;
 import javafx.scene.control.TabPane;
+import javax.swing.JLabel;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -21,8 +22,10 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
  */
 public class MovingAverageChart extends AbstractChartPanel {
 
-    private int timeFrame;
-    private NumericTextField inputTimeframe;
+    private int timeFrameLong;
+    private NumericTextField inputTimeframeLong;
+    private int timeFrameShort;
+    private NumericTextField inputTimeframeShort;
 
     public MovingAverageChart(TimeSeries series, TabPane parent) {
         super(series, parent);
@@ -38,33 +41,44 @@ public class MovingAverageChart extends AbstractChartPanel {
     @Override
     protected void initToolbar() {
         super.initToolbar();
-        inputTimeframe = new NumericTextField();
-        inputTimeframe.setText(String.valueOf(timeFrame));
-        inputTimeframe.setColumns(10);
-        toolbar.add(inputTimeframe);
+        inputTimeframeLong = new NumericTextField();
+        inputTimeframeLong.setText(String.valueOf(timeFrameLong));
+        inputTimeframeLong.setColumns(10);
+        inputTimeframeShort = new NumericTextField();
+        inputTimeframeShort.setText(String.valueOf(timeFrameShort));
+        inputTimeframeShort.setColumns(10);
+        JLabel lblShortMA = new JLabel("Short MA");
+        JLabel lblLongMA = new JLabel("Long MA");
+        toolbar.add(lblShortMA);
+        toolbar.add(inputTimeframeShort);
+        toolbar.add(lblLongMA);
+        toolbar.add(inputTimeframeLong);
     }
 
     @Override
     public void refresh() {
-        timeFrame = Integer.valueOf(inputTimeframe.getText());
-        System.out.println(timeFrame);
+        timeFrameLong = Integer.valueOf(inputTimeframeLong.getText());
+        timeFrameShort = Integer.valueOf(inputTimeframeShort.getText());
         super.refresh();
     }
 
     @Override
     protected void init() {
-        timeFrame = 14;
+        timeFrameLong = 26;
+        timeFrameShort = 9;
     }
 
     @Override
     protected void initData() {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-        //test
-        EMAIndicator avg = new EMAIndicator(closePrice, timeFrame);
+
+        EMAIndicator avgLong = new EMAIndicator(closePrice, timeFrameLong);
+        EMAIndicator avgShort = new EMAIndicator(closePrice, timeFrameShort);
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(buildChartTimeSeries(series, closePrice, legend));
-        dataset.addSeries(buildChartTimeSeries(series, avg, "MA " + timeFrame));
+        dataset.addSeries(buildChartTimeSeries(series, avgShort, "MA Short" + timeFrameShort));
+        dataset.addSeries(buildChartTimeSeries(series, avgLong, "MA Long" + timeFrameLong));
 
         chart = createChart(dataset, legend, "Date", "Price", true);
         XYPlot plot = (XYPlot) chart.getPlot();

@@ -36,6 +36,14 @@ public class BollingerBandsChart extends AbstractChartPanel {
     }
 
     @Override
+    public void reload(String currency, String exchange) {
+        this.currency = currency;
+        this.exchange = exchange;
+        legend = exchange + " " + currency;
+        refresh();
+    }
+
+    @Override
     protected void initData() {
 
         // Close price
@@ -62,14 +70,6 @@ public class BollingerBandsChart extends AbstractChartPanel {
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("yyyy-MM-dd"));
 
-    }
-    
-    @Override
-    public void reload(String currency, String exchange) {
-        this.currency = currency;
-        this.exchange = exchange;
-        legend = exchange + " " + currency;
-        refresh();
     }
 
 }

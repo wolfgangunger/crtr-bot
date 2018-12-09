@@ -11,7 +11,6 @@ import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
 import com.unw.crypto.strategy.StrategyPanel;
 import com.unw.crypto.ui.TabUtil;
-import java.awt.FlowLayout;
 import java.time.LocalDate;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -25,7 +24,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javax.swing.JPanel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -159,10 +157,10 @@ public class SpringBootApp extends Application {
 
         from = new DatePicker();
         //from.setValue(LocalDate.now().minusMonths(3));
-        from.setValue(LocalDate.now().minusMonths(9));
+        from.setValue(LocalDate.now().minusMonths(8));
         until = new DatePicker();
         //until.setValue(LocalDate.now());
-        until.setValue(LocalDate.now().minusMonths(8));
+        until.setValue(LocalDate.now().minusMonths(7));
 
         tb.getItems().add(cmbCurrency);
         tb.getItems().add(cmbExchange);
@@ -222,7 +220,7 @@ public class SpringBootApp extends Application {
     }
 
     private String createBottomTextLeft() {
-        if (timeSeriesDBLoader.loadFirstEntry(cmbCurrency.getValue(), cmbExchange.getValue()) == null) {
+        if (series.isEmpty()) {
             return "- ";
         }
         return "Loaded " + series.getBarCount() + " Bars from " + series.getFirstBar().getBeginTime().toLocalDateTime()
@@ -247,10 +245,14 @@ public class SpringBootApp extends Application {
 
         emaRsiChart.setSeries(series);
         emaRsiChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
-
+        
+        emaStoChart.setSeries(series);
+        emaStoChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        
         bollingerChart.setSeries(series);
         bollingerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         strategyPanel.setSeries(series);
+        strategyPanel.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
     }
 }

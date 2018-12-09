@@ -17,6 +17,7 @@ public enum Exchange {
     KRAKEN ("Kraken"),
     BITTREX("Bittrex"),
     GDAX("GDax"),
+    HITBTC("Hitbtc"),
     UNKNOWN("Unknown");
 
     private final String stringValue;
