@@ -45,28 +45,28 @@ public class TimeSeriesDBLoader {
         LocalDate du = LocalDate.parse(Config.untilDate);
         // Instant instantFrom = df.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
         //Instant instantUntil = du.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadSeries(df, du, Currency.BTC, Exchange.COINBASE);
+        TimeSeries series = loadSeries(df, du, Currency.BTC, Exchange.COINBASE, 5);
         return series;
     }
 
-    public TimeSeries loadDataWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange) {
+    public TimeSeries loadDataWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
         //Instant instantFrom = from.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
         //Instant instantUntil = until.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadSeries(from, until, currency, exchange);
+        TimeSeries series = loadSeries(from, until, currency, exchange, barDurationInMinutes);
         return series;
     }
 
-    public Tick loadFirstEntry(Currency currency, Exchange exchange){
-      // return tickRepository.findByExchangeAndCurrencyFirst(exchange.getStringValue(), currency.getStringValue());
-       return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeAsc(currency.getStringValue(), exchange.getStringValue());
+    public Tick loadFirstEntry(Currency currency, Exchange exchange) {
+        // return tickRepository.findByExchangeAndCurrencyFirst(exchange.getStringValue(), currency.getStringValue());
+        return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeAsc(currency.getStringValue(), exchange.getStringValue());
     }
 
-    public Tick loadLastEntry(Currency currency, Exchange exchange){
-       //return tickRepository.findByExchangeAndCurrencyLast(exchange.getStringValue(), currency.getStringValue());
-       return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeDesc(currency.getStringValue(), exchange.getStringValue());
-    }    
-    
-    private TimeSeries loadSeries(LocalDate from, LocalDate until, Currency currency, Exchange exchange) {
+    public Tick loadLastEntry(Currency currency, Exchange exchange) {
+        //return tickRepository.findByExchangeAndCurrencyLast(exchange.getStringValue(), currency.getStringValue());
+        return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeDesc(currency.getStringValue(), exchange.getStringValue());
+    }
+
+    private TimeSeries loadSeries(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
         Sort sort = new Sort(Sort.Direction.ASC, "tradeTime");
         //List<Tick> ticks = tickRepository.findAll(sort);
         //List<Tick> ticks = tickRepository.findAll();
@@ -92,7 +92,7 @@ public class TimeSeriesDBLoader {
             }
             // build the list of populated bars
             //duration in seconds ( 300 = 5 min)
-            bars = buildBars(beginTime, endTime, 300, ticks);
+            bars = buildBars(beginTime, endTime, 300, ticks, barDurationInMinutes);
         }
         return new BaseTimeSeries("bitstamp_trades", bars);
     }
@@ -101,11 +101,11 @@ public class TimeSeriesDBLoader {
      *
      * @param beginTime
      * @param endTime
-     * @param duration in seconds ( 300 = 5 min)
+     * @param duration
      * @param ticks
      * @return
      */
-    private List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, int duration, List<Tick> ticks) {
+    private List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, int duration, List<Tick> ticks, int barDurationInMinutes) {
         List<Bar> bars = new ArrayList<>();
 //        for (Tick t : ticks) {
 //            System.out.println("###");
@@ -114,7 +114,9 @@ public class TimeSeriesDBLoader {
 //        if (true) {
 //            return null;
 //        }
-        Duration barDuration = Duration.ofSeconds(duration);
+        //Duration barDuration = Duration.ofSeconds(duration);
+        //Duration barDuration = Duration.ofSeconds(300);
+        Duration barDuration = Duration.ofSeconds(barDurationInMinutes * 60);
         ZonedDateTime barEndTime = beginTime;
         int i = 0;
         // line number of trade data

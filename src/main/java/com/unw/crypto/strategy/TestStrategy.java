@@ -7,9 +7,7 @@ import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.MACDIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
-import org.ta4j.core.trading.rules.FixedRule;
-import org.ta4j.core.trading.rules.OverIndicatorRule;
+import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
 import org.ta4j.core.trading.rules.StopLossRule;
 
@@ -51,8 +49,8 @@ public class TestStrategy extends AbstractStrategy {
        // FixedRule, InSlopeRule, InPipeRule, IsFallingRule, IsHighestRule, IsRisingRule, JustOnceRule, WaitForRule, BooleanIndicatorRule
         //        CrossedDownIndicatorRule, CrossedUpIndicatorRule,
         // Entry rule
-        // Rule entryRule = new OverIndicatorRule(shortEma, longEma);
-        Rule entryRule = new OverIndicatorRule(shortEma, longEma) ;// Trend
+        //Rule entryRule = new OverIndicatorRule(shortEma, longEma) ;// Trend
+        Rule entryRule = new CrossedUpIndicatorRule(shortEma, longEma) ;// Trend
 //                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(20))) // Signal 1
 //                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
         

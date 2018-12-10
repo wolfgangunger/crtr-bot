@@ -1,5 +1,6 @@
 package com.unw.crypto;
 
+import com.unw.crypto.chart.BarDuration;
 import com.unw.crypto.chart.BollingerBandsChart;
 import com.unw.crypto.chart.CandleChart;
 import com.unw.crypto.chart.EMARsiChart;
@@ -24,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javax.swing.JLabel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -46,6 +48,8 @@ public class SpringBootApp extends Application {
     private DatePicker until;
     private ComboBox<Currency> cmbCurrency;
     private ComboBox<Exchange> cmbExchange;
+    private ComboBox<BarDuration> barDuration;
+    private int barDurationInMinutes;
     //charts
     private CandleChart candleChart;
     private SimpleClosedPriceChart simpleClosedPriceChart;
@@ -161,11 +165,19 @@ public class SpringBootApp extends Application {
         until = new DatePicker();
         //until.setValue(LocalDate.now());
         until.setValue(LocalDate.now().minusMonths(7));
+        
+        barDuration = new ComboBox<>();
+        barDuration.getItems().setAll(BarDuration.values());
+        barDuration.setValue(BarDuration.FIVE_MIN);
+        barDurationInMinutes = barDuration.getValue().getIntValue();
+        JLabel barDurationLable = new JLabel("BarSize in Min");
 
         tb.getItems().add(cmbCurrency);
         tb.getItems().add(cmbExchange);
         tb.getItems().add(from);
         tb.getItems().add(until);
+        //tb.getItems().add(barDurationLable);
+        tb.getItems().add(barDuration);
     }
 
     private void createBottomBar(BorderPane root) {
@@ -180,7 +192,8 @@ public class SpringBootApp extends Application {
     }
 
     private void initTabPane(BorderPane root) {
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue());
+        barDurationInMinutes = barDuration.getValue().getIntValue();
+        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(),barDurationInMinutes );
         String txtLeft = createBottomTextLeft();
         String txtRight = createBottomTextRight();
         setBottomText(txtLeft, txtRight);
@@ -216,7 +229,7 @@ public class SpringBootApp extends Application {
             return "- ";
         }
         return "Total data from " + timeSeriesDBLoader.loadFirstEntry(cmbCurrency.getValue(), cmbExchange.getValue()).getTradeTime()
-                + " until " + timeSeriesDBLoader.loadLastEntry(cmbCurrency.getValue(), cmbExchange.getValue()).getTradeTime()+ "(" + cmbCurrency.getValue().toString() + ")";
+                + " until " + timeSeriesDBLoader.loadLastEntry(cmbCurrency.getValue(), cmbExchange.getValue()).getTradeTime() + "(" + cmbCurrency.getValue().toString() + ")";
     }
 
     private String createBottomTextLeft() {
@@ -229,7 +242,8 @@ public class SpringBootApp extends Application {
 
     private void refreshData() {
         System.out.println(" Load data for " + from.getValue() + " " + until.getValue() + " " + cmbCurrency.getValue() + " " + cmbExchange.getValue());
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue());
+        barDurationInMinutes = barDuration.getValue().getIntValue();
+        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(),barDurationInMinutes);
         String txtLeft = createBottomTextLeft();
         String txtRight = createBottomTextRight();
         setBottomText(txtLeft, txtRight);
@@ -245,10 +259,10 @@ public class SpringBootApp extends Application {
 
         emaRsiChart.setSeries(series);
         emaRsiChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
-        
+
         emaStoChart.setSeries(series);
         emaStoChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
-        
+
         bollingerChart.setSeries(series);
         bollingerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
