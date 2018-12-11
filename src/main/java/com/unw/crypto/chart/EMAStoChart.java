@@ -58,7 +58,7 @@ public class EMAStoChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrame = 10;
+        timeFrame = 18;
     }
 
     @Override

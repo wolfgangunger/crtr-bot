@@ -11,8 +11,8 @@ package com.unw.crypto;
  */
 public final class Config {
     
-    public static final int HEIGHT = 680;
-    public static final int WIDTH = 1288;
+    public static final int HEIGHT = 920;
+    public static final int WIDTH = 1720;
     //public static final String csv_file = "bitfinexUSD_2016_from_Nov.csv";
     public static final String csv_file = "bitstampEUR_2018.csv";    
     //public static final String csv_file = "bitfinexUSD-from_2017.csv";    

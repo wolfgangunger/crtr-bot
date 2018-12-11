@@ -59,7 +59,7 @@ public class EMARsiChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrame = 10;
+        timeFrame = 4;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class EMARsiChart extends AbstractChartPanel {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
 
         //test
-        EMAIndicator avg14 = new EMAIndicator(closePrice, 180);
+        EMAIndicator avg14 = new EMAIndicator(closePrice, 180); // 180 = 14 tage ?
         RSIIndicator rsi = new RSIIndicator(closePrice, timeFrame);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
@@ -104,10 +104,10 @@ public class EMARsiChart extends AbstractChartPanel {
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
 
         chartPanel = new ChartPanel(chart);
-        Dimension d1 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.7));
+        Dimension d1 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.6));
         chartPanel.setPreferredSize(d1);
         chartPanel2 = new ChartPanel(chart2);
-        Dimension d2 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.3));
+        Dimension d2 = new Dimension(Config.WIDTH, (int) ((Config.HEIGHT - 110) * 0.4));
         chartPanel2.setPreferredSize(d2);
     }
 
