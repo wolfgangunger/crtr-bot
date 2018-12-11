@@ -71,20 +71,21 @@ public class MovingAverageChart extends AbstractChartPanel {
     @Override
     protected void initData() {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-        int shortMa = timeFrameShort * 12;
-        int longMa = timeFrameLong * 12;
-        EMAIndicator avgLong = new EMAIndicator(closePrice, longMa);
+        // multiplicator depends on candle size : candle size 60 min = 1 ; 5 min candle = 12
+        int shortMa =  timeFrameShort * getMAMultiplicator();
+        int longMa = timeFrameLong * getMAMultiplicator();
         EMAIndicator avgShort = new EMAIndicator(closePrice, shortMa);
-        // time frame = tag * 12,8 ?
-        int ma200 = 200 * 12;
-        int ma314 = 314 * 12;
+        EMAIndicator avgLong = new EMAIndicator(closePrice, longMa);
+        // time frame
+        int ma200 = 200 * getMAMultiplicator();
+        int ma314 = 314 * getMAMultiplicator();
         EMAIndicator avg200 = new EMAIndicator(closePrice, ma200);
         EMAIndicator avg314 = new EMAIndicator(closePrice, ma314);
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(buildChartTimeSeries(series, closePrice, legend));
-        dataset.addSeries(buildChartTimeSeries(series, avgShort, "MA Short" + timeFrameShort));
-        dataset.addSeries(buildChartTimeSeries(series, avgLong, "MA Long" + timeFrameLong));
+        dataset.addSeries(buildChartTimeSeries(series, avgShort, "MA Short" + shortMa));
+        dataset.addSeries(buildChartTimeSeries(series, avgLong, "MA Long" + longMa));
         // fix ma
         dataset.addSeries(buildChartTimeSeries(series, avg200, "MA 200"));
         dataset.addSeries(buildChartTimeSeries(series, avg314, "MA 314"));

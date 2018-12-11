@@ -103,6 +103,7 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void initToolbar() {
+        
         JPanel toolbar = new JPanel();
         toolbar.setBorder(BorderFactory.createEtchedBorder());
 
@@ -125,8 +126,8 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = mm;
-                iMAShort = Integer.valueOf(maShort.getText());
-                iMALong = Integer.valueOf(maLong.getText());
+                iMAShort = Integer.valueOf(maShort.getText())* getMAMultiplicator();
+                iMALong = Integer.valueOf(maLong.getText())* getMAMultiplicator();
                 mm.setiMALong(iMALong);
                 mm.setiMALong(iMALong);
                 tradingRecord = mm.execute(series);
@@ -168,8 +169,8 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = mmUnger;
-                iMAShort = Integer.valueOf(maShort.getText());
-                iMALong = Integer.valueOf(maLong.getText());
+                iMAShort = Integer.valueOf(maShort.getText())* getMAMultiplicator();
+                iMALong = Integer.valueOf(maLong.getText())* getMAMultiplicator();
                 mmUnger.setiMALong(iMALong);
                 mmUnger.setiMAShort(iMAShort);
                 tradingRecord = mmUnger.execute(series);
@@ -185,8 +186,8 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = testStrategy;
-                iMAShort = Integer.valueOf(maShort.getText());
-                iMALong = Integer.valueOf(maLong.getText());
+                iMAShort = Integer.valueOf(maShort.getText())* getMAMultiplicator();
+                iMALong = Integer.valueOf(maLong.getText())* getMAMultiplicator();
                 testStrategy.setiMALong(iMALong);
                 testStrategy.setiMAShort(iMAShort);
                 tradingRecord = testStrategy.execute(series);

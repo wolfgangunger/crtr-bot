@@ -28,10 +28,11 @@ import org.ta4j.core.TimeSeries;
 public class AbstractPanel extends JPanel {
 
     protected ChartPanel chartPanel;
-    
+
     protected String currency = "-";
     protected String exchange = "-";
     protected String legend = "";
+    protected BarDuration barDuration = BarDuration.FIVE_MIN;
 
     protected ChartPanel createChartPanel(JFreeChart chart) {
         ChartPanel result = new ChartPanel(chart);
@@ -93,7 +94,35 @@ public class AbstractPanel extends JPanel {
     public void setLegend(String legend) {
         this.legend = legend;
     }
+
+    public BarDuration getBarDuration() {
+        return barDuration;
+    }
+
+    public void setBarDuration(BarDuration barDuration) {
+        this.barDuration = barDuration;
+    }
     
-    
+
+    protected int getMAMultiplicator() {
+        switch (barDuration) {
+            case SIXTY_MIN:
+                return 1;
+            case THIRTY_MIN:
+                return 2;
+            case TWENTY_MIN:
+                return 3;
+            case TEN_MIN:
+                return 6;
+            case FIVE_MIN:
+                return 12;
+            case TWO_MIN:
+                return 30;
+            case ONE_MIN:
+                return 60;
+            default:
+                return 12;
+        }
+    }
 
 }

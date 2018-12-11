@@ -165,25 +165,22 @@ public class SpringBootApp extends Application {
         until = new DatePicker();
         //until.setValue(LocalDate.now());
         until.setValue(LocalDate.now().minusMonths(7));
-        
+
         barDuration = new ComboBox<>();
         barDuration.getItems().setAll(BarDuration.values());
         barDuration.setValue(BarDuration.FIVE_MIN);
         barDurationInMinutes = barDuration.getValue().getIntValue();
-        JLabel barDurationLable = new JLabel("BarSize in Min");
+        //JLabel barDurationLable = new JLabel("BarSize in Min");
 
         tb.getItems().add(cmbCurrency);
         tb.getItems().add(cmbExchange);
         tb.getItems().add(from);
         tb.getItems().add(until);
-        //tb.getItems().add(barDurationLable);
         tb.getItems().add(barDuration);
     }
 
     private void createBottomBar(BorderPane root) {
         bpBottom = new BorderPane();
-//        tfBottomLeft.setPrefWidth(root.getWidth() / 2);
-//        tfBottomRight.setPrefWidth(root.getWidth() / 2);
         tfBottomLeft.setPrefWidth(700);
         tfBottomRight.setPrefWidth(700);
         bpBottom.setLeft(tfBottomLeft);
@@ -193,7 +190,7 @@ public class SpringBootApp extends Application {
 
     private void initTabPane(BorderPane root) {
         barDurationInMinutes = barDuration.getValue().getIntValue();
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(),barDurationInMinutes );
+        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
         String txtLeft = createBottomTextLeft();
         String txtRight = createBottomTextRight();
         setBottomText(txtLeft, txtRight);
@@ -205,6 +202,7 @@ public class SpringBootApp extends Application {
         simpleClosedPriceChart = new SimpleClosedPriceChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(simpleClosedPriceChart, "ClosedPrice"));
         movingAverageChart = new MovingAverageChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        movingAverageChart.setBarDuration(barDuration.getValue());
         tabPane.getTabs().add(TabUtil.createChartTab(movingAverageChart, "MovingAverage"));
         emaRsiChart = new EMARsiChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(emaRsiChart, "EMA RSI"));
@@ -214,6 +212,7 @@ public class SpringBootApp extends Application {
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
         //strategy
         strategyPanel = new StrategyPanel(series);
+        strategyPanel.setBarDuration(barDuration.getValue());
         tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));
         //root.setCenter(sc);
         root.setCenter(tabPane);
@@ -243,7 +242,7 @@ public class SpringBootApp extends Application {
     private void refreshData() {
         System.out.println(" Load data for " + from.getValue() + " " + until.getValue() + " " + cmbCurrency.getValue() + " " + cmbExchange.getValue());
         barDurationInMinutes = barDuration.getValue().getIntValue();
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(),barDurationInMinutes);
+        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
         String txtLeft = createBottomTextLeft();
         String txtRight = createBottomTextRight();
         setBottomText(txtLeft, txtRight);
@@ -254,6 +253,7 @@ public class SpringBootApp extends Application {
         simpleClosedPriceChart.setSeries(series);
         simpleClosedPriceChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
+        movingAverageChart.setBarDuration(barDuration.getValue());
         movingAverageChart.setSeries(series);
         movingAverageChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
@@ -266,6 +266,7 @@ public class SpringBootApp extends Application {
         bollingerChart.setSeries(series);
         bollingerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
+        strategyPanel.setBarDuration(barDuration.getValue());
         strategyPanel.setSeries(series);
         strategyPanel.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
     }
