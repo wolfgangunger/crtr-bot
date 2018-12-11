@@ -23,7 +23,7 @@ import org.ta4j.core.trading.rules.StopLossRule;
 @Component
 public class TestStrategy extends AbstractStrategy {
 
-    private int iMAShort = 9;
+    private int iMAShort = 12;
     private int iMALong = 26;
 
     /**
@@ -34,11 +34,14 @@ public class TestStrategy extends AbstractStrategy {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }
-
+        System.out.println("short ma: " + iMAShort);
+        System.out.println("long ma: " + iMALong);
         // indicators -----------------------------------------------------
         // simple base indicator for closed price
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
 
+//        int shortMa = iMAShort * 12;
+//        int longMa = iMALong * 12;
         // The bias is bullish when the shorter-moving average moves above the longer moving average.
         // The bias is bearish when the shorter-moving average moves below the longer moving average.
         EMAIndicator shortEma = new EMAIndicator(closePrice, iMAShort);
@@ -48,7 +51,6 @@ public class TestStrategy extends AbstractStrategy {
         // stochastik
         StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, 18);
         StochasticOscillatorKIndicator stochasticOscillK = new StochasticOscillatorKIndicator(series, 14);
-  
 
         MACDIndicator macd = new MACDIndicator(closePrice, iMAShort, iMALong);
         EMAIndicator emaMacd = new EMAIndicator(macd, 18);
@@ -56,7 +58,6 @@ public class TestStrategy extends AbstractStrategy {
         //Rules  -----------------------------------------------------------------
         // FixedRule, InSlopeRule, InPipeRule, IsFallingRule, IsHighestRule, IsRisingRule, JustOnceRule, WaitForRule, BooleanIndicatorRule
         //        CrossedDownIndicatorRule, CrossedUpIndicatorRule,
-        
         // Entry rules -------------
         // simple rule when shortEma crosses up longEma (v)
         //Rule entryRule = new CrossedUpIndicatorRule(shortEma, longEma) ;// Trend
@@ -64,16 +65,15 @@ public class TestStrategy extends AbstractStrategy {
         //Rule entryRule = new CrossedDownIndicatorRule(rsiIndicator, Decimal.valueOf(10));
         // simple rule when RSI moves over 20 (v)
         //Rule entryRule = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(10));
-       // not working with these params - invest  
-       //Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(20));
+        // not working with these params - invest  
+        //Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(20));
         // simple rule when Stoch moves up
-       Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.1d)) ;
-       //Rule entryRule = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(80)) ;
-        
+        Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.1d));
+        //Rule entryRule = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(80)) ;
+
 //                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(20))) // Signal 1
 //                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
         //Rule entryRule = new OverIndicatorRule(shortEma, longEma) ;// Trend    
-        
         // Exit rules --------------
         // Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
         // .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80))) // Signal 1

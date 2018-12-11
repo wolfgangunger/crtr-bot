@@ -64,21 +64,30 @@ public class MovingAverageChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrameLong = 26;
-        timeFrameShort = 9;
+        timeFrameLong = 3;
+        timeFrameShort = 1;
     }
 
     @Override
     protected void initData() {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-
-        EMAIndicator avgLong = new EMAIndicator(closePrice, timeFrameLong);
-        EMAIndicator avgShort = new EMAIndicator(closePrice, timeFrameShort);
+        int shortMa = timeFrameShort * 12;
+        int longMa = timeFrameLong * 12;
+        EMAIndicator avgLong = new EMAIndicator(closePrice, longMa);
+        EMAIndicator avgShort = new EMAIndicator(closePrice, shortMa);
+        // time frame = tag * 12,8 ?
+        int ma200 = 200 * 12;
+        int ma314 = 314 * 12;
+        EMAIndicator avg200 = new EMAIndicator(closePrice, ma200);
+        EMAIndicator avg314 = new EMAIndicator(closePrice, ma314);
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(buildChartTimeSeries(series, closePrice, legend));
         dataset.addSeries(buildChartTimeSeries(series, avgShort, "MA Short" + timeFrameShort));
         dataset.addSeries(buildChartTimeSeries(series, avgLong, "MA Long" + timeFrameLong));
+        // fix ma
+        dataset.addSeries(buildChartTimeSeries(series, avg200, "MA 200"));
+        dataset.addSeries(buildChartTimeSeries(series, avg314, "MA 314"));
 
         chart = createChart(dataset, legend, "Date", "Price", true);
         XYPlot plot = (XYPlot) chart.getPlot();

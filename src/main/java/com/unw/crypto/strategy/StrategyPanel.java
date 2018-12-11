@@ -54,8 +54,8 @@ public class StrategyPanel extends AbstractPanel {
     protected JFreeChart chart;
     private NumericTextField maShort;
     private NumericTextField maLong;
-    private int iMAShort = 9;
-    private int iMALong = 26;
+    private int iMAShort = 1;
+    private int iMALong = 3;
     private XYPlot plot;
     private static final String LB = "\n";
     private static final String TAB = "\t";
@@ -76,8 +76,8 @@ public class StrategyPanel extends AbstractPanel {
         this.currency = currency;
         this.exchange = exchange;
         legend = exchange + " " + currency;
-        iMAShort = Integer.valueOf(maShort.getText());
-        iMALong = Integer.valueOf(maLong.getText());
+        iMAShort = Integer.valueOf(maShort.getText())*12;
+        iMALong = Integer.valueOf(maLong.getText())*12;
         update();
     }
 
