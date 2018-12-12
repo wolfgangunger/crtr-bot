@@ -1,6 +1,6 @@
 package com.unw.crypto;
 
-import com.unw.crypto.chart.BarDuration;
+import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.chart.BollingerBandsChart;
 import com.unw.crypto.chart.CandleChart;
 import com.unw.crypto.chart.EMARsiChart;
@@ -25,7 +25,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javax.swing.JLabel;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;

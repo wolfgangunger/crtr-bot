@@ -1,6 +1,7 @@
 
 package com.unw.crypto.strategy;
 
+import com.unw.crypto.model.BarDuration;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
@@ -22,7 +23,7 @@ public class GlobalExtremaStrategy extends AbstractStrategy{
      * @param series a time series
      * @return a global extrema strategy
      */
-    public  Strategy buildStrategy(TimeSeries series) {
+    public  Strategy buildStrategy(TimeSeries series, BarDuration barDuration) {
         if (series == null) {
             throw new IllegalArgumentException("Series cannot be null");
         }
@@ -47,10 +48,10 @@ public class GlobalExtremaStrategy extends AbstractStrategy{
         return new BaseStrategy(buyingRule, sellingRule);
     }
 
-    public TradingRecord execute(TimeSeries series) {
+    public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
 
         // Building the trading strategy
-        Strategy strategy = buildStrategy(series);
+        Strategy strategy = buildStrategy(series, barDuration);
 
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);

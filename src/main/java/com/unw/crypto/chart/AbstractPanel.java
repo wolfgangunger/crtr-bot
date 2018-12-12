@@ -5,7 +5,9 @@
  */
 package com.unw.crypto.chart;
 
+import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.Config;
+import com.unw.crypto.strategy.BarDurationUtil;
 import java.awt.Dimension;
 import java.util.Date;
 import javax.swing.BorderFactory;
@@ -105,24 +107,7 @@ public class AbstractPanel extends JPanel {
     
 
     protected int getMAMultiplicator() {
-        switch (barDuration) {
-            case SIXTY_MIN:
-                return 1;
-            case THIRTY_MIN:
-                return 2;
-            case TWENTY_MIN:
-                return 3;
-            case TEN_MIN:
-                return 6;
-            case FIVE_MIN:
-                return 12;
-            case TWO_MIN:
-                return 30;
-            case ONE_MIN:
-                return 60;
-            default:
-                return 12;
-        }
+        return BarDurationUtil.getMAMultiplicator(barDuration);
     }
 
 }

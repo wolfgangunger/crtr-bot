@@ -5,8 +5,10 @@
  */
 package com.unw.crypto.strategy;
 
+import com.unw.crypto.model.BarDuration;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.TradingRecord;
 
 /**
  *
@@ -14,6 +16,7 @@ import org.ta4j.core.TimeSeries;
  */
 public abstract class AbstractStrategy {
 
-    public abstract Strategy buildStrategy(TimeSeries series);
+    public abstract Strategy buildStrategy(TimeSeries series, BarDuration barDuration);
 
+     public abstract TradingRecord execute(TimeSeries series, BarDuration barDuration) ;
 }

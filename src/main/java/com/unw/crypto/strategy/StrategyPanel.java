@@ -99,7 +99,7 @@ public class StrategyPanel extends AbstractPanel {
         plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
-        Strategy str = currentStrategy.buildStrategy(series);
+        Strategy str = currentStrategy.buildStrategy(series, getBarDuration());
         ChartUtil.addBuySellSignals(series, str, plot);
     }
 
@@ -114,7 +114,7 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = rsi2;
-                tradingRecord = rsi2.execute(series);
+                tradingRecord = rsi2.execute(series, getBarDuration());
                 updateLog(tradingRecord);
                 update();
             }
@@ -131,7 +131,7 @@ public class StrategyPanel extends AbstractPanel {
                 iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
                 mm.setiMALong(iMALong);
                 mm.setiMALong(iMALong);
-                tradingRecord = mm.execute(series);
+                tradingRecord = mm.execute(series, getBarDuration());
                 updateLog(tradingRecord);
                 update();
             }
@@ -144,7 +144,7 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = cciCorrectionStrategy;
-                tradingRecord = cciCorrectionStrategy.execute(series);
+                tradingRecord = cciCorrectionStrategy.execute(series, getBarDuration());
                 updateLog(tradingRecord);
                 update();
             }
@@ -157,7 +157,7 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = globalExtremaStrategy;
-                tradingRecord = globalExtremaStrategy.execute(series);
+                tradingRecord = globalExtremaStrategy.execute(series, getBarDuration());
                 updateLog(tradingRecord);
                 update();
             }
@@ -174,7 +174,7 @@ public class StrategyPanel extends AbstractPanel {
                 iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
                 mmUnger.setiMALong(iMALong);
                 mmUnger.setiMAShort(iMAShort);
-                tradingRecord = mmUnger.execute(series);
+                tradingRecord = mmUnger.execute(series, getBarDuration());
                 updateLog(tradingRecord);
                 update();
             }
@@ -191,7 +191,7 @@ public class StrategyPanel extends AbstractPanel {
                 iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
                 testStrategy.setiMALong(iMALong);
                 testStrategy.setiMAShort(iMAShort);
-                tradingRecord = testStrategy.execute(series);
+                tradingRecord = testStrategy.execute(series, getBarDuration());
                 updateLog(tradingRecord);
                 update();
             }
@@ -208,7 +208,7 @@ public class StrategyPanel extends AbstractPanel {
                 iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
                 finalTradingStrategy.setiMALong(iMALong);
                 finalTradingStrategy.setiMAShort(iMAShort);
-                tradingRecord = finalTradingStrategy.execute(series);
+                tradingRecord = finalTradingStrategy.execute(series, getBarDuration());
                 updateLog(tradingRecord);
                 update();
             }

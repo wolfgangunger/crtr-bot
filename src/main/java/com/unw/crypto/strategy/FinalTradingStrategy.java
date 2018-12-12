@@ -5,6 +5,9 @@
  */
 package com.unw.crypto.strategy;
 
+import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.strategy.to.StrategyInputParams;
+import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.Decimal;
@@ -26,7 +29,6 @@ import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
@@ -40,8 +42,38 @@ public class FinalTradingStrategy extends AbstractStrategy {
     private int iMAShort = 9;
     private int iMALong = 26;
 
+
     @Override
-    public Strategy buildStrategy(TimeSeries series) {
+    public Strategy buildStrategy(TimeSeries series, BarDuration barDuration) {
+
+        int stoRsiTimeframe = 18;
+        int stoOscKTimeFrame = 14;
+        int emaIndicatorTimeframe = 18;
+        int rsiThresholdLow = 15;
+        int rsiThresholdHigh = 80;
+        double stoThresholdLow = 0.15d;
+        double stoThresholdHigh = 0.85d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double stopLoss  =1;
+       double stopGain = -1d;
+       int waitBars = 50;
+        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, iMAShort, iMALong, iMAShort, iMALong, 4,
+                stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars );
+
+        return buildStrategyWithParams(series, params);
+    }
+
+    /**
+     * this method can be used from outside app to test strategy , for example
+     * junit or later for scheduled services
+     *
+     * @param series TimeSeries
+     * @param params the parameter object StrategyInputParams
+     * @return
+     */
+    public Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) {
 
         // these rules are designed for hour candles - in case of shorter candles and bars the params (MA) must be adapted
 //1- RSI is low and pointing up (v)
@@ -61,31 +93,31 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // moving averages
         // The bias is bullish when the shorter-moving average moves above the longer moving average.
         // The bias is bearish when the shorter-moving average moves below the longer moving average.
-        EMAIndicator shortEma = new EMAIndicator(closePrice, iMAShort);
-        EMAIndicator longEma = new EMAIndicator(closePrice, iMALong);
+        EMAIndicator shortEma = new EMAIndicator(closePrice, params.getEmaShort());
+        EMAIndicator longEma = new EMAIndicator(closePrice, params.getEmaLong());
 
         // simple moving average on long time frame
-        SMAIndicator smaLong = new SMAIndicator(closePrice, iMALong);
+        SMAIndicator smaLong = new SMAIndicator(closePrice, params.getSmaLong());
         // RSI
-        RSIIndicator rsiIndicator = new RSIIndicator(closePrice, 4);
+        RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframe());
         // stochastik
-        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, 18);
-        StochasticOscillatorKIndicator stochasticOscillK = new StochasticOscillatorKIndicator(series, 14);
+        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframe());
+        StochasticOscillatorKIndicator stochasticOscillK = new StochasticOscillatorKIndicator(series, params.getStoOscKTimeFrame());
         //MACD
-        MACDIndicator macd = new MACDIndicator(closePrice, iMAShort, iMALong);
-        EMAIndicator emaMacd = new EMAIndicator(macd, 18);
+        MACDIndicator macd = new MACDIndicator(closePrice, params.getSmaShort(), params.getSmaLong());
+        EMAIndicator emaMacd = new EMAIndicator(macd, params.getEmaIndicatorTimeframe());
 
         // ----------
         // rules 
         // 1 - RSI is crossing low threshold 
-        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, Decimal.valueOf(15));
+        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, Decimal.valueOf(params.getRsiThresholdLow()));
         // 2  STO is crossing low threshold 
-        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.15d));
+        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdLow()));
         // 3 - to be done - does it make sense ?
 
         // 4 8-MA is pointing up - second param to check
-        Rule entryRule4 = new IsRisingRule(smaLong, iMAShort);
-        
+        Rule entryRule4 = new IsRisingRule(smaLong, params.getSma8());
+
         //5- Price is near or below the 8-MA 
         Rule entryRule5 = new UnderIndicatorRule(closePrice, smaLong);
 
@@ -96,22 +128,21 @@ public class FinalTradingStrategy extends AbstractStrategy {
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
 //                .or(new StopGainRule(closePrice, Decimal.valueOf(0.4d)));
         Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80))) // Signal 1
+                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoOscKThresholdHigh()))) // Signal 1
                 .and(new UnderIndicatorRule(macd, emaMacd))
-                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
+                .and(new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()))); // works
 //                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         //             .or(new StopLossRule(closePrice, Decimal.valueOf(0.3d)));
 
-        Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, 50);
-             
-        return new BaseStrategy(entryRule, exitRule2);
+        Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 
+        return new BaseStrategy(entryRule, exitRule2);
     }
 
-    public TradingRecord execute(TimeSeries series) {
+    public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
 
         // Building the trading strategy
-        Strategy strategy = buildStrategy(series);
+        Strategy strategy = buildStrategy(series, barDuration);
 
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
