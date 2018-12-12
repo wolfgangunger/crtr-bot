@@ -46,6 +46,7 @@ public class StrategyPanel extends AbstractPanel {
     private MovingMomentumStrategyUnw mmUnger = new MovingMomentumStrategyUnw();
     private CCICorrectionStrategy cciCorrectionStrategy = new CCICorrectionStrategy();
     private GlobalExtremaStrategy globalExtremaStrategy = new GlobalExtremaStrategy();
+    private FinalTradingStrategy finalTradingStrategy = new FinalTradingStrategy();
     private TestStrategy testStrategy = new TestStrategy();
     private AbstractStrategy currentStrategy;
     private TradingRecord tradingRecord;
@@ -76,8 +77,8 @@ public class StrategyPanel extends AbstractPanel {
         this.currency = currency;
         this.exchange = exchange;
         legend = exchange + " " + currency;
-        iMAShort = Integer.valueOf(maShort.getText())*12;
-        iMALong = Integer.valueOf(maLong.getText())*12;
+        iMAShort = Integer.valueOf(maShort.getText()) * 12;
+        iMALong = Integer.valueOf(maLong.getText()) * 12;
         update();
     }
 
@@ -103,7 +104,7 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void initToolbar() {
-        
+
         JPanel toolbar = new JPanel();
         toolbar.setBorder(BorderFactory.createEtchedBorder());
 
@@ -126,8 +127,8 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = mm;
-                iMAShort = Integer.valueOf(maShort.getText())* getMAMultiplicator();
-                iMALong = Integer.valueOf(maLong.getText())* getMAMultiplicator();
+                iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
+                iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
                 mm.setiMALong(iMALong);
                 mm.setiMALong(iMALong);
                 tradingRecord = mm.execute(series);
@@ -169,8 +170,8 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = mmUnger;
-                iMAShort = Integer.valueOf(maShort.getText())* getMAMultiplicator();
-                iMALong = Integer.valueOf(maLong.getText())* getMAMultiplicator();
+                iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
+                iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
                 mmUnger.setiMALong(iMALong);
                 mmUnger.setiMAShort(iMAShort);
                 tradingRecord = mmUnger.execute(series);
@@ -186,8 +187,8 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 currentStrategy = testStrategy;
-                iMAShort = Integer.valueOf(maShort.getText())* getMAMultiplicator();
-                iMALong = Integer.valueOf(maLong.getText())* getMAMultiplicator();
+                iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
+                iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
                 testStrategy.setiMALong(iMALong);
                 testStrategy.setiMAShort(iMAShort);
                 tradingRecord = testStrategy.execute(series);
@@ -196,6 +197,23 @@ public class StrategyPanel extends AbstractPanel {
             }
         });
         toolbar.add(bttTestStrategy);
+
+        JButton bttFinalStrategy = new JButton();
+        bttFinalStrategy.setText("Final Strategie");
+        bttFinalStrategy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = finalTradingStrategy;
+                iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
+                iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
+                finalTradingStrategy.setiMALong(iMALong);
+                finalTradingStrategy.setiMAShort(iMAShort);
+                tradingRecord = finalTradingStrategy.execute(series);
+                updateLog(tradingRecord);
+                update();
+            }
+        });
+        toolbar.add(bttFinalStrategy);
 
         // input fields
         maShort = new NumericTextField();
