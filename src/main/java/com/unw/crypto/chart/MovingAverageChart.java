@@ -14,6 +14,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.indicators.EMAIndicator;
+import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 
 /**
@@ -47,8 +48,8 @@ public class MovingAverageChart extends AbstractChartPanel {
         inputTimeframeShort = new NumericTextField();
         inputTimeframeShort.setText(String.valueOf(timeFrameShort));
         inputTimeframeShort.setColumns(10);
-        JLabel lblShortMA = new JLabel("Short MA");
-        JLabel lblLongMA = new JLabel("Long MA");
+        JLabel lblShortMA = new JLabel("Short MA (days)");
+        JLabel lblLongMA = new JLabel("Long MA (days)");
         toolbar.add(lblShortMA);
         toolbar.add(inputTimeframeShort);
         toolbar.add(lblLongMA);
@@ -64,8 +65,8 @@ public class MovingAverageChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrameLong = 3;
-        timeFrameShort = 1;
+        timeFrameLong = 8;
+        timeFrameShort = 3;
     }
 
     @Override
@@ -74,18 +75,22 @@ public class MovingAverageChart extends AbstractChartPanel {
         // multiplicator depends on candle size : candle size 60 min = 1 ; 5 min candle = 12
         int shortMa =  timeFrameShort * getMAMultiplicator();
         int longMa = timeFrameLong * getMAMultiplicator();
-        EMAIndicator avgShort = new EMAIndicator(closePrice, shortMa);
-        EMAIndicator avgLong = new EMAIndicator(closePrice, longMa);
+        //EMAIndicator avgShort = new EMAIndicator(closePrice, shortMa);
+        //EMAIndicator avgLong = new EMAIndicator(closePrice, longMa);
+        SMAIndicator avgShort = new SMAIndicator(closePrice, shortMa);
+        SMAIndicator avgLong = new SMAIndicator(closePrice, longMa);        
         // time frame
         int ma200 = 200 * getMAMultiplicator();
         int ma314 = 314 * getMAMultiplicator();
-        EMAIndicator avg200 = new EMAIndicator(closePrice, ma200);
-        EMAIndicator avg314 = new EMAIndicator(closePrice, ma314);
-
+        //EMAIndicator avg200 = new EMAIndicator(closePrice, ma200);
+        //EMAIndicator avg314 = new EMAIndicator(closePrice, ma314);
+        SMAIndicator avg200 = new SMAIndicator(closePrice, ma200);
+        SMAIndicator avg314 = new SMAIndicator(closePrice, ma314);
+        
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(buildChartTimeSeries(series, closePrice, legend));
-        dataset.addSeries(buildChartTimeSeries(series, avgShort, "MA Short" + shortMa));
-        dataset.addSeries(buildChartTimeSeries(series, avgLong, "MA Long" + longMa));
+        dataset.addSeries(buildChartTimeSeries(series, avgShort, "MA Short" + timeFrameShort));
+        dataset.addSeries(buildChartTimeSeries(series, avgLong, "MA Long" + timeFrameLong));
         // fix ma
         dataset.addSeries(buildChartTimeSeries(series, avg200, "MA 200"));
         dataset.addSeries(buildChartTimeSeries(series, avg314, "MA 314"));

@@ -6,12 +6,17 @@ import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.MACDIndicator;
 import org.ta4j.core.indicators.RSIIndicator;
+import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
+import org.ta4j.core.trading.rules.FixedRule;
+import org.ta4j.core.trading.rules.IsFallingRule;
+import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.StopGainRule;
 import org.ta4j.core.trading.rules.StopLossRule;
+import org.ta4j.core.trading.rules.UnderIndicatorRule;
+import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  * Moving momentum strategy.
@@ -44,8 +49,11 @@ public class TestStrategy extends AbstractStrategy {
 //        int longMa = iMALong * 12;
         // The bias is bullish when the shorter-moving average moves above the longer moving average.
         // The bias is bearish when the shorter-moving average moves below the longer moving average.
+        // exp. moving average
         EMAIndicator shortEma = new EMAIndicator(closePrice, iMAShort);
         EMAIndicator longEma = new EMAIndicator(closePrice, iMALong);
+        // simple moving average 
+        SMAIndicator smaLong = new SMAIndicator(closePrice, iMALong);
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, 4);
         // stochastik
@@ -59,16 +67,22 @@ public class TestStrategy extends AbstractStrategy {
         // FixedRule, InSlopeRule, InPipeRule, IsFallingRule, IsHighestRule, IsRisingRule, JustOnceRule, WaitForRule, BooleanIndicatorRule
         //        CrossedDownIndicatorRule, CrossedUpIndicatorRule,
         // Entry rules -------------
+        // MAs
         // simple rule when shortEma crosses up longEma (v)
         //Rule entryRule = new CrossedUpIndicatorRule(shortEma, longEma) ;// Trend
         // simple rule when RSI moves below 20 (v)
         //Rule entryRule = new CrossedDownIndicatorRule(rsiIndicator, Decimal.valueOf(10));
+        // sma is pointing up (v) - second parameter can be varied - brute force ?
+        //Rule entryRule = new IsRisingRule(smaLong, iMAShort);
+        // // Price is (near or) below the 8-MA
+        Rule entryRule = new UnderIndicatorRule(closePrice, smaLong);
+        // RSI
         // simple rule when RSI moves over 20 (v)
         //Rule entryRule = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(10));
         // not working with these params - invest  
         //Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(20));
         // simple rule when Stoch moves up
-        Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.1d));
+        // Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.1d));
         //Rule entryRule = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(80)) ;
 
 //                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(20))) // Signal 1
@@ -82,12 +96,15 @@ public class TestStrategy extends AbstractStrategy {
         // .and(new StopGainRule(closePrice, Decimal.valueOf(-1)));
         //.and(new IsFallingRule(closePrice, 3));
         //Rule exitRule = new StopGainRule(closePrice, Decimal.valueOf(6));
-        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
-                .or(new StopGainRule(closePrice, Decimal.valueOf(0.4d)));
-        //Rule exitRule = new IsFallingRule(closePrice, 10, 0.2d);
+        //Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.2d))
+        //       .or(new StopGainRule(closePrice, Decimal.valueOf(0.2d)));
+//Rule exitRule = new IsFallingRule(closePrice, 10, 0.2d);
 //        Rule exitRule = new StopGainRule(closePrice, Decimal.valueOf(2))
 //                .and(new StopLossRule(closePrice, Decimal.valueOf(1)));
-
+        //Rule exitRule = new FixedRule(indexes);
+        //Rule exitRule = new WaitForRule(Order.OrderType.BUY, 15);
+        // checks only the timeframe not the volume
+        Rule exitRule = new IsFallingRule(closePrice, 3);
         //Rule exitRule = new FixedRule(1,2,4,5);
         return new BaseStrategy(entryRule, exitRule);
     }

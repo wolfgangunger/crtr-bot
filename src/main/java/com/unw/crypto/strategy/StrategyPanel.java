@@ -55,8 +55,8 @@ public class StrategyPanel extends AbstractPanel {
     protected JFreeChart chart;
     private NumericTextField maShort;
     private NumericTextField maLong;
-    private int iMAShort = 1;
-    private int iMALong = 3;
+    private int iMAShort = 3;
+    private int iMALong = 8;
     private XYPlot plot;
     private static final String LB = "\n";
     private static final String TAB = "\t";
@@ -182,7 +182,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbar.add(bttMmUnger);
 
         JButton bttTestStrategy = new JButton();
-        bttTestStrategy.setText("Test Strategie");
+        bttTestStrategy.setText("Test Strategy");
         bttTestStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -199,7 +199,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbar.add(bttTestStrategy);
 
         JButton bttFinalStrategy = new JButton();
-        bttFinalStrategy.setText("Final Strategie");
+        bttFinalStrategy.setText("Final Strategy");
         bttFinalStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
