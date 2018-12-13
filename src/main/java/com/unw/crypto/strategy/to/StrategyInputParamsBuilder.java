@@ -16,11 +16,15 @@ public final class StrategyInputParamsBuilder {
     private StrategyInputParamsBuilder() {
     }
 
-    public static StrategyInputParams createStrategyInputParams(BarDuration barDuration, int smaShort, int smaLong, int emaShort, int emaLong,
+    public static StrategyInputParams createStrategyInputParams(BarDuration barDuration,int ma8,int ma14,int ma200,int ma314, int smaShort, int smaLong, int emaShort, int emaLong,
             int rsiTimeFrame, int stoRsiTimeframe, int stoOscKTimeFrame, int emaIndicatorTimeframe, int rsiThresholdLow, int rsiThresholdHigh,
              double stoThresholdLow ,  double stoThresholdHigh, int stoOscKThresholdLow, int stoOscKThresholdHigh ,
              double stopLoss, double stopGain,int waitBars,RuleChain ruleChain) {
         StrategyInputParams result = new StrategyInputParams();
+        result.setSma8(ma8);
+        result.setSma14(ma14);
+        result.setSma200(ma200);
+        result.setSma314(ma314);
         result.setBarDuration(barDuration);
         result.setSmaShort(smaShort);
         result.setSmaLong(smaLong);

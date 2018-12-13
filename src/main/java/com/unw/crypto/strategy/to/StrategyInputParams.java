@@ -6,17 +6,20 @@
 package com.unw.crypto.strategy.to;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.strategy.BarDurationUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  *
  * @author UNGERW
  */
 @Builder
-@Data
+//@Data
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class StrategyInputParams {
@@ -69,7 +72,102 @@ public class StrategyInputParams {
     private double stopGain;
     // wait rule
     private int waitBars;
+
+    private int getMAMultiplicator(){
+        return BarDurationUtil.getMAMultiplicator(barDuration);
+    }
+    public BarDuration getBarDuration() {
+        return barDuration;
+    }
+
+    public RuleChain getRuleChain() {
+        return ruleChain;
+    }
+
+    public int getSmaShort() {
+        return smaShort * getMAMultiplicator();
+    }
+
+    public int getSmaLong() {
+        return smaLong * getMAMultiplicator();
+    }
+
+    public int getSma8() {
+        return sma8 * getMAMultiplicator();
+    }
+
+    public int getSma14() {
+        return sma14  * getMAMultiplicator();
+    }
+
+    public int getSma200() {
+        return sma200 * getMAMultiplicator();
+    }
+
+    public int getSma314() {
+        return sma314 * getMAMultiplicator();
+    }
+
+    public int getEmaShort() {
+        return emaShort * getMAMultiplicator();
+    }
+
+    public int getEmaLong() {
+        return emaLong * getMAMultiplicator();
+    }
+
+    public int getRsiTimeframe() {
+        return rsiTimeframe * getMAMultiplicator();
+    }
+
+    public int getStoRsiTimeframe() {
+        return stoRsiTimeframe * getMAMultiplicator();
+    }
+
+    public int getStoOscKTimeFrame() {
+        return stoOscKTimeFrame * getMAMultiplicator();
+    }
+
+    public int getEmaIndicatorTimeframe() {
+        return emaIndicatorTimeframe * getMAMultiplicator();
+    }
+
+    public int getRsiThresholdLow() {
+        return rsiThresholdLow;
+    }
+
+    public int getRsiThresholdHigh() {
+        return rsiThresholdHigh;
+    }
+
+    public double getStoThresholdLow() {
+        return stoThresholdLow;
+    }
+
+    public double getStoThresholdHigh() {
+        return stoThresholdHigh;
+    }
+
+    public int getStoOscKThresholdLow() {
+        return stoOscKThresholdLow;
+    }
+
+    public int getStoOscKThresholdHigh() {
+        return stoOscKThresholdHigh;
+    }
+
+    public double getStopLoss() {
+        return stopLoss;
+    }
+
+    public double getStopGain() {
+        return stopGain;
+    }
+
+    public int getWaitBars() {
+        return waitBars;
+    }
     
     
-    // todo : booleans for all rules - to be able to disable and enable the rules concatenation from outside ( brutforce ...)
+    
 }

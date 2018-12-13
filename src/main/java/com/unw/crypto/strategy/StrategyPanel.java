@@ -69,6 +69,10 @@ public class StrategyPanel extends AbstractPanel {
     private XYPlot plot;
     private static final String LB = "\n";
     private static final String TAB = "\t";
+    private NumericTextField tfMA8;
+    private NumericTextField tfMA14;
+    private NumericTextField tfMA200;
+    private NumericTextField tfMA314;
     private NumericTextField tfShortSMA;
     private NumericTextField tfLongSMA;
     private NumericTextField tfShortEMA;
@@ -131,14 +135,14 @@ public class StrategyPanel extends AbstractPanel {
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
         //Strategy str = currentStrategy.buildStrategy(series, getBarDuration());
-        Strategy str ;
+        Strategy str;
         if (currentStrategy instanceof FinalTradingStrategy) {
-                str = finalStrategy;
-        }else{
-             str = currentStrategy.buildStrategy(series, getBarDuration());
+            str = finalStrategy;
+        } else {
+            str = currentStrategy.buildStrategy(series, getBarDuration());
         }
 
-         ChartUtil.addBuySellSignals(series, str, plot);
+        ChartUtil.addBuySellSignals(series, str, plot);
     }
 
     private void initMainPanel() {
@@ -311,7 +315,10 @@ public class StrategyPanel extends AbstractPanel {
 
     private StrategyInputParams createStrategyInputParams() {
         StrategyInputParams result;
-        // iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
+        int ma8 = Integer.valueOf(tfMA8.getText());
+        int ma14 = Integer.valueOf(tfMA14.getText());
+        int ma200 = Integer.valueOf(tfMA200.getText());
+        int ma314 = Integer.valueOf(tfMA314.getText());
         int smaShort = Integer.valueOf(tfShortSMA.getText());
         int smaLong = Integer.valueOf(tfLongSMA.getText());
         int emaShort = Integer.valueOf(tfShortEMA.getText());
@@ -331,7 +338,7 @@ public class StrategyPanel extends AbstractPanel {
         int waitBars = Integer.valueOf(tfWaitBars.getText());
         RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).rule3_priceAboveSMA200(chkAboveSMA.isSelected()).
                 rule4_ma8PointingUp(chkMaPointingUp.isSelected()).rule5_priceBelow8MA(chkBelow8MA.isSelected()).rule7_emaBandsPointingUp(false).build();
-        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration,ma8,ma14,ma200,ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
                 rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
         return result;
@@ -350,7 +357,39 @@ public class StrategyPanel extends AbstractPanel {
         result.setName("Final Strategy Params");
         result.setToolTipText("Final Strategy Params");
 
-        // ma
+        // ma - fix MAs
+        JLabel lblMA8 = new JLabel("MA8");
+        result.add(lblMA8);
+
+        tfMA8 = new NumericTextField();
+        tfMA8.setText(String.valueOf(8));
+        tfMA8.setColumns(4);
+        result.add(tfMA8);
+
+        JLabel lblMA14 = new JLabel("MA14");
+        result.add(lblMA14);
+
+        tfMA14 = new NumericTextField();
+        tfMA14.setText(String.valueOf(14));
+        tfMA14.setColumns(4);
+        result.add(tfMA14);
+
+        JLabel lblMA200 = new JLabel("MA200");
+        result.add(lblMA200);
+
+        tfMA200 = new NumericTextField();
+        tfMA200.setText(String.valueOf(200));
+        tfMA200.setColumns(4);
+        result.add(tfMA200);
+
+        JLabel lblMA314 = new JLabel("MA314");
+        result.add(lblMA314);
+
+        tfMA314 = new NumericTextField();
+        tfMA314.setText(String.valueOf(314));
+        tfMA314.setColumns(4);
+        result.add(tfMA314);
+        //ma
         JLabel lblShortSMA = new JLabel("Short SMA");
         result.add(lblShortSMA);
 
@@ -507,7 +546,7 @@ public class StrategyPanel extends AbstractPanel {
         chkStoLow.setSelected(true);
         rules.add(chkStoLow);
 
-        JLabel lblAboveSMA = new JLabel("Above SMA");
+        JLabel lblAboveSMA = new JLabel("Above SMAs");
         rules.add(lblAboveSMA);
         chkAboveSMA = new JCheckBox();
         chkAboveSMA.setSelected(false);
@@ -516,7 +555,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblMaUp = new JLabel("8MA pointing up");
         rules.add(lblMaUp);
         chkMaPointingUp = new JCheckBox();
-        chkMaPointingUp.setSelected(true);
+        chkMaPointingUp.setSelected(false);
         rules.add(chkMaPointingUp);
 
         JLabel lblBelow8MA = new JLabel("Below 8MA");

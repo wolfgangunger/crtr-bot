@@ -31,6 +31,7 @@ import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
+import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
@@ -47,6 +48,10 @@ public class FinalTradingStrategy extends AbstractStrategy {
     @Override
     public Strategy buildStrategy(TimeSeries series, BarDuration barDuration) {
 
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
         int rsiTimeframe = 4;
         int stoRsiTimeframe = 18;
         int stoOscKTimeFrame = 14;
@@ -62,7 +67,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         int waitBars = 50;
         RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(true).rule2_stoLow(true).rule3_priceAboveSMA200(false).
                 rule4_ma8PointingUp(true).rule5_priceBelow8MA(true).rule7_emaBandsPointingUp(true).build();
-        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
+        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
                 stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
 
@@ -103,6 +108,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
 
         // simple moving average on long time frame
         SMAIndicator smaLong = new SMAIndicator(closePrice, params.getSmaLong());
+        // simple MA8 
+        SMAIndicator sma8 = new SMAIndicator(closePrice, params.getSma8());
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframe());
         // stochastik
@@ -121,10 +128,10 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // 3 - to be done - does it make sense ?
 
         // 4 8-MA is pointing up - second param to check
-        Rule entryRule4 = new IsRisingRule(smaLong, params.getSma8());
+        Rule entryRule4 = new IsRisingRule(sma8, params.getSma8());
 
         //5- Price is near or below the 8-MA 
-        Rule entryRule5 = new UnderIndicatorRule(closePrice, smaLong);
+        Rule entryRule5 = new UnderIndicatorRule(closePrice, sma8);
 
         // the complete final rule 
         //Rule entryRule = entryRule1.and(entryRule2).and(entryRule4).and(entryRule5);
@@ -140,7 +147,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
 //                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         //             .or(new StopLossRule(closePrice, Decimal.valueOf(0.3d)));
 
-        Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
+        Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars()).
+                or(new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss())));
 
         return new BaseStrategy(entryRule, exitRule2);
     }
@@ -165,10 +173,11 @@ public class FinalTradingStrategy extends AbstractStrategy {
 
     /**
      * use this method to execute strategy from outside with params
+     *
      * @param series
      * @param params
      * @param strategy
-     * @return 
+     * @return
      */
     public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) {
         // Running the strategy
