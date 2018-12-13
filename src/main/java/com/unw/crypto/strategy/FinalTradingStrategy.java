@@ -164,7 +164,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
     }
 
     /**
-     * 
+     * use this method to execute strategy from outside with params
      * @param series
      * @param params
      * @param strategy

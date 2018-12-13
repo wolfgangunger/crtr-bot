@@ -322,8 +322,8 @@ public class StrategyPanel extends AbstractPanel {
         int emaIndicatorTimeframe = Integer.valueOf(tfEmaIndicatorTimeframe.getText());
         int rsiThresholdLow = Integer.valueOf(tfRsiThresholdLow.getText());
         int rsiThresholdHigh = Integer.valueOf(tfRsiThresholdHigh.getText());
-        double stoThresholdLow = 0.15d;
-        double stoThresholdHigh = 0.85d;
+        double stoThresholdLow = Double.valueOf(tfStoThresholdLow.getText());
+        double stoThresholdHigh = Double.valueOf(tfStoThresholdHigh.getText());
         int stoOscKThresholdLow = Integer.valueOf(tfStoOscKThresholdLow.getText());
         int stoOscKThresholdHigh = Integer.valueOf(tfStoOscKThresholdHigh.getText());
         double stopLoss = Double.valueOf(tfStopLoss.getText());
@@ -437,7 +437,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoThresholdLow);
 
         tfStoThresholdLow = new JTextField();
-        tfStoThresholdLow.setText(String.valueOf(1.5f));
+        tfStoThresholdLow.setText(String.valueOf(0.15f));
         tfStoThresholdLow.setColumns(4);
         result.add(tfStoThresholdLow);
 
@@ -445,7 +445,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoThresholdHigh);
 
         tfStoThresholdHigh = new JTextField();
-        tfStoThresholdHigh.setText(String.valueOf(0.85d));
+        tfStoThresholdHigh.setText(String.valueOf(0.85f));
         tfStoThresholdHigh.setColumns(4);
         result.add(tfStoThresholdHigh);
         //stochasticOscillK
