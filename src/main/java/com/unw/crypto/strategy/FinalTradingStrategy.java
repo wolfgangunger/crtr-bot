@@ -6,6 +6,7 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.strategy.to.RuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import org.springframework.stereotype.Component;
@@ -70,17 +71,17 @@ public class FinalTradingStrategy extends AbstractStrategy {
      * junit or later for scheduled services
      *
      * @param series TimeSeries
-     * @param params the parameter object StrategyInputParams
-     * @return
+     * @param params the parameter object StrategyInputParams ( contains all params for indicators and strategies )
+     * @return Strategy (BaseStrategy)
      */
     public Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) {
 
-        // these rules are designed for hour candles - in case of shorter candles and bars the params (MA) must be adapted
+        // these rules are designed for hour candles - in case of shorter candles and bars the timeframe params (MA ...) must be adapted
 //1- RSI is low and pointing up (v)
 //2- Stochastic is low and pointing up (v)
 //3- Price is above SMA200&314 ???? really ?
 //4- 8-MA is pointing up (v)
-//5- Price is near or below the 8-MA (the further away from the 8-MA price is, the higher probability price will turn back towards it)
+//5- Price is near or below the 8-MA (v) (the further away from the 8-MA price is, the higher probability price will turn back towards it)
 //6- Price is _above_ a known area of resistance (use Fib levels to determine those zones)
 //7- Moving EMA bands are angled up
 //8- Price is not approaching prior resistance
@@ -152,6 +153,10 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // Analysis
         System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
         return tradingRecord;
+    }
+    private Rule buildCompleteEntryRule(RuleChain ruleChain){
+        
+        return null;
     }
 
     public int getiMAShort() {

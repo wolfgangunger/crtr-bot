@@ -17,11 +17,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StrategyInputParams {
 
+    // to be discussed: should timeframe values be set in days ( and multiplicated inside this cointainer ) or 
+    // set with the timeframe value ( days * bar multiplicator) from outside 
     /// todo : timeframe values must be calculated with factor of barsize
     //  smaLong = smaLon * BarDurationUtil.getMAMultiplicator
     
     // bar / candle size
     private BarDuration barDuration;
+    
+    private RuleChain ruleChain;
 
     /// indicators
         // simple MA indays
