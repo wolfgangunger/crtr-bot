@@ -11,13 +11,8 @@ import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.trading.rules.FixedRule;
 import org.ta4j.core.trading.rules.IsFallingRule;
-import org.ta4j.core.trading.rules.IsRisingRule;
-import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
-import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  * Moving momentum strategy.

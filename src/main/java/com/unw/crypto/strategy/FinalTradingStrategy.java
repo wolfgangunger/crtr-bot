@@ -29,6 +29,7 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
+import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
@@ -43,10 +44,10 @@ public class FinalTradingStrategy extends AbstractStrategy {
     private int iMAShort = 9;
     private int iMALong = 26;
 
-
     @Override
     public Strategy buildStrategy(TimeSeries series, BarDuration barDuration) {
 
+        int rsiTimeframe = 4;
         int stoRsiTimeframe = 18;
         int stoOscKTimeFrame = 14;
         int emaIndicatorTimeframe = 18;
@@ -56,12 +57,14 @@ public class FinalTradingStrategy extends AbstractStrategy {
         double stoThresholdHigh = 0.85d;
         int stoOscKThresholdLow = 20;
         int stoOscKThresholdHigh = 80;
-        double stopLoss  =1;
-       double stopGain = -1d;
-       int waitBars = 50;
-        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, iMAShort, iMALong, iMAShort, iMALong, 4,
+        double stopLoss = 1;
+        double stopGain = -1d;
+        int waitBars = 50;
+        RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(true).rule2_stoLow(true).rule3_priceAboveSMA200(false).
+                rule4_ma8PointingUp(true).rule5_priceBelow8MA(true).rule7_emaBandsPointingUp(true).build();
+        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
                 stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars );
+                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
 
         return buildStrategyWithParams(series, params);
     }
@@ -71,7 +74,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
      * junit or later for scheduled services
      *
      * @param series TimeSeries
-     * @param params the parameter object StrategyInputParams ( contains all params for indicators and strategies )
+     * @param params the parameter object StrategyInputParams ( contains all
+     * params for indicators and strategies )
      * @return Strategy (BaseStrategy)
      */
     public Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) {
@@ -123,7 +127,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
         Rule entryRule5 = new UnderIndicatorRule(closePrice, smaLong);
 
         // the complete final rule 
-        Rule entryRule = entryRule1.and(entryRule2).and(entryRule4).and(entryRule5);
+        //Rule entryRule = entryRule1.and(entryRule2).and(entryRule4).and(entryRule5);
+        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, null, entryRule4, entryRule5, null);
 
         // exit rule - todo
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
@@ -140,23 +145,89 @@ public class FinalTradingStrategy extends AbstractStrategy {
         return new BaseStrategy(entryRule, exitRule2);
     }
 
-    public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
-
-        // Building the trading strategy
-        Strategy strategy = buildStrategy(series, barDuration);
-
+    /**
+     * use this method to execute strategy from outside with params
+     *
+     * @param series
+     * @param params
+     * @return
+     */
+    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params) {
+        Strategy strategy = buildStrategyWithParams(series, params);
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         TradingRecord tradingRecord = seriesManager.run(strategy);
         System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
-
         // Analysis
         System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
         return tradingRecord;
     }
-    private Rule buildCompleteEntryRule(RuleChain ruleChain){
-        
-        return null;
+
+    /**
+     * 
+     * @param series
+     * @param params
+     * @param strategy
+     * @return 
+     */
+    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) {
+        // Running the strategy
+        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+        TradingRecord tradingRecord = seriesManager.run(strategy);
+        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
+        // Analysis
+        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
+        return tradingRecord;
+    }
+
+    public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
+        // Building the trading strategy
+        Strategy strategy = buildStrategy(series, barDuration);
+        // Running the strategy
+        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+        TradingRecord tradingRecord = seriesManager.run(strategy);
+        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
+        // Analysis
+        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
+        return tradingRecord;
+    }
+
+    /**
+     * concatenate the rules depending on the boolean params
+     *
+     * @param closePrice
+     * @param ruleChain
+     * @param rule1
+     * @param rule2
+     * @param rule3
+     * @param rule4
+     * @param rule5
+     * @param rule7
+     * @return
+     */
+    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, RuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5, Rule rule7) {
+        // first create a rule, which will always be chained and is always true
+        Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
+
+        if (ruleChain.isRule1_rsiLow()) {
+            result = result.and(rule1);
+        }
+        if (ruleChain.isRule2_stoLow()) {
+            result = result.and(rule2);
+        }
+//        if (ruleChain.isRule3_priceAboveSMA200()) {
+//            result = result.and(rule3);
+//        }
+        if (ruleChain.isRule4_ma8PointingUp()) {
+            result = result.and(rule4);
+        }
+        if (ruleChain.isRule5_priceBelow8MA()) {
+            result = result.and(rule1);
+        }
+//        if (ruleChain.isRule7_emaBandsPointingUp()) {
+//            result = result.and(rule7);
+//        }
+        return result;
     }
 
     public int getiMAShort() {

@@ -5,6 +5,8 @@
  */
 package com.unw.crypto.strategy.to;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -12,6 +14,8 @@ import lombok.Data;
  * @author UNGERW
  */
 @Data
+@AllArgsConstructor
+@Builder
 public class RuleChain {
 
     //1- RSI is low and pointing up (v)

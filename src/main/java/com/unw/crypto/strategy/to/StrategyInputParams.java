@@ -6,6 +6,8 @@
 package com.unw.crypto.strategy.to;
 
 import com.unw.crypto.model.BarDuration;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,8 +15,10 @@ import lombok.NoArgsConstructor;
  *
  * @author UNGERW
  */
+@Builder
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class StrategyInputParams {
 
     // to be discussed: should timeframe values be set in days ( and multiplicated inside this cointainer ) or 

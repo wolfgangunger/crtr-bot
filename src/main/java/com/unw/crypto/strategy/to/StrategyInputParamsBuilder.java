@@ -19,7 +19,7 @@ public final class StrategyInputParamsBuilder {
     public static StrategyInputParams createStrategyInputParams(BarDuration barDuration, int smaShort, int smaLong, int emaShort, int emaLong,
             int rsiTimeFrame, int stoRsiTimeframe, int stoOscKTimeFrame, int emaIndicatorTimeframe, int rsiThresholdLow, int rsiThresholdHigh,
              double stoThresholdLow ,  double stoThresholdHigh, int stoOscKThresholdLow, int stoOscKThresholdHigh ,
-             double stopLoss, double stopGain,int waitBars) {
+             double stopLoss, double stopGain,int waitBars,RuleChain ruleChain) {
         StrategyInputParams result = new StrategyInputParams();
         result.setBarDuration(barDuration);
         result.setSmaShort(smaShort);
@@ -39,6 +39,7 @@ public final class StrategyInputParamsBuilder {
         result.setStopLoss(stopLoss);
         result.setStopGain(stopGain);
         result.setWaitBars(waitBars);
+        result.setRuleChain(ruleChain);
         return result;
     }
 
