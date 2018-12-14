@@ -167,7 +167,7 @@ public class SpringBootApp extends Application {
 
         barDuration = new ComboBox<>();
         barDuration.getItems().setAll(BarDuration.values());
-        barDuration.setValue(BarDuration.FIVE_MIN);
+        barDuration.setValue(BarDuration.SIXTY_MIN);
         barDurationInMinutes = barDuration.getValue().getIntValue();
         //JLabel barDurationLable = new JLabel("BarSize in Min");
 

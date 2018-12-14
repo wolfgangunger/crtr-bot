@@ -427,7 +427,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblRsiTimeFrame);
 
         tfRsiTimeframe = new NumericTextField();
-        tfRsiTimeframe.setText(String.valueOf(4));
+        tfRsiTimeframe.setText(String.valueOf(3));
         tfRsiTimeframe.setColumns(4);
         result.add(tfRsiTimeframe);
 
@@ -460,7 +460,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblRsiThresholdLow);
 
         tfRsiThresholdLow = new NumericTextField();
-        tfRsiThresholdLow.setText(String.valueOf(15));
+        tfRsiThresholdLow.setText(String.valueOf(20));
         tfRsiThresholdLow.setColumns(4);
         result.add(tfRsiThresholdLow);
 
@@ -476,7 +476,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoThresholdLow);
 
         tfStoThresholdLow = new JTextField();
-        tfStoThresholdLow.setText(String.valueOf(0.15f));
+        tfStoThresholdLow.setText(String.valueOf(0.18f));
         tfStoThresholdLow.setColumns(4);
         result.add(tfStoThresholdLow);
 
@@ -546,7 +546,7 @@ public class StrategyPanel extends AbstractPanel {
         chkStoLow.setSelected(true);
         rules.add(chkStoLow);
 
-        JLabel lblAboveSMA = new JLabel("Above SMAs");
+        JLabel lblAboveSMA = new JLabel("Above SMA200");
         rules.add(lblAboveSMA);
         chkAboveSMA = new JCheckBox();
         chkAboveSMA.setSelected(false);

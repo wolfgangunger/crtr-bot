@@ -31,7 +31,6 @@ import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
@@ -88,7 +87,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // these rules are designed for hour candles - in case of shorter candles and bars the timeframe params (MA ...) must be adapted
 //1- RSI is low and pointing up (v)
 //2- Stochastic is low and pointing up (v)
-//3- Price is above SMA200&314 ???? really ?
+//3- Price is above SMA200&314 (v) really ?
 //4- 8-MA is pointing up (v)
 //5- Price is near or below the 8-MA (v) (the further away from the 8-MA price is, the higher probability price will turn back towards it)
 //6- Price is _above_ a known area of resistance (use Fib levels to determine those zones)
@@ -110,6 +109,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
         SMAIndicator smaLong = new SMAIndicator(closePrice, params.getSmaLong());
         // simple MA8 
         SMAIndicator sma8 = new SMAIndicator(closePrice, params.getSma8());
+        // simple MA200
+        SMAIndicator sma200 = new SMAIndicator(closePrice, params.getSma200());
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframe());
         // stochastik
@@ -126,16 +127,15 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // 2  STO is crossing low threshold 
         Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdLow()));
         // 3 - to be done - does it make sense ?
-
+        Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         // 4 8-MA is pointing up - second param to check
         Rule entryRule4 = new IsRisingRule(sma8, params.getSma8());
-
         //5- Price is near or below the 8-MA 
         Rule entryRule5 = new UnderIndicatorRule(closePrice, sma8);
 
         // the complete final rule 
         //Rule entryRule = entryRule1.and(entryRule2).and(entryRule4).and(entryRule5);
-        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, null, entryRule4, entryRule5, null);
+        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5, null);
 
         // exit rule - todo
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
@@ -147,8 +147,13 @@ public class FinalTradingStrategy extends AbstractStrategy {
 //                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         //             .or(new StopLossRule(closePrice, Decimal.valueOf(0.3d)));
 
-        Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars()).
-                or(new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss())));
+        //Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars()).
+        //        or(new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss())));
+        
+        
+//        Rule exitRule2 =  new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss()));
+                //Rule exitRule2 =  new IsFallingRule(closePrice,2);
+                Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 
         return new BaseStrategy(entryRule, exitRule2);
     }
@@ -216,7 +221,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
      */
     private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, RuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5, Rule rule7) {
         // first create a rule, which will always be chained and is always true
-        Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
+            Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
 
         if (ruleChain.isRule1_rsiLow()) {
             result = result.and(rule1);
@@ -224,14 +229,14 @@ public class FinalTradingStrategy extends AbstractStrategy {
         if (ruleChain.isRule2_stoLow()) {
             result = result.and(rule2);
         }
-//        if (ruleChain.isRule3_priceAboveSMA200()) {
-//            result = result.and(rule3);
-//        }
+        if (ruleChain.isRule3_priceAboveSMA200()) {
+            result = result.and(rule3);
+        }
         if (ruleChain.isRule4_ma8PointingUp()) {
             result = result.and(rule4);
         }
         if (ruleChain.isRule5_priceBelow8MA()) {
-            result = result.and(rule1);
+            result = result.and(rule5);
         }
 //        if (ruleChain.isRule7_emaBandsPointingUp()) {
 //            result = result.and(rule7);
