@@ -628,7 +628,7 @@ public class StrategyPanel extends AbstractPanel {
         Decimal averagePercent = Decimal.ZERO;
         for (Trade trade : trades) {
             //sb.append( "trade amount " + trade.getEntry().getAmount() );
-            System.out.println("index" + trade.getEntry().getIndex());
+            //System.out.println("index" + trade.getEntry().getIndex());
             sb.append("Entry " + trade.getEntry().getPrice() + TAB + " : Exit " + trade.getExit().getPrice() + TAB);
             Decimal diff = trade.getExit().getPrice().minus(trade.getEntry().getPrice());
             Decimal diffPercent = trade.getExit().getPrice().dividedBy(trade.getEntry().getPrice());

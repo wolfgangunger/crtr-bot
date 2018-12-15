@@ -32,7 +32,7 @@ public class TimerService {
     private Analyzer analyzer;
 
     // delay in ms
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 100)
     public void scheduleFixedDelayTask() {
         if (series == null) {
             return;
@@ -45,11 +45,20 @@ public class TimerService {
         List<Bar> bars = createBarList(first, last);
         TimeSeries rollingSeries = new BaseTimeSeries("bitstamp_trades", bars);
         log(rollingSeries);
-        analyzer.analyseClosedPrice(rollingSeries, 2);
+        analyzer.isClosedPriceRising(rollingSeries, 2);
         // sma 8
-        analyzer.analyseSMA(rollingSeries, 8, 2);
+        analyzer.isSmaRising(rollingSeries, 8, 2);
+        // sma 50
+        analyzer.isSmaRising(rollingSeries, 50, 2);
         // sma 200
-        analyzer.analyseSMA(rollingSeries, 200, 2);
+        analyzer.isSmaRising(rollingSeries, 200, 2);
+        // ema 14
+        analyzer.isEmaRising(rollingSeries, 14, 2);
+        // ema 50
+        analyzer.isEmaRising(rollingSeries, 50, 3);
+        // long time trend
+        analyzer.isSMALongTimeBullish(rollingSeries, 3, 80, 2);
+
         counter++;
     }
 
