@@ -47,6 +47,9 @@ public class FinalTradingStrategy extends AbstractStrategy {
     @Override
     public Strategy buildStrategy(TimeSeries series, BarDuration barDuration) {
 
+        boolean barMultiplikator = true;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
         int ma8 = 8;
         int ma14 = 14;
         int ma200 = 200;
@@ -55,6 +58,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         int stoRsiTimeframe = 18;
         int stoOscKTimeFrame = 14;
         int emaIndicatorTimeframe = 18;
+        int smaIndicatorTimeframe = 12;
         int rsiThresholdLow = 15;
         int rsiThresholdHigh = 80;
         double stoThresholdLow = 0.15d;
@@ -66,8 +70,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
         int waitBars = 50;
         RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(true).rule2_stoLow(true).rule3_priceAboveSMA200(false).
                 rule4_ma8PointingUp(true).rule5_priceBelow8MA(true).rule7_emaBandsPointingUp(true).build();
-        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
-                stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
+                stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
 
         return buildStrategyWithParams(series, params);
@@ -90,8 +94,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
 //3- Price is above SMA200&314 (v) really ?
 //4- 8-MA is pointing up (v)
 //5- Price is near or below the 8-MA (v) (the further away from the 8-MA price is, the higher probability price will turn back towards it)
-//6- Price is _above_ a known area of resistance (use Fib levels to determine those zones)
-//7- Moving EMA bands are angled up
+//6- Price is _above_ a known area of resistance (use Fib levels to determine those zones) TODO
+//7- Moving EMA bands are angled up (v)
 //8- Price is not approaching prior resistance
 //9- Price is near the bottom of an identified cycle
 //10- Still room to grow in larger time frames
@@ -111,6 +115,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         SMAIndicator sma8 = new SMAIndicator(closePrice, params.getSma8());
         // simple MA200
         SMAIndicator sma200 = new SMAIndicator(closePrice, params.getSma200());
+      
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframe());
         // stochastik
@@ -129,13 +134,19 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // 3 - to be done - does it make sense ?
         Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         // 4 8-MA is pointing up - second param to check
-        Rule entryRule4 = new IsRisingRule(sma8, params.getSma8());
+        Rule entryRule4 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe());
         //5- Price is near or below the 8-MA 
         Rule entryRule5 = new UnderIndicatorRule(closePrice, sma8);
+        // Rule 6 TODO 
+        
+        // Rule 7
+          Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe())
+                  .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe()));
+          // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
         // the complete final rule 
         //Rule entryRule = entryRule1.and(entryRule2).and(entryRule4).and(entryRule5);
-        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5, null);
+        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5, entryRule7);
 
         // exit rule - todo
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
@@ -149,11 +160,9 @@ public class FinalTradingStrategy extends AbstractStrategy {
 
         //Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars()).
         //        or(new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss())));
-        
-        
 //        Rule exitRule2 =  new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss()));
-                //Rule exitRule2 =  new IsFallingRule(closePrice,2);
-                Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
+        //Rule exitRule2 =  new IsFallingRule(closePrice,2);
+        Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 
         return new BaseStrategy(entryRule, exitRule2);
     }
@@ -221,7 +230,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
      */
     private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, RuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5, Rule rule7) {
         // first create a rule, which will always be chained and is always true
-            Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
+        Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
 
         if (ruleChain.isRule1_rsiLow()) {
             result = result.and(rule1);
@@ -238,9 +247,9 @@ public class FinalTradingStrategy extends AbstractStrategy {
         if (ruleChain.isRule5_priceBelow8MA()) {
             result = result.and(rule5);
         }
-//        if (ruleChain.isRule7_emaBandsPointingUp()) {
-//            result = result.and(rule7);
-//        }
+        if (ruleChain.isRule7_emaBandsPointingUp()) {
+            result = result.and(rule7);
+        }
         return result;
     }
 

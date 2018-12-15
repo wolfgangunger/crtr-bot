@@ -16,11 +16,14 @@ public final class StrategyInputParamsBuilder {
     private StrategyInputParamsBuilder() {
     }
 
-    public static StrategyInputParams createStrategyInputParams(BarDuration barDuration,int ma8,int ma14,int ma200,int ma314, int smaShort, int smaLong, int emaShort, int emaLong,
-            int rsiTimeFrame, int stoRsiTimeframe, int stoOscKTimeFrame, int emaIndicatorTimeframe, int rsiThresholdLow, int rsiThresholdHigh,
+    public static StrategyInputParams createStrategyInputParams(BarDuration barDuration,  boolean barMultiplikator, boolean extraMultiplikator,float extraMultiplikatorValue , int ma8,int ma14,int ma200,int ma314, int smaShort, int smaLong, int emaShort, int emaLong,
+            int rsiTimeFrame, int stoRsiTimeframe, int stoOscKTimeFrame, int emaIndicatorTimeframe, int smaIndicatorTimeframe, int rsiThresholdLow, int rsiThresholdHigh,
              double stoThresholdLow ,  double stoThresholdHigh, int stoOscKThresholdLow, int stoOscKThresholdHigh ,
              double stopLoss, double stopGain,int waitBars,RuleChain ruleChain) {
         StrategyInputParams result = new StrategyInputParams();
+        result.setBarMultiplikator(barMultiplikator);
+        result.setExtraMultiplikator(extraMultiplikator);
+        result.setExtraMultiplikatorValue(extraMultiplikatorValue);
         result.setSma8(ma8);
         result.setSma14(ma14);
         result.setSma200(ma200);
@@ -34,6 +37,7 @@ public final class StrategyInputParamsBuilder {
         result.setStoRsiTimeframe(stoRsiTimeframe);
         result.setStoOscKTimeFrame(stoOscKTimeFrame);
         result.setEmaIndicatorTimeframe(emaIndicatorTimeframe);
+        result.setSmaIndicatorTimeframe(smaIndicatorTimeframe);
         result.setRsiThresholdLow(rsiThresholdLow);
         result.setRsiThresholdHigh(rsiThresholdHigh);
         result.setStoThresholdLow(stoThresholdLow);

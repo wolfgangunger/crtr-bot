@@ -32,6 +32,10 @@ public class StrategyInputParams {
     // bar / candle size
     private BarDuration barDuration;
     
+    private boolean barMultiplikator;
+    private boolean extraMultiplikator;
+    private float extraMultiplikatorValue;
+    
     private RuleChain ruleChain;
 
     /// indicators
@@ -53,6 +57,8 @@ public class StrategyInputParams {
     private int stoRsiTimeframe;
   //StochasticOscillatorKIndicator
     private int stoOscKTimeFrame;
+    //SMAIndicator
+    private int smaIndicatorTimeframe;
     //EMAIndicator
     private int emaIndicatorTimeframe;
     
@@ -74,7 +80,14 @@ public class StrategyInputParams {
     private int waitBars;
 
     private int getMAMultiplicator(){
-        return BarDurationUtil.getMAMultiplicator(barDuration);
+        float tmp = 1;
+        if(barMultiplikator){
+            tmp = (float)BarDurationUtil.getMAMultiplicator(barDuration);
+        }
+        if (extraMultiplikator){
+            tmp = tmp * extraMultiplikatorValue;
+        }
+        return (int)tmp;
     }
     public BarDuration getBarDuration() {
         return barDuration;
@@ -131,6 +144,11 @@ public class StrategyInputParams {
     public int getEmaIndicatorTimeframe() {
         return emaIndicatorTimeframe * getMAMultiplicator();
     }
+
+    public int getSmaIndicatorTimeframe() {
+        return smaIndicatorTimeframe * getMAMultiplicator();
+    }
+    
 
     public int getRsiThresholdLow() {
         return rsiThresholdLow;

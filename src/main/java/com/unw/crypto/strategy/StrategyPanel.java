@@ -69,6 +69,9 @@ public class StrategyPanel extends AbstractPanel {
     private XYPlot plot;
     private static final String LB = "\n";
     private static final String TAB = "\t";
+    private JCheckBox chkBarMultiplikator;
+    private JCheckBox chkExtraMultiplikator;
+    private JTextField tfExtraMultiplikator;
     private NumericTextField tfMA8;
     private NumericTextField tfMA14;
     private NumericTextField tfMA200;
@@ -81,6 +84,7 @@ public class StrategyPanel extends AbstractPanel {
     private NumericTextField tfRsiStoTimeframe;
     private NumericTextField tfStoOscKTimeframe;
     private NumericTextField tfEmaIndicatorTimeframe;
+    private NumericTextField tfSmaIndicatorTimeframe;
     private NumericTextField tfRsiThresholdLow;
     private NumericTextField tfRsiThresholdHigh;
     private JTextField tfStoThresholdLow;
@@ -95,6 +99,7 @@ public class StrategyPanel extends AbstractPanel {
     private JCheckBox chkAboveSMA;
     private JCheckBox chkMaPointingUp;
     private JCheckBox chkBelow8MA;
+    private JCheckBox chkMAsUp;
 
     public StrategyPanel(TimeSeries series) {
         this.series = series;
@@ -170,13 +175,12 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void initToolbar() {
-
         JPanel toolbarComplete = new JPanel();
         JPanel toolbarTop = new JPanel();
         //JPanel toolbarFinalStrategy = new JPanel();        
         toolbarComplete.setLayout(new BorderLayout());
-        toolbarComplete.setPreferredSize(new Dimension(Config.WIDTH, 120));
-        toolbarComplete.setMinimumSize(new Dimension(960, 120));
+        toolbarComplete.setPreferredSize(new Dimension(Config.WIDTH, 160));
+        toolbarComplete.setMinimumSize(new Dimension(960, 160));
         toolbarComplete.setBorder(BorderFactory.createEtchedBorder());
         toolbarTop.setBorder(BorderFactory.createEtchedBorder());
 
@@ -315,6 +319,9 @@ public class StrategyPanel extends AbstractPanel {
 
     private StrategyInputParams createStrategyInputParams() {
         StrategyInputParams result;
+        boolean barMultiplikator = chkBarMultiplikator.isSelected();
+        boolean extraMultiplikator = chkExtraMultiplikator.isSelected();
+        float extraMultiplikatorValue = Float.valueOf(tfExtraMultiplikator.getText());
         int ma8 = Integer.valueOf(tfMA8.getText());
         int ma14 = Integer.valueOf(tfMA14.getText());
         int ma200 = Integer.valueOf(tfMA200.getText());
@@ -327,6 +334,7 @@ public class StrategyPanel extends AbstractPanel {
         int rsiStoTimeframe = Integer.valueOf(tfRsiStoTimeframe.getText());
         int stoOscKTimeFrame = Integer.valueOf(tfStoOscKTimeframe.getText());
         int emaIndicatorTimeframe = Integer.valueOf(tfEmaIndicatorTimeframe.getText());
+        int smaIndicatorTimeframe = Integer.valueOf(tfSmaIndicatorTimeframe.getText());
         int rsiThresholdLow = Integer.valueOf(tfRsiThresholdLow.getText());
         int rsiThresholdHigh = Integer.valueOf(tfRsiThresholdHigh.getText());
         double stoThresholdLow = Double.valueOf(tfStoThresholdLow.getText());
@@ -337,9 +345,9 @@ public class StrategyPanel extends AbstractPanel {
         double stopGain = Double.valueOf(tfStopGain.getText());
         int waitBars = Integer.valueOf(tfWaitBars.getText());
         RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).rule3_priceAboveSMA200(chkAboveSMA.isSelected()).
-                rule4_ma8PointingUp(chkMaPointingUp.isSelected()).rule5_priceBelow8MA(chkBelow8MA.isSelected()).rule7_emaBandsPointingUp(false).build();
-        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration,ma8,ma14,ma200,ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
-                rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                rule4_ma8PointingUp(chkMaPointingUp.isSelected()).rule5_priceBelow8MA(chkBelow8MA.isSelected()).rule7_emaBandsPointingUp(chkMAsUp.isSelected()).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
+                rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
         return result;
     }
@@ -356,6 +364,30 @@ public class StrategyPanel extends AbstractPanel {
         result.setBorder(BorderFactory.createEtchedBorder());
         result.setName("Final Strategy Params");
         result.setToolTipText("Final Strategy Params");
+
+        // timeFrame Multiplikator
+        JPanel timeframes = new JPanel();
+        timeframes.setLayout(new FlowLayout());
+        timeframes.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+
+        JLabel lblBarMultiplikator = new JLabel("Bar Multiplikator");
+        timeframes.add(lblBarMultiplikator);
+        chkBarMultiplikator = new JCheckBox();
+        chkBarMultiplikator.setSelected(false);
+        timeframes.add(chkBarMultiplikator);
+
+        JLabel lblExtraMultiplikator = new JLabel("Extra Multiplikator");
+        timeframes.add(lblExtraMultiplikator);
+        chkExtraMultiplikator = new JCheckBox();
+        chkExtraMultiplikator.setSelected(false);
+        timeframes.add(chkExtraMultiplikator);
+
+        tfExtraMultiplikator = new JTextField();
+        tfExtraMultiplikator.setText(String.valueOf(1.0f));
+        tfExtraMultiplikator.setColumns(4);
+        timeframes.add(tfExtraMultiplikator);
+
+        result.add(timeframes);
 
         // ma - fix MAs
         JLabel lblMA8 = new JLabel("MA8");
@@ -410,7 +442,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblShortEMA);
 
         tfShortEMA = new NumericTextField();
-        tfShortEMA.setText(String.valueOf(3));
+        tfShortEMA.setText(String.valueOf(5));
         tfShortEMA.setColumns(4);
         result.add(tfShortEMA);
 
@@ -418,7 +450,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblLongEMA);
 
         tfLongEMA = new NumericTextField();
-        tfLongEMA.setText(String.valueOf(10));
+        tfLongEMA.setText(String.valueOf(12));
         tfLongEMA.setColumns(4);
         result.add(tfLongEMA);
 
@@ -427,7 +459,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblRsiTimeFrame);
 
         tfRsiTimeframe = new NumericTextField();
-        tfRsiTimeframe.setText(String.valueOf(3));
+        tfRsiTimeframe.setText(String.valueOf(1));
         tfRsiTimeframe.setColumns(4);
         result.add(tfRsiTimeframe);
 
@@ -435,7 +467,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoRsiTimeframe);
 
         tfRsiStoTimeframe = new NumericTextField();
-        tfRsiStoTimeframe.setText(String.valueOf(18));
+        tfRsiStoTimeframe.setText(String.valueOf(2));
         tfRsiStoTimeframe.setColumns(4);
         result.add(tfRsiStoTimeframe);
 
@@ -443,16 +475,24 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoOscKTimeframe);
 
         tfStoOscKTimeframe = new NumericTextField();
-        tfStoOscKTimeframe.setText(String.valueOf(18));
+        tfStoOscKTimeframe.setText(String.valueOf(4));
         tfStoOscKTimeframe.setColumns(4);
         result.add(tfStoOscKTimeframe);
 
+        //SMAIndicator
+        JLabel lblSmaIndicatorTimeframe = new JLabel("SMA Indicatior Timeframe");
+        result.add(lblSmaIndicatorTimeframe);
+
+        tfSmaIndicatorTimeframe = new NumericTextField();
+        tfSmaIndicatorTimeframe.setText(String.valueOf(4));
+        tfSmaIndicatorTimeframe.setColumns(4);
+        result.add(tfSmaIndicatorTimeframe);
         //EMAIndicator
         JLabel lblEmaIndicatorTimeframe = new JLabel("EMA Indicatior Timeframe");
         result.add(lblEmaIndicatorTimeframe);
 
         tfEmaIndicatorTimeframe = new NumericTextField();
-        tfEmaIndicatorTimeframe.setText(String.valueOf(18));
+        tfEmaIndicatorTimeframe.setText(String.valueOf(2));
         tfEmaIndicatorTimeframe.setColumns(4);
         result.add(tfEmaIndicatorTimeframe);
         //RSI threshold
@@ -460,11 +500,11 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblRsiThresholdLow);
 
         tfRsiThresholdLow = new NumericTextField();
-        tfRsiThresholdLow.setText(String.valueOf(20));
+        tfRsiThresholdLow.setText(String.valueOf(15));
         tfRsiThresholdLow.setColumns(4);
         result.add(tfRsiThresholdLow);
 
-        JLabel lblRsiThresholdHigh = new JLabel("RSI Threshold HIgh");
+        JLabel lblRsiThresholdHigh = new JLabel("RSI Threshold High");
         result.add(lblRsiThresholdHigh);
 
         tfRsiThresholdHigh = new NumericTextField();
@@ -487,6 +527,7 @@ public class StrategyPanel extends AbstractPanel {
         tfStoThresholdHigh.setText(String.valueOf(0.85f));
         tfStoThresholdHigh.setColumns(4);
         result.add(tfStoThresholdHigh);
+
         //stochasticOscillK
         JLabel lblStoOscKThresholdLow = new JLabel("STO OscK Threshold Low");
         result.add(lblStoOscKThresholdLow);
@@ -525,7 +566,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblWaitBars);
 
         tfWaitBars = new NumericTextField();
-        tfWaitBars.setText(String.valueOf(50));
+        tfWaitBars.setText(String.valueOf(35));
         tfWaitBars.setColumns(4);
         result.add(tfWaitBars);
 
@@ -534,35 +575,41 @@ public class StrategyPanel extends AbstractPanel {
         rules.setLayout(new FlowLayout());
         rules.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 
-        JLabel lblRuleRSI = new JLabel("RSI Low");
+        JLabel lblRuleRSI = new JLabel("1 RSI Low");
         rules.add(lblRuleRSI);
         chkRsiLow = new JCheckBox();
         chkRsiLow.setSelected(true);
         rules.add(chkRsiLow);
 
-        JLabel lblRuleSTO = new JLabel("STO Low");
+        JLabel lblRuleSTO = new JLabel("2 STO Low");
         rules.add(lblRuleSTO);
         chkStoLow = new JCheckBox();
         chkStoLow.setSelected(true);
         rules.add(chkStoLow);
 
-        JLabel lblAboveSMA = new JLabel("Above SMA200");
+        JLabel lblAboveSMA = new JLabel("3 Above SMA200");
         rules.add(lblAboveSMA);
         chkAboveSMA = new JCheckBox();
         chkAboveSMA.setSelected(false);
         rules.add(chkAboveSMA);
 
-        JLabel lblMaUp = new JLabel("8MA pointing up");
+        JLabel lblMaUp = new JLabel("4 8MA pointing up");
         rules.add(lblMaUp);
         chkMaPointingUp = new JCheckBox();
-        chkMaPointingUp.setSelected(false);
+        chkMaPointingUp.setSelected(true);
         rules.add(chkMaPointingUp);
 
-        JLabel lblBelow8MA = new JLabel("Below 8MA");
+        JLabel lblBelow8MA = new JLabel("5 Below 8MA");
         rules.add(lblBelow8MA);
         chkBelow8MA = new JCheckBox();
-        chkBelow8MA.setSelected(true);
+        chkBelow8MA.setSelected(false);
         rules.add(chkBelow8MA);
+
+        JLabel lblMAsUp = new JLabel("7 EMA-Bands ups");
+        rules.add(lblMAsUp);
+        chkMAsUp = new JCheckBox();
+        chkMAsUp.setSelected(true);
+        rules.add(chkMAsUp);
 
         result.add(rules);
         return result;
