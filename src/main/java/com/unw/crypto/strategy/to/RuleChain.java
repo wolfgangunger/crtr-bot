@@ -34,4 +34,8 @@ public class RuleChain {
     private boolean rule4_ma8PointingUp;
     private boolean rule5_priceBelow8MA;
     private boolean rule7_emaBandsPointingUp;
+
+    private boolean rule11_isRsiPointingUp;
+    private boolean rule12_isStoPointingUp;
+    private boolean rule13_movingMomentum;
 }

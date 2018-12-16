@@ -18,6 +18,7 @@ public enum Exchange {
     BITTREX("Bittrex"),
     GDAX("GDax"),
     HITBTC("Hitbtc"),
+    BITSTAMP("Bitstamp"),
     UNKNOWN("Unknown");
 
     private final String stringValue;

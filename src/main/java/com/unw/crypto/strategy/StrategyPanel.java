@@ -100,6 +100,9 @@ public class StrategyPanel extends AbstractPanel {
     private JCheckBox chkMaPointingUp;
     private JCheckBox chkBelow8MA;
     private JCheckBox chkMAsUp;
+    private JCheckBox chkRsiUp;
+    private JCheckBox chkStoUp;
+    private JCheckBox chkMovMom;
 
     public StrategyPanel(TimeSeries series) {
         this.series = series;
@@ -205,7 +208,7 @@ public class StrategyPanel extends AbstractPanel {
                 currentStrategy = mm;
                 iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
                 iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
-                mm.setiMALong(iMALong);
+                mm.setiMAShort(iMAShort);
                 mm.setiMALong(iMALong);
                 tradingRecord = mm.execute(series, getBarDuration());
                 updateLog(tradingRecord);
@@ -345,7 +348,8 @@ public class StrategyPanel extends AbstractPanel {
         double stopGain = Double.valueOf(tfStopGain.getText());
         int waitBars = Integer.valueOf(tfWaitBars.getText());
         RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).rule3_priceAboveSMA200(chkAboveSMA.isSelected()).
-                rule4_ma8PointingUp(chkMaPointingUp.isSelected()).rule5_priceBelow8MA(chkBelow8MA.isSelected()).rule7_emaBandsPointingUp(chkMAsUp.isSelected()).build();
+                rule4_ma8PointingUp(chkMaPointingUp.isSelected()).rule5_priceBelow8MA(chkBelow8MA.isSelected()).rule7_emaBandsPointingUp(chkMAsUp.isSelected())
+                .rule11_isRsiPointingUp(chkRsiUp.isSelected()).rule12_isStoPointingUp(chkStoUp.isSelected()).rule13_movingMomentum(chkMovMom.isSelected()).build();
         result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
                 rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
@@ -590,7 +594,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblAboveSMA = new JLabel("3 Above SMA200");
         rules.add(lblAboveSMA);
         chkAboveSMA = new JCheckBox();
-        chkAboveSMA.setSelected(false);
+        chkAboveSMA.setSelected(true);
         rules.add(chkAboveSMA);
 
         JLabel lblMaUp = new JLabel("4 8MA pointing up");
@@ -610,6 +614,24 @@ public class StrategyPanel extends AbstractPanel {
         chkMAsUp = new JCheckBox();
         chkMAsUp.setSelected(true);
         rules.add(chkMAsUp);
+
+        JLabel lblRsiUp = new JLabel("11 RSI ->up");
+        rules.add(lblRsiUp);
+        chkRsiUp = new JCheckBox();
+        chkRsiUp.setSelected(false);
+        rules.add(chkRsiUp);
+
+        JLabel lblStoUp = new JLabel("12 Sto ->up");
+        rules.add(lblStoUp);
+        chkStoUp = new JCheckBox();
+        chkStoUp.setSelected(false);
+        rules.add(chkStoUp);
+
+        JLabel lblMovingMom = new JLabel("13 MovMom");
+        rules.add(lblMovingMom);
+        chkMovMom = new JCheckBox();
+        chkMovMom.setSelected(false);
+        rules.add(chkMovMom);
 
         result.add(rules);
         return result;

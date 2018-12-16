@@ -89,8 +89,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
     public Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) {
 
         // these rules are designed for hour candles - in case of shorter candles and bars the timeframe params (MA ...) must be adapted
-//1- RSI is low and pointing up (v)
-//2- Stochastic is low and pointing up (v)
+//1- RSI is low and pointing up (v) only crossed down implemented, see rule 11 for pointing up
+//2- Stochastic is low and pointing up (v) only crossed down implemented, see rule 12 for pointing up
 //3- Price is above SMA200&314 (v) really ?
 //4- 8-MA is pointing up (v)
 //5- Price is near or below the 8-MA (v) (the further away from the 8-MA price is, the higher probability price will turn back towards it)
@@ -99,6 +99,9 @@ public class FinalTradingStrategy extends AbstractStrategy {
 //8- Price is not approaching prior resistance
 //9- Price is near the bottom of an identified cycle
 //10- Still room to grow in larger time frames
+// 11 RSI is pointing up
+// 12 STO is pointing up
+// 13 Moving Momentum
 //Be prepare to sell when the rsi, stoch and 8-MA turn down in agreement
         // simple base indicator for closed price
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
@@ -115,7 +118,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         SMAIndicator sma8 = new SMAIndicator(closePrice, params.getSma8());
         // simple MA200
         SMAIndicator sma200 = new SMAIndicator(closePrice, params.getSma200());
-      
+
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframe());
         // stochastik
@@ -138,15 +141,27 @@ public class FinalTradingStrategy extends AbstractStrategy {
         //5- Price is near or below the 8-MA 
         Rule entryRule5 = new UnderIndicatorRule(closePrice, sma8);
         // Rule 6 TODO 
-        
-        // Rule 7
-          Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe())
-                  .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe()));
-          // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
-        // the complete final rule 
+        // Rule 7
+        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe())
+                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe()));
+        // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
+
+        // rule 11 rsi pointing up
+        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe());
+
+        //rule 12 sto pointing up
+        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe());
+
+        // rule 13 - moving momentung
+        Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
+                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoThresholdLow()))) // Signal 1
+                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
+
+        // build the complete final rule 
         //Rule entryRule = entryRule1.and(entryRule2).and(entryRule4).and(entryRule5);
-        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5, entryRule7);
+        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5, 
+                entryRule7,entryRule11,entryRule12,entryRule13);
 
         // exit rule - todo
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
@@ -228,7 +243,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
      * @param rule7
      * @return
      */
-    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, RuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5, Rule rule7) {
+    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, RuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5,
+            Rule rule7,Rule rule11,Rule rule12,Rule rule13) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
 
@@ -249,6 +265,16 @@ public class FinalTradingStrategy extends AbstractStrategy {
         }
         if (ruleChain.isRule7_emaBandsPointingUp()) {
             result = result.and(rule7);
+        }
+        //
+        if (ruleChain.isRule11_isRsiPointingUp()) {
+            result = result.and(rule11);
+        }
+        if (ruleChain.isRule12_isStoPointingUp()) {
+            result = result.and(rule12);
+        }
+        if (ruleChain.isRule13_movingMomentum()) {
+            result = result.and(rule13);
         }
         return result;
     }

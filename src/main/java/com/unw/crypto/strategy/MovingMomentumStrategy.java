@@ -12,6 +12,7 @@ import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
+import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  * Moving momentum strategy.
@@ -55,8 +56,11 @@ public class MovingMomentumStrategy extends AbstractStrategy {
         Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
                 .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80))) // Signal 1
                 .and(new UnderIndicatorRule(macd, emaMacd)); // Signal 2
+        
+        // simple static exit rule 
+         Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, 35);
 
-        return new BaseStrategy(entryRule, exitRule);
+        return new BaseStrategy(entryRule, exitRule2);
     }
 
     public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
