@@ -12,11 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BaseTimeSeries;
-import org.ta4j.core.Rule;
 import org.ta4j.core.TimeSeries;
-import org.ta4j.core.indicators.SMAIndicator;
-import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.trading.rules.IsRisingRule;
 
 /**
  *
