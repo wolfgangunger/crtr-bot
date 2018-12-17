@@ -16,7 +16,7 @@ public class HealthService {
     @GET
     @Path("/health")
     public Response test() {
-        return Response.status(200).entity("Service running").build();
+        return Response.status(200).entity("CRTR Service running").build();
     }
 
 }

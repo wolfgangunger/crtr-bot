@@ -16,7 +16,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * the backround/service app
  * @author UNGERW
  */
-//@SpringBootApplication
+@SpringBootApplication
 public class SpringBootApp {
 
     public static void main(String[] args) throws BeansException, IOException {
