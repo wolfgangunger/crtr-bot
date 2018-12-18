@@ -64,6 +64,8 @@ public class StrategyPanel extends AbstractPanel {
     private List<Tick> ticks;
     // the series 2 month before the period ( to be able to create a MA200 for 10 min bars)
     private TimeSeries preSeries;
+    // the complete series for the forward testing
+    private TimeSeries completeSeries; 
     // progress bar of the main window
     private ProgressBar progressBar;
     // required for the chart
@@ -175,14 +177,12 @@ public class StrategyPanel extends AbstractPanel {
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
         //Strategy str = currentStrategy.buildStrategy(series, getBarDuration());
-        Strategy str;
         if (currentStrategy instanceof FinalTradingStrategy) {
-            str = finalStrategy;
+              ChartUtil.addBuySellSignals(completeSeries, finalStrategy, plot);
         } else {
-            str = currentStrategy.buildStrategy(series, getBarDuration());
+              ChartUtil.addBuySellSignals(series, currentStrategy.buildStrategy(series, getBarDuration()), plot);
         }
 
-        ChartUtil.addBuySellSignals(series, str, plot);
     }
 
     private void initMainPanel() {
@@ -373,10 +373,7 @@ public class StrategyPanel extends AbstractPanel {
     private void executeFinalStrategy2() {
         currentStrategy = finalTradingStrategy;
         StrategyInputParams params = createStrategyInputParams();
-
-        TimeSeries completeSeries = preSeries;
-        //int first = series.getBeginIndex();
-        //int last = series.getEndIndex();
+        completeSeries = preSeries;
         boolean entered = false;
         List<Order> orders = new ArrayList();
         int ticksSize = ticks.size();
@@ -385,7 +382,7 @@ public class StrategyPanel extends AbstractPanel {
         ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
         for (Tick tick : ticks) {
             progressBarCounter++;
-            System.out.println(tick.getTradeTime());
+            //System.out.println(tick.getTradeTime());
              if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))){
                  System.out.println("overlap");
                  continue;
@@ -394,10 +391,11 @@ public class StrategyPanel extends AbstractPanel {
                     .isBefore(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
                 completeSeries.addBar(createNewBar(tick));
                 beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
+                progressBar.setProgress(Double.valueOf((progressBarCounter/ticksSize))*100);
+                System.out.println(Double.valueOf((progressBarCounter/ticksSize))*100 + " %");
             } else {
                 completeSeries.getLastBar().addTrade(Decimal.valueOf(tick.getAmount()),
                         Decimal.valueOf(tick.getPrice()));
-                progressBar.setProgress(Double.valueOf((progressBarCounter/ticksSize))*100);
             }
 
             finalStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
@@ -742,8 +740,7 @@ public class StrategyPanel extends AbstractPanel {
     private TradingRecord buildTradingRecord(List<Order> orders) {
         Order[] orderArray = new Order[orders.size()];
         orderArray = orders.toArray(orderArray);
-        TradingRecord tradingRecord = new BaseTradingRecord(orderArray);
-        return tradingRecord;
+        return new BaseTradingRecord(orderArray);
     }
 
     private void updateLog2(List<Order> orders) {

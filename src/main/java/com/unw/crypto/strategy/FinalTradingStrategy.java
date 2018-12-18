@@ -167,8 +167,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
 //                .or(new StopGainRule(closePrice, Decimal.valueOf(0.4d)));
         Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoOscKThresholdHigh()))) // Signal 1
-                .and(new UnderIndicatorRule(macd, emaMacd));
+                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoOscKThresholdHigh()))); // Signal 1
+               // .and(new UnderIndicatorRule(macd, emaMacd));
                 //.and(new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()))); // works
 //                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
 
