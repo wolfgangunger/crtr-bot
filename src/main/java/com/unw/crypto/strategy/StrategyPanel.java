@@ -385,7 +385,7 @@ public class StrategyPanel extends AbstractPanel {
         ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
         for (Tick tick : ticks) {
             progressBarCounter++;
-            progressBar.setProgress(Double.valueOf((progressBarCounter/ticksSize))*100);
+            System.out.println(tick.getTradeTime());
              if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))){
                  System.out.println("overlap");
                  continue;
@@ -397,6 +397,7 @@ public class StrategyPanel extends AbstractPanel {
             } else {
                 completeSeries.getLastBar().addTrade(Decimal.valueOf(tick.getAmount()),
                         Decimal.valueOf(tick.getPrice()));
+                progressBar.setProgress(Double.valueOf((progressBarCounter/ticksSize))*100);
             }
 
             finalStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
@@ -407,14 +408,6 @@ public class StrategyPanel extends AbstractPanel {
                 orders.add(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                 entered = false;
             }
-//            Strategy strategy = strategyService.getStrategy(strategyType, timeSeries, config);
-//            if (strategy.shouldEnter(timeSeries.getEndIndex()) && !entered) {
-//                orders.add(Order.buyAt(timeSeries.getEndIndex(), timeSeries));
-//                entered = true;
-//            } else if (strategy.shouldExit(timeSeries.getEndIndex()) && entered) {
-//                orders.add(Order.sellAt(timeSeries.getEndIndex(), timeSeries));
-//                entered = false;
-//            }
         }
         progressBar.setProgress(100d);
         TradingRecord record = buildTradingRecord(orders);
