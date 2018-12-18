@@ -376,9 +376,9 @@ public class StrategyPanel extends AbstractPanel {
         completeSeries = preSeries;
         boolean entered = false;
         List<Order> orders = new ArrayList();
-        int ticksSize = ticks.size();
+        double ticksSize = ticks.size();
+        double progressBarCounter = 0;
         progressBar.setProgress(0d);
-        int progressBarCounter = 0;
         ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
         for (Tick tick : ticks) {
             progressBarCounter++;
