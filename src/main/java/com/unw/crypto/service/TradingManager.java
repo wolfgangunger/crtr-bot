@@ -34,7 +34,7 @@ public class TradingManager {
         System.out.println("execute...");
         LocalDate from = LocalDate.now().minusMonths(8);
         LocalDate until = LocalDate.now().minusMonths(6);
-        series = timeSeriesDBLoader.loadDataWithParams(from, until, Currency.BTC, Exchange.COINBASE, 60);
+        series = timeSeriesDBLoader.loadSeriesWithParams(from, until, Currency.BTC, Exchange.COINBASE, 60);
         timerService.setSeries(series);
     }
 

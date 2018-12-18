@@ -166,12 +166,11 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // exit rule - todo
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
 //                .or(new StopGainRule(closePrice, Decimal.valueOf(0.4d)));
-        Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoOscKThresholdHigh()))) // Signal 1
-                .and(new UnderIndicatorRule(macd, emaMacd))
-                .and(new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()))); // works
+        Rule exitRule = new UnderIndicatorRule(shortEma, longEma); // Trend
+//                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoOscKThresholdHigh()))) // Signal 1
+//                .and(new UnderIndicatorRule(macd, emaMacd));
+                //.and(new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()))); // works
 //                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
-        //             .or(new StopLossRule(closePrice, Decimal.valueOf(0.3d)));
 
         //Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars()).
         //        or(new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss())));
@@ -179,7 +178,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         //Rule exitRule2 =  new IsFallingRule(closePrice,2);
         Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 
-        return new BaseStrategy(entryRule, exitRule2);
+        return new BaseStrategy(entryRule, exitRule);
     }
 
     /**

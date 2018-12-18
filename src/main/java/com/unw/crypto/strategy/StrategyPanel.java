@@ -8,6 +8,7 @@ package com.unw.crypto.strategy;
 import com.unw.crypto.Config;
 import com.unw.crypto.chart.AbstractPanel;
 import com.unw.crypto.chart.ChartUtil;
+import com.unw.crypto.model.Tick;
 import com.unw.crypto.strategy.to.RuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
@@ -19,7 +20,13 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.control.ProgressBar;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -33,7 +40,11 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BaseBar;
+import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Decimal;
+import org.ta4j.core.Order;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.Trade;
@@ -47,8 +58,17 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
  */
 public class StrategyPanel extends AbstractPanel {
 
+    // the series for the selected period
     private TimeSeries series;
+    // the ticks for the selected period
+    private List<Tick> ticks;
+    // the series 2 month before the period ( to be able to create a MA200 for 10 min bars)
+    private TimeSeries preSeries;
+    // progress bar of the main window
+    private ProgressBar progressBar;
+    // required for the chart
     private TimeSeriesCollection dataset = new TimeSeriesCollection();
+    // the strategies
     private RSI2Strategy rsi2 = new RSI2Strategy();
     private MovingMomentumStrategy mm = new MovingMomentumStrategy();
     private MovingMomentumStrategyUnw mmUnger = new MovingMomentumStrategyUnw();
@@ -57,6 +77,7 @@ public class StrategyPanel extends AbstractPanel {
     private FinalTradingStrategy finalTradingStrategy = new FinalTradingStrategy();
     private TestStrategy testStrategy = new TestStrategy();
     private AbstractStrategy currentStrategy;
+    // the trading record for the output
     private TradingRecord tradingRecord;
     private Strategy finalStrategy;
     private JTextArea textArea;
@@ -104,8 +125,19 @@ public class StrategyPanel extends AbstractPanel {
     private JCheckBox chkStoUp;
     private JCheckBox chkMovMom;
 
-    public StrategyPanel(TimeSeries series) {
+    public StrategyPanel(TimeSeries series, TimeSeries preSeries) {
         this.series = series;
+        this.preSeries = preSeries;
+        this.setLayout(new BorderLayout());
+        initData();
+        initUi();
+    }
+
+    public StrategyPanel(List<Tick> ticks, TimeSeries series, TimeSeries preSeries, ProgressBar progressBar) {
+        this.ticks = ticks;
+        this.series = series;
+        this.preSeries = preSeries;
+        this.progressBar = progressBar;
         this.setLayout(new BorderLayout());
         initData();
         initUi();
@@ -282,7 +314,8 @@ public class StrategyPanel extends AbstractPanel {
         bttFinalStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                executeFinalStrategy();
+                //executeFinalStrategy();
+                executeFinalStrategy2();
             }
         });
         toolbarTop.add(bttFinalStrategy);
@@ -314,10 +347,86 @@ public class StrategyPanel extends AbstractPanel {
     private void executeFinalStrategy() {
         currentStrategy = finalTradingStrategy;
         StrategyInputParams params = createStrategyInputParams();
-        finalStrategy = finalTradingStrategy.buildStrategyWithParams(series, params);
-        tradingRecord = finalTradingStrategy.executeWithParams(series, params, finalStrategy);
-        updateLog(tradingRecord);
+
+        TimeSeries completeSeries = preSeries;
+        int first = series.getBeginIndex();
+        int last = series.getEndIndex();
+        boolean entered = false;
+        List<Order> orders = new ArrayList<Order>();
+        for (int i = first; i <= last; i++) {
+            if (series.getBar(i).getBeginTime().compareTo(completeSeries.getLastBar().getBeginTime()) > 0) {
+                completeSeries.addBar(series.getBar(i));
+                finalStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
+                if (finalStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
+                    orders.add(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
+                    entered = true;
+                } else if (finalStrategy.shouldExit(completeSeries.getEndIndex()) && entered) {
+                    orders.add(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                    entered = false;
+                }
+            }
+        }
+        updateLog3(orders);
         update();
+    }
+
+    private void executeFinalStrategy2() {
+        currentStrategy = finalTradingStrategy;
+        StrategyInputParams params = createStrategyInputParams();
+
+        TimeSeries completeSeries = preSeries;
+        //int first = series.getBeginIndex();
+        //int last = series.getEndIndex();
+        boolean entered = false;
+        List<Order> orders = new ArrayList();
+        int ticksSize = ticks.size();
+        progressBar.setProgress(0d);
+        int progressBarCounter = 0;
+        ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
+        for (Tick tick : ticks) {
+            progressBarCounter++;
+            progressBar.setProgress(Double.valueOf((progressBarCounter/ticksSize))*100);
+             if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))){
+                 System.out.println("overlap");
+                 continue;
+             }
+             if (beginTimeCurrentBar.plusMinutes(barDuration.getIntValue())
+                    .isBefore(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
+                completeSeries.addBar(createNewBar(tick));
+                beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
+            } else {
+                completeSeries.getLastBar().addTrade(Decimal.valueOf(tick.getAmount()),
+                        Decimal.valueOf(tick.getPrice()));
+            }
+
+            finalStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
+            if (finalStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
+                orders.add(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
+                entered = true;
+            } else if (finalStrategy.shouldExit(completeSeries.getEndIndex()) && entered) {
+                orders.add(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                entered = false;
+            }
+//            Strategy strategy = strategyService.getStrategy(strategyType, timeSeries, config);
+//            if (strategy.shouldEnter(timeSeries.getEndIndex()) && !entered) {
+//                orders.add(Order.buyAt(timeSeries.getEndIndex(), timeSeries));
+//                entered = true;
+//            } else if (strategy.shouldExit(timeSeries.getEndIndex()) && entered) {
+//                orders.add(Order.sellAt(timeSeries.getEndIndex(), timeSeries));
+//                entered = false;
+//            }
+        }
+        progressBar.setProgress(100d);
+        TradingRecord record = buildTradingRecord(orders);
+        updateLog(record);
+        //updateLog3(orders);
+        update();
+    }
+
+    private Bar createNewBar(Tick tick) {
+        ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tick.getTradeTime().getTime()), ZoneId.systemDefault());
+        return new BaseBar(dateTime, tick.getPrice(), tick.getPrice(), tick.getPrice(), tick.getPrice(),
+                tick.getAmount());
     }
 
     private StrategyInputParams createStrategyInputParams() {
@@ -637,6 +746,77 @@ public class StrategyPanel extends AbstractPanel {
         return result;
     }
 
+    private TradingRecord buildTradingRecord(List<Order> orders) {
+        Order[] orderArray = new Order[orders.size()];
+        orderArray = orders.toArray(orderArray);
+        TradingRecord tradingRecord = new BaseTradingRecord(orderArray);
+        return tradingRecord;
+    }
+
+    private void updateLog2(List<Order> orders) {
+        System.out.println("--");
+        int i = 0;
+        for (Order o : orders) {
+            //System.out.println("Index" + o.getIndex() + " Type " + o.getType() + " Amount " + o.getAmount() + " Price " + o.getPrice() );
+            if (o.getType() == Order.OrderType.SELL) {
+                Order buyOrder = orders.get(i - 1);
+                System.out.println("Index" + buyOrder.getIndex() + " Type " + buyOrder.getType() + " Amount " + buyOrder.getAmount() + " Price " + buyOrder.getPrice());
+                System.out.println("Index" + o.getIndex() + " Type " + o.getType() + " Amount " + o.getAmount() + " Price " + o.getPrice());
+                Decimal diff = buyOrder.getPrice().minus(o.getPrice());
+                System.out.println("  Diff " + diff);
+                Decimal diffPercent = o.getPrice().dividedBy(buyOrder.getPrice());
+                diffPercent = diffPercent.minus(Decimal.ONE);
+                diffPercent = diffPercent.multipliedBy(Decimal.HUNDRED);
+                String percent = NumberFormat.getNumberInstance().format(diffPercent);
+                System.out.println("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
+            }
+
+            i++;
+        }
+        System.out.println("--");
+    }
+
+    private void updateLog3(List<Order> orders) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Number of trades for the strategy: " + orders.size() / 2 + LB);
+        // Analysis
+        //sb.append("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord) + LB);
+        //
+        sb.append("" + LB);
+        sb.append("Trades:" + LB);
+        Decimal sum = Decimal.ZERO;
+        Decimal averagePercent = Decimal.ZERO;
+        int i = 0;
+        for (Order o : orders) {
+            if (o.getType() == Order.OrderType.SELL) {
+                Order buyOrder = orders.get(i - 1);
+                sb.append("Entry " + buyOrder.getPrice() + TAB + " : Exit " + o.getPrice() + TAB);
+                Decimal diff = o.getPrice().minus(buyOrder.getPrice());
+                Decimal diffPercent = o.getPrice().dividedBy(buyOrder.getPrice());
+                diffPercent = diffPercent.minus(Decimal.ONE);
+                diffPercent = diffPercent.multipliedBy(Decimal.HUNDRED);
+                //Decimal diffPercent = diff.plus(trade.getEntry().getPrice());
+                String percent = NumberFormat.getNumberInstance().format(diffPercent);
+                sb.append("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
+                sb.append("Index-Diff " + (o.getIndex() - buyOrder.getIndex()) + " ");
+                sb.append(LB);
+                sum = sum.plus(diff);
+                averagePercent = averagePercent.plus(diffPercent);
+            }
+            i++;
+        }
+        sb.append("" + LB);
+        sb.append("Total " + sum + LB);
+        String percent = NumberFormat.getNumberInstance().format(averagePercent);
+        sb.append("Total Percent " + percent + " % " + LB);
+
+        averagePercent = averagePercent.dividedBy(orders.size() / 2);
+        percent = NumberFormat.getNumberInstance().format(averagePercent);
+        sb.append("Average Percent " + percent + " % " + LB);
+
+        textArea.setText(sb.toString());
+    }
+
     private void updateLog(TradingRecord tradingRecord) {
         StringBuilder sb = new StringBuilder();
         sb.append("Number of trades for the strategy: " + tradingRecord.getTradeCount() + LB);
@@ -683,6 +863,22 @@ public class StrategyPanel extends AbstractPanel {
 
     public void setSeries(TimeSeries series) {
         this.series = series;
+    }
+
+    public TimeSeries getPreSeries() {
+        return preSeries;
+    }
+
+    public void setPreSeries(TimeSeries preSeries) {
+        this.preSeries = preSeries;
+    }
+
+    public List<Tick> getTicks() {
+        return ticks;
+    }
+
+    public void setTicks(List<Tick> ticks) {
+        this.ticks = ticks;
     }
 
 }

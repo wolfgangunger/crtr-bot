@@ -38,38 +38,97 @@ public class TimeSeriesDBLoader {
     private TickRepository tickRepository;
 
     /**
-     * @deprecated @return
+     * load the very first entry in the db for the given params (used in bottom bar as info)
+     * @param currency
+     * @param exchange
+     * @return Tick
      */
-    public TimeSeries loadData() {
-        LocalDate df = LocalDate.parse(Config.fromDate);
-        LocalDate du = LocalDate.parse(Config.untilDate);
-        // Instant instantFrom = df.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        //Instant instantUntil = du.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadSeries(df, du, Currency.BTC, Exchange.COINBASE, 5);
-        return series;
-    }
-
-    public TimeSeries loadDataWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
-        //Instant instantFrom = from.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        //Instant instantUntil = until.atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant();
-        TimeSeries series = loadSeries(from, until, currency, exchange, barDurationInMinutes);
-        return series;
-    }
-
     public Tick loadFirstEntry(Currency currency, Exchange exchange) {
-        // return tickRepository.findByExchangeAndCurrencyFirst(exchange.getStringValue(), currency.getStringValue());
         return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeAsc(currency.getStringValue(), exchange.getStringValue());
     }
 
+    /**
+     * load the very last entry in the db for the given params (used in bottom bar as info)
+     * @param currency
+     * @param exchange
+     * @return  Tick
+     */
     public Tick loadLastEntry(Currency currency, Exchange exchange) {
-        //return tickRepository.findByExchangeAndCurrencyLast(exchange.getStringValue(), currency.getStringValue());
         return tickRepository.findTopByCurrencyAndExchangeOrderByTradeTimeDesc(currency.getStringValue(), exchange.getStringValue());
     }
 
-    private TimeSeries loadSeries(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
-        Sort sort = new Sort(Sort.Direction.ASC, "tradeTime");
-        //List<Tick> ticks = tickRepository.findAll(sort);
-        //List<Tick> ticks = tickRepository.findAll();
+    /**
+     * load ticks by defined params
+     * @param from
+     * @param until
+     * @param currency
+     * @param exchange
+     * @param barDurationInMinutes
+     * @return List 
+     */
+    public List<Tick> loadTicksWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
+        Date df = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date du = Date.from(until.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        List<Tick> ticks = tickRepository.findByExchangeAndCurrencyAndDates(exchange.getStringValue(), currency.getStringValue(), df, du);
+        ZonedDateTime beginTime;
+        ZonedDateTime endTime;
+
+        if ((ticks != null) && !ticks.isEmpty()) {
+            // Getting the first and last trades timestamps
+            beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime()), ZoneId.systemDefault());
+            endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime()), ZoneId.systemDefault());
+            if (beginTime.isAfter(endTime)) {
+                // Since the CSV file has the most recent trades at the top of the file, we'll reverse the list to feed the List<Bar> correctly.
+                Collections.reverse(ticks);
+            }
+        }
+        return ticks;
+    }
+
+    /**
+     * load series by defined parameters
+     * @param from
+     * @param until
+     * @param currency
+     * @param exchange
+     * @param barDurationInMinutes
+     * @return 
+     */
+    public TimeSeries loadSeriesWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
+        List<Tick> ticks = loadTicksWithParams(from, until, currency, exchange, barDurationInMinutes);
+
+        ZonedDateTime beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime()), ZoneId.systemDefault());
+        ZonedDateTime endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime()), ZoneId.systemDefault());
+
+        List<Bar> bars = bars = buildBars(beginTime, endTime, ticks, barDurationInMinutes);
+        return new BaseTimeSeries("bitstamp_trades", bars);
+    }
+
+    /**
+     * build series by existing ticks list
+     * @param ticks
+     * @param barDurationInMinutes
+     * @return 
+     */
+    public TimeSeries loadSeriesByTicks(List<Tick> ticks,  int barDurationInMinutes) {
+        ZonedDateTime beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime()), ZoneId.systemDefault());
+        ZonedDateTime endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime()), ZoneId.systemDefault());
+        List<Bar> bars = bars = buildBars(beginTime, endTime, ticks, barDurationInMinutes);
+        return new BaseTimeSeries("bitstamp_trades", bars);
+    }
+
+    /**
+     * 
+     * @param from
+     * @param until
+     * @param currency
+     * @param exchange
+     * @param barDurationInMinutes
+     * @deprecated use #loadSeriesWithParams
+     * @return 
+     */
+    public TimeSeries loadSeriesWithParamsOld(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
+        //Sort sort = new Sort(Sort.Direction.ASC, "tradeTime");
         Date df = Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date du = Date.from(until.atStartOfDay(ZoneId.systemDefault()).toInstant());
         List<Tick> ticks = tickRepository.findByExchangeAndCurrencyAndDates(exchange.getStringValue(), currency.getStringValue(), df, du);
@@ -92,7 +151,7 @@ public class TimeSeriesDBLoader {
             }
             // build the list of populated bars
             //duration in seconds ( 300 = 5 min)
-            bars = buildBars(beginTime, endTime, 300, ticks, barDurationInMinutes);
+            bars = buildBars(beginTime, endTime, ticks, barDurationInMinutes);
         }
         return new BaseTimeSeries("bitstamp_trades", bars);
     }
@@ -105,17 +164,8 @@ public class TimeSeriesDBLoader {
      * @param ticks
      * @return
      */
-    private List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, int duration, List<Tick> ticks, int barDurationInMinutes) {
+    private List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, List<Tick> ticks, int barDurationInMinutes) {
         List<Bar> bars = new ArrayList<>();
-//        for (Tick t : ticks) {
-//            System.out.println("###");
-//            System.out.println(t.getTradeTime());
-//        }
-//        if (true) {
-//            return null;
-//        }
-        //Duration barDuration = Duration.ofSeconds(duration);
-        //Duration barDuration = Duration.ofSeconds(300);
         Duration barDuration = Duration.ofSeconds(barDurationInMinutes * 60);
         ZonedDateTime barEndTime = beginTime;
         int i = 0;
@@ -127,7 +177,6 @@ public class TimeSeriesDBLoader {
             do {
                 // get a trade
                 Tick t = ticks.get(i);
-                // ZonedDateTime tradeTimeStamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(t.getTradeTime().getTime() * 1000), ZoneId.systemDefault());
                 ZonedDateTime tradeTimeStamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(t.getTradeTime().getTime()), ZoneId.systemDefault());
                 // if the trade happened during the bar
                 if (bar.inPeriod(tradeTimeStamp)) {
@@ -135,16 +184,8 @@ public class TimeSeriesDBLoader {
                     double tradePrice = t.getPrice();
                     double tradeAmount = t.getAmount();
                     bar.addTrade(tradeAmount, tradePrice);
-//                    System.out.println("### in period");
-//                    System.out.println(bar.getBeginTime());
-//                    System.out.println(bar.getEndTime());
-//                    System.out.println(tradeTimeStamp);
                 } else {
                     // should not happen - order problem ?
-//                    System.out.println("### out of period");
-//                    System.out.println(bar.getBeginTime());
-//                    System.out.println(bar.getEndTime());
-//                    System.out.println(tradeTimeStamp);
                     // the trade happened after the end of the bar
                     // go to the next bar but stay with the same trade (don't increment i)
                     // this break will drop us after the inner "while", skipping the increment

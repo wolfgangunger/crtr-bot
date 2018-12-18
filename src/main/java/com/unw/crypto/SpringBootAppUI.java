@@ -10,9 +10,11 @@ import com.unw.crypto.chart.SimpleClosedPriceChart;
 import com.unw.crypto.loader.TimeSeriesDBLoader;
 import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
+import com.unw.crypto.model.Tick;
 import com.unw.crypto.strategy.StrategyPanel;
 import com.unw.crypto.ui.TabUtil;
 import java.time.LocalDate;
+import java.util.List;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,11 +22,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javax.swing.JProgressBar;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -43,6 +47,7 @@ public class SpringBootAppUI extends Application {
     private BorderPane bpBottom;
     private TextField tfBottomLeft = new TextField();
     private TextField tfBottomRight = new TextField();
+    private ProgressBar progressBar = new ProgressBar();
     private DatePicker from;
     private DatePicker until;
     private ComboBox<Currency> cmbCurrency;
@@ -62,6 +67,9 @@ public class SpringBootAppUI extends Application {
     //private DataLoaderDB dataLoader;
     private TimeSeriesDBLoader timeSeriesDBLoader;
     private TimeSeries series;
+    private List<Tick> ticks;
+    // series for live testing, 2 month before series 
+    private TimeSeries preSeries;
 
     public static void main(String[] args) {
         launch(SpringBootAppUI.class, args);
@@ -167,7 +175,7 @@ public class SpringBootAppUI extends Application {
 
         barDuration = new ComboBox<>();
         barDuration.getItems().setAll(BarDuration.values());
-        barDuration.setValue(BarDuration.SIXTY_MIN);
+        barDuration.setValue(BarDuration.TWENTY_MIN);
         barDurationInMinutes = barDuration.getValue().getIntValue();
         //JLabel barDurationLable = new JLabel("BarSize in Min");
 
@@ -182,6 +190,8 @@ public class SpringBootAppUI extends Application {
         bpBottom = new BorderPane();
         tfBottomLeft.setPrefWidth(700);
         tfBottomRight.setPrefWidth(700);
+        progressBar.setProgress(0d);
+        bpBottom.setCenter(progressBar);
         bpBottom.setLeft(tfBottomLeft);
         bpBottom.setRight(tfBottomRight);
         root.setBottom(bpBottom);
@@ -189,7 +199,13 @@ public class SpringBootAppUI extends Application {
 
     private void initTabPane(BorderPane root) {
         barDurationInMinutes = barDuration.getValue().getIntValue();
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+        ticks = timeSeriesDBLoader.loadTicksWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+        //series = timeSeriesDBLoader.loadSeriesWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+        series = timeSeriesDBLoader.loadSeriesByTicks(ticks, barDurationInMinutes);
+        // loading the pre-series ( 2 month before from)
+        LocalDate preFrom = from.getValue().minusMonths(2);
+        preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+
         String txtLeft = createBottomTextLeft();
         String txtRight = createBottomTextRight();
         setBottomText(txtLeft, txtRight);
@@ -210,7 +226,7 @@ public class SpringBootAppUI extends Application {
         bollingerChart = new BollingerBandsChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
         //strategy
-        strategyPanel = new StrategyPanel(series);
+        strategyPanel = new StrategyPanel(ticks, series, preSeries, progressBar);
         strategyPanel.setBarDuration(barDuration.getValue());
         tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));
         //root.setCenter(sc);
@@ -239,9 +255,18 @@ public class SpringBootAppUI extends Application {
     }
 
     private void refreshData() {
+        progressBar.setProgress(0d);
         System.out.println(" Load data for " + from.getValue() + " " + until.getValue() + " " + cmbCurrency.getValue() + " " + cmbExchange.getValue());
         barDurationInMinutes = barDuration.getValue().getIntValue();
-        series = timeSeriesDBLoader.loadDataWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+
+        ticks = timeSeriesDBLoader.loadTicksWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+        progressBar.setProgress(30d);
+        series = timeSeriesDBLoader.loadSeriesByTicks(ticks, barDurationInMinutes);
+        progressBar.setProgress(60d);
+        // loading the pre-series ( 2 month before from)
+        LocalDate preFrom = from.getValue().minusMonths(2);
+        preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+        progressBar.setProgress(90d);
         String txtLeft = createBottomTextLeft();
         String txtRight = createBottomTextRight();
         setBottomText(txtLeft, txtRight);
@@ -267,6 +292,9 @@ public class SpringBootAppUI extends Application {
 
         strategyPanel.setBarDuration(barDuration.getValue());
         strategyPanel.setSeries(series);
+        strategyPanel.setPreSeries(preSeries);
+        strategyPanel.setTicks(ticks);
         strategyPanel.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        progressBar.setProgress(100d);
     }
 }
