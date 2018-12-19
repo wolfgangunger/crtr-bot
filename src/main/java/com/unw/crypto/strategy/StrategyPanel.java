@@ -625,7 +625,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblEmaIndicatorTimeframe = new JLabel("EMA Indicatior Timeframe");
         result.add(lblEmaIndicatorTimeframe);
         tfEmaIndicatorTimeframe = new NumericTextField();
-        tfEmaIndicatorTimeframe.setText(String.valueOf(2));
+        tfEmaIndicatorTimeframe.setText(String.valueOf(4));
         tfEmaIndicatorTimeframe.setColumns(4);
         result.add(tfEmaIndicatorTimeframe);
 
@@ -633,7 +633,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblPriceTimeframe = new JLabel("Price Timeframe");
         result.add(lblPriceTimeframe);
         tfPriceTimeframe = new NumericTextField();
-        tfPriceTimeframe.setText(String.valueOf(2));
+        tfPriceTimeframe.setText(String.valueOf(1));
         tfPriceTimeframe.setColumns(4);
         result.add(tfPriceTimeframe);
 
@@ -658,7 +658,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoThresholdLow);
 
         tfStoThresholdLow = new JTextField();
-        tfStoThresholdLow.setText(String.valueOf(0.18f));
+        tfStoThresholdLow.setText(String.valueOf(0.12f));
         tfStoThresholdLow.setColumns(4);
         result.add(tfStoThresholdLow);
 
@@ -675,7 +675,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoOscKThresholdLow);
 
         tfStoOscKThresholdLow = new NumericTextField();
-        tfStoOscKThresholdLow.setText(String.valueOf(20));
+        tfStoOscKThresholdLow.setText(String.valueOf(15));
         tfStoOscKThresholdLow.setColumns(4);
         result.add(tfStoOscKThresholdLow);
 
@@ -701,7 +701,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfStopGain = new JTextField();
         tfStopGain.setText(String.valueOf(5));
-        tfStopGain.setColumns(4);
+        tfStopGain.setColumns(5);
         result.add(tfStopGain);
         // wait rule
         JLabel lblWaitBars = new JLabel("Wait Bars");
@@ -781,13 +781,13 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblRuleRSIDown = new JLabel("1 RSI High");
         exitRules.add(lblRuleRSIDown);
         chkExitRsiHigh = new JCheckBox();
-        chkExitRsiHigh.setSelected(true);
+        chkExitRsiHigh.setSelected(false);
         exitRules.add(chkExitRsiHigh);
 
         JLabel lblRuleStoDown = new JLabel("2 Sto High");
         exitRules.add(lblRuleStoDown);
         chkExitStoHigh = new JCheckBox();
-        chkExitStoHigh.setSelected(true);
+        chkExitStoHigh.setSelected(false);
         exitRules.add(chkExitStoHigh);
 
         JLabel lblRule8MADown = new JLabel("3 8MA ->Down");
@@ -799,7 +799,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblRuleRSIPontingDown = new JLabel("11 RSI ->Down");
         exitRules.add(lblRuleRSIPontingDown);
         chkExitRsiDown = new JCheckBox();
-        chkExitRsiDown.setSelected(false);
+        chkExitRsiDown.setSelected(true);
         exitRules.add(chkExitRsiDown);
 
         JLabel lblRuleStoPontingDown = new JLabel("11 Sto ->Down");
@@ -811,13 +811,13 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblRulePriceDown = new JLabel("21 Price ->Down");
         exitRules.add(lblRulePriceDown);
         chkExitPriceDown = new JCheckBox();
-        chkExitPriceDown.setSelected(false);
+        chkExitPriceDown.setSelected(true);
         exitRules.add(chkExitPriceDown);
 
         JLabel lblRuleStopLoss = new JLabel("22 Stop Loss");
         exitRules.add(lblRuleStopLoss);
         chkExitStopLoss = new JCheckBox();
-        chkExitStopLoss.setSelected(false);
+        chkExitStopLoss.setSelected(true);
         exitRules.add(chkExitStopLoss);
 
         JLabel lblRuleStopGain = new JLabel("23 Stop Gain");

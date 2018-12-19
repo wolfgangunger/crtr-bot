@@ -176,7 +176,7 @@ public class SpringBootAppUI extends Application {
 
         barDuration = new ComboBox<>();
         barDuration.getItems().setAll(BarDuration.values());
-        barDuration.setValue(BarDuration.TEN_MIN);
+        barDuration.setValue(BarDuration.SIXTY_MIN);
         barDurationInMinutes = barDuration.getValue().getIntValue();
 
         tb.getItems().add(cmbCurrency);
