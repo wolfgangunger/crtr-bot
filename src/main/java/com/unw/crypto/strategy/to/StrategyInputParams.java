@@ -6,7 +6,7 @@
 package com.unw.crypto.strategy.to;
 
 import com.unw.crypto.model.BarDuration;
-import com.unw.crypto.strategy.BarUtil;
+import com.unw.crypto.chart.BarUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,6 +63,8 @@ public class StrategyInputParams {
     private int smaIndicatorTimeframe;
     //EMAIndicator
     private int emaIndicatorTimeframe;
+    // for closed price e.g. isFalling
+    private int priceTimeFrame;
     
     /// rules
     // rsi 
@@ -155,6 +157,10 @@ public class StrategyInputParams {
 
     public int getSmaIndicatorTimeframe() {
         return smaIndicatorTimeframe * getMAMultiplicator();
+    }
+
+    public int getPriceTimeFrame() {
+        return priceTimeFrame;
     }
     
 

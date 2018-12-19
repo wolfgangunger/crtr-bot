@@ -7,7 +7,6 @@ package com.unw.crypto.chart;
 
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.Config;
-import com.unw.crypto.strategy.BarUtil;
 import java.awt.Dimension;
 import java.util.Date;
 import javax.swing.BorderFactory;

@@ -5,6 +5,7 @@
  */
 package com.unw.crypto.strategy;
 
+import com.unw.crypto.chart.BarUtil;
 import com.unw.crypto.Config;
 import com.unw.crypto.chart.AbstractPanel;
 import com.unw.crypto.chart.ChartUtil;
@@ -111,6 +112,7 @@ public class StrategyPanel extends AbstractPanel {
     private NumericTextField tfStoOscKTimeframe;
     private NumericTextField tfEmaIndicatorTimeframe;
     private NumericTextField tfSmaIndicatorTimeframe;
+    private NumericTextField tfPriceTimeframe;
     private NumericTextField tfRsiThresholdLow;
     private NumericTextField tfRsiThresholdHigh;
     private JTextField tfStoThresholdLow;
@@ -136,6 +138,9 @@ public class StrategyPanel extends AbstractPanel {
     private JCheckBox chkExit8MaDown;
     private JCheckBox chkExitRsiDown;
     private JCheckBox chkExitStoDown;
+    private JCheckBox chkExitPriceDown;
+    private JCheckBox chkExitStopLoss;
+    private JCheckBox chkExitStopGain;
 
     private static final String LB = "\n";
     private static final String TAB = "\t";
@@ -193,7 +198,7 @@ public class StrategyPanel extends AbstractPanel {
         if ((completeSeries == null && chkForwardTesting.isSelected())) {
             return;
         }
-
+        // no update the chart with real data
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         dataset.addSeries(buildChartTimeSeries(series, closePrice, legend));
         chart = createChart(dataset, legend, "Date", "Price", true);
@@ -225,8 +230,6 @@ public class StrategyPanel extends AbstractPanel {
         //scrollpanel for log
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(600, 700));
-        //StackPane sp1 = new StackPane(textArea);
-        //mainPanel.add(scrollPane);
         mainPanel.add(scrollPane, BorderLayout.WEST);
         chartPanel = createChartPanelForStrategy(chart);
         mainPanel.add(chartPanel);
@@ -241,7 +244,6 @@ public class StrategyPanel extends AbstractPanel {
     private void initToolbar() {
         JPanel toolbarComplete = new JPanel();
         JPanel toolbarTop = new JPanel();
-        //JPanel toolbarFinalStrategy = new JPanel();        
         toolbarComplete.setLayout(new BorderLayout());
         toolbarComplete.setPreferredSize(new Dimension(Config.WIDTH, 160));
         toolbarComplete.setMinimumSize(new Dimension(960, 160));
@@ -345,7 +347,8 @@ public class StrategyPanel extends AbstractPanel {
 
         JLabel lblForwardTesting = new JLabel("Forward Testing");
         toolbarTop.add(lblForwardTesting);
-        chkForwardTesting.setSelected(true);
+        // false by default, takes long time you have a long period
+        chkForwardTesting.setSelected(false);
         toolbarTop.add(chkForwardTesting);
 
         toolbarComplete.add(toolbarTop, BorderLayout.NORTH);
@@ -459,6 +462,7 @@ public class StrategyPanel extends AbstractPanel {
         int stoOscKTimeFrame = Integer.valueOf(tfStoOscKTimeframe.getText());
         int emaIndicatorTimeframe = Integer.valueOf(tfEmaIndicatorTimeframe.getText());
         int smaIndicatorTimeframe = Integer.valueOf(tfSmaIndicatorTimeframe.getText());
+        int priceTimeFrame = Integer.valueOf(tfPriceTimeframe.getText());
         int rsiThresholdLow = Integer.valueOf(tfRsiThresholdLow.getText());
         int rsiThresholdHigh = Integer.valueOf(tfRsiThresholdHigh.getText());
         double stoThresholdLow = Double.valueOf(tfStoThresholdLow.getText());
@@ -473,9 +477,10 @@ public class StrategyPanel extends AbstractPanel {
                 .rule11_isRsiPointingUp(chkRsiUp.isSelected()).rule12_isStoPointingUp(chkStoUp.isSelected()).rule13_movingMomentum(chkMovMom.isSelected()).build();
         ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(chkExitRsiHigh.isSelected()).rule2_stoHigh(chkExitStoHigh.isSelected())
                 .rule3_8maDown(chkExit8MaDown.isSelected()).rule11_rsiPointingDown(chkExitRsiDown.isSelected())
-                .rule12_StoPointingDown(chkExitStoDown.isSelected()).build();
+                .rule12_StoPointingDown(chkExitStoDown.isSelected()).rule21_priceFalling(chkExitPriceDown.isSelected())
+                .rule23_stopGain(chkExitStopGain.isSelected()).rule22_stopLoss(chkExitStopLoss.isSelected()).build();
         result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
-                rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrame, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
@@ -615,14 +620,23 @@ public class StrategyPanel extends AbstractPanel {
         tfSmaIndicatorTimeframe.setText(String.valueOf(4));
         tfSmaIndicatorTimeframe.setColumns(4);
         result.add(tfSmaIndicatorTimeframe);
+
         //EMAIndicator
         JLabel lblEmaIndicatorTimeframe = new JLabel("EMA Indicatior Timeframe");
         result.add(lblEmaIndicatorTimeframe);
-
         tfEmaIndicatorTimeframe = new NumericTextField();
         tfEmaIndicatorTimeframe.setText(String.valueOf(2));
         tfEmaIndicatorTimeframe.setColumns(4);
         result.add(tfEmaIndicatorTimeframe);
+
+        //EMAIndicator
+        JLabel lblPriceTimeframe = new JLabel("Price Timeframe");
+        result.add(lblPriceTimeframe);
+        tfPriceTimeframe = new NumericTextField();
+        tfPriceTimeframe.setText(String.valueOf(2));
+        tfPriceTimeframe.setColumns(4);
+        result.add(tfPriceTimeframe);
+
         //RSI threshold
         JLabel lblRsiThresholdLow = new JLabel("RSI Threshold Low");
         result.add(lblRsiThresholdLow);
@@ -686,7 +700,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblstopGain);
 
         tfStopGain = new JTextField();
-        tfStopGain.setText(String.valueOf(-1));
+        tfStopGain.setText(String.valueOf(5));
         tfStopGain.setColumns(4);
         result.add(tfStopGain);
         // wait rule
@@ -794,51 +808,27 @@ public class StrategyPanel extends AbstractPanel {
         chkExitStoDown.setSelected(false);
         exitRules.add(chkExitStoDown);
 
+        JLabel lblRulePriceDown = new JLabel("21 Price ->Down");
+        exitRules.add(lblRulePriceDown);
+        chkExitPriceDown = new JCheckBox();
+        chkExitPriceDown.setSelected(false);
+        exitRules.add(chkExitPriceDown);
+
+        JLabel lblRuleStopLoss = new JLabel("22 Stop Loss");
+        exitRules.add(lblRuleStopLoss);
+        chkExitStopLoss = new JCheckBox();
+        chkExitStopLoss.setSelected(false);
+        exitRules.add(chkExitStopLoss);
+
+        JLabel lblRuleStopGain = new JLabel("23 Stop Gain");
+        exitRules.add(lblRuleStopGain);
+        chkExitStopGain = new JCheckBox();
+        chkExitStopGain.setSelected(false);
+        exitRules.add(chkExitStopGain);
+
         result.add(exitRules);
 
         return result;
-    }
-
-
-    private void updateLog3(List<Order> orders) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Number of trades for the strategy: " + orders.size() / 2 + LB);
-        // Analysis
-        //sb.append("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord) + LB);
-        //
-        sb.append("" + LB);
-        sb.append("Trades:" + LB);
-        Decimal sum = Decimal.ZERO;
-        Decimal averagePercent = Decimal.ZERO;
-        int i = 0;
-        for (Order o : orders) {
-            if (o.getType() == Order.OrderType.SELL) {
-                Order buyOrder = orders.get(i - 1);
-                sb.append("Entry " + buyOrder.getPrice() + TAB + " : Exit " + o.getPrice() + TAB);
-                Decimal diff = o.getPrice().minus(buyOrder.getPrice());
-                Decimal diffPercent = o.getPrice().dividedBy(buyOrder.getPrice());
-                diffPercent = diffPercent.minus(Decimal.ONE);
-                diffPercent = diffPercent.multipliedBy(Decimal.HUNDRED);
-                //Decimal diffPercent = diff.plus(trade.getEntry().getPrice());
-                String percent = NumberFormat.getNumberInstance().format(diffPercent);
-                sb.append("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
-                sb.append("Index-Diff " + (o.getIndex() - buyOrder.getIndex()) + " ");
-                sb.append(LB);
-                sum = sum.plus(diff);
-                averagePercent = averagePercent.plus(diffPercent);
-            }
-            i++;
-        }
-        sb.append("" + LB);
-        sb.append("Total " + sum + LB);
-        String percent = NumberFormat.getNumberInstance().format(averagePercent);
-        sb.append("Total Percent " + percent + " % " + LB);
-
-        averagePercent = averagePercent.dividedBy(orders.size() / 2);
-        percent = NumberFormat.getNumberInstance().format(averagePercent);
-        sb.append("Average Percent " + percent + " % " + LB);
-
-        textArea.setText(sb.toString());
     }
 
     private void updateLog(TradingRecord tradingRecord) {
@@ -903,6 +893,47 @@ public class StrategyPanel extends AbstractPanel {
 
     public void setTicks(List<Tick> ticks) {
         this.ticks = ticks;
+    }
+
+    private void updateLog3(List<Order> orders) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Number of trades for the strategy: " + orders.size() / 2 + LB);
+        // Analysis
+        //sb.append("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord) + LB);
+        //
+        sb.append("" + LB);
+        sb.append("Trades:" + LB);
+        Decimal sum = Decimal.ZERO;
+        Decimal averagePercent = Decimal.ZERO;
+        int i = 0;
+        for (Order o : orders) {
+            if (o.getType() == Order.OrderType.SELL) {
+                Order buyOrder = orders.get(i - 1);
+                sb.append("Entry " + buyOrder.getPrice() + TAB + " : Exit " + o.getPrice() + TAB);
+                Decimal diff = o.getPrice().minus(buyOrder.getPrice());
+                Decimal diffPercent = o.getPrice().dividedBy(buyOrder.getPrice());
+                diffPercent = diffPercent.minus(Decimal.ONE);
+                diffPercent = diffPercent.multipliedBy(Decimal.HUNDRED);
+                //Decimal diffPercent = diff.plus(trade.getEntry().getPrice());
+                String percent = NumberFormat.getNumberInstance().format(diffPercent);
+                sb.append("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
+                sb.append("Index-Diff " + (o.getIndex() - buyOrder.getIndex()) + " ");
+                sb.append(LB);
+                sum = sum.plus(diff);
+                averagePercent = averagePercent.plus(diffPercent);
+            }
+            i++;
+        }
+        sb.append("" + LB);
+        sb.append("Total " + sum + LB);
+        String percent = NumberFormat.getNumberInstance().format(averagePercent);
+        sb.append("Total Percent " + percent + " % " + LB);
+
+        averagePercent = averagePercent.dividedBy(orders.size() / 2);
+        percent = NumberFormat.getNumberInstance().format(averagePercent);
+        sb.append("Average Percent " + percent + " % " + LB);
+
+        textArea.setText(sb.toString());
     }
 
 }

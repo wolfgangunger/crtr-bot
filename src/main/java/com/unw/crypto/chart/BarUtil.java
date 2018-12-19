@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.unw.crypto.strategy;
+package com.unw.crypto.chart;
 
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.model.Tick;

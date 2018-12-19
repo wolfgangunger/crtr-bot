@@ -38,4 +38,5 @@ public class EntryRuleChain {
     private boolean rule11_isRsiPointingUp;
     private boolean rule12_isStoPointingUp;
     private boolean rule13_movingMomentum;
+
 }
