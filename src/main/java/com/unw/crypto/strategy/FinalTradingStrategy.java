@@ -6,7 +6,8 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
-import com.unw.crypto.strategy.to.RuleChain;
+import com.unw.crypto.strategy.to.EntryRuleChain;
+import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import org.springframework.stereotype.Component;
@@ -28,9 +29,9 @@ import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
+import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
-import org.ta4j.core.trading.rules.StopGainRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
@@ -68,11 +69,13 @@ public class FinalTradingStrategy extends AbstractStrategy {
         double stopLoss = 1;
         double stopGain = -1d;
         int waitBars = 50;
-        RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(true).rule2_stoLow(true).rule3_priceAboveSMA200(false).
+        EntryRuleChain entryRuleChain = EntryRuleChain.builder().rule1_rsiLow(true).rule2_stoLow(true).rule3_priceAboveSMA200(false).
                 rule4_ma8PointingUp(true).rule5_priceBelow8MA(true).rule7_emaBandsPointingUp(true).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(true).rule2_stoHigh(true)
+                .rule3_8maDown(true).rule11_rsiPointingDown(false).rule12_StoPointingDown(false).build();
         StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
                 stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
+                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
 
         return buildStrategyWithParams(series, params);
     }
@@ -159,24 +162,34 @@ public class FinalTradingStrategy extends AbstractStrategy {
                 .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
 
         // build the complete final rule 
-        //Rule entryRule = entryRule1.and(entryRule2).and(entryRule4).and(entryRule5);
-        Rule entryRule = buildCompleteEntryRule(closePrice, params.getRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5, 
-                entryRule7,entryRule11,entryRule12,entryRule13);
+        Rule entryRule = buildCompleteEntryRule(closePrice, params.getEntryRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5,
+                entryRule7, entryRule11, entryRule12, entryRule13);
 
         // exit rule - todo
 //        Rule exitRule = new StopLossRule(closePrice, Decimal.valueOf(0.4d))
 //                .or(new StopGainRule(closePrice, Decimal.valueOf(0.4d)));
-        Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoOscKThresholdHigh()))); // Signal 1
-               // .and(new UnderIndicatorRule(macd, emaMacd));
-                //.and(new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()))); // works
+        //Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
+        //        .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoOscKThresholdHigh()))); // Signal 1
+        // .and(new UnderIndicatorRule(macd, emaMacd));
+        //.and(new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()))); // works
 //                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
-
         //Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars()).
         //        or(new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss())));
 //        Rule exitRule2 =  new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss()));
         //Rule exitRule2 =  new IsFallingRule(closePrice,2);
-        Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
+        Rule exitRuleb = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
+
+        //////////// exit rules
+        // rsi is falling - isFalling or CrossedUp ?
+        Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(params.getRsiThresholdHigh()));
+        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe());
+
+        Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdHigh()));
+        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe());
+
+        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe());
+
+        Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11, exitRule12);
 
         return new BaseStrategy(entryRule, exitRule);
     }
@@ -242,8 +255,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
      * @param rule7
      * @return
      */
-    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, RuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5,
-            Rule rule7,Rule rule11,Rule rule12,Rule rule13) {
+    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, EntryRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5,
+            Rule rule7, Rule rule11, Rule rule12, Rule rule13) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
 
@@ -274,6 +287,28 @@ public class FinalTradingStrategy extends AbstractStrategy {
         }
         if (ruleChain.isRule13_movingMomentum()) {
             result = result.and(rule13);
+        }
+        return result;
+    }
+
+    private Rule buildCompleteExitRule(ClosePriceIndicator closePrice, ExitRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule11, Rule rule12) {
+        // first create a rule, which will always be chained and is always true
+        Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
+
+        if (ruleChain.isRule1_rsiHigh()) {
+            result = result.and(rule1);
+        }
+        if (ruleChain.isRule2_stoHigh()) {
+            result = result.and(rule2);
+        }
+        if (ruleChain.isRule3_8maDown()) {
+            result = result.and(rule3);
+        }
+        if (ruleChain.isRule11_rsiPointingDown()) {
+            result = result.and(rule11);
+        }
+        if (ruleChain.isRule12_StoPointingDown()) {
+            result = result.and(rule12);
         }
         return result;
     }

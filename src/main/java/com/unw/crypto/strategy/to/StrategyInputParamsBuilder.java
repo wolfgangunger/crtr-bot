@@ -16,10 +16,10 @@ public final class StrategyInputParamsBuilder {
     private StrategyInputParamsBuilder() {
     }
 
-    public static StrategyInputParams createStrategyInputParams(BarDuration barDuration,  boolean barMultiplikator, boolean extraMultiplikator,float extraMultiplikatorValue , int ma8,int ma14,int ma200,int ma314, int smaShort, int smaLong, int emaShort, int emaLong,
+    public static StrategyInputParams createStrategyInputParams(BarDuration barDuration, boolean barMultiplikator, boolean extraMultiplikator, float extraMultiplikatorValue, int ma8, int ma14, int ma200, int ma314, int smaShort, int smaLong, int emaShort, int emaLong,
             int rsiTimeFrame, int stoRsiTimeframe, int stoOscKTimeFrame, int emaIndicatorTimeframe, int smaIndicatorTimeframe, int rsiThresholdLow, int rsiThresholdHigh,
-             double stoThresholdLow ,  double stoThresholdHigh, int stoOscKThresholdLow, int stoOscKThresholdHigh ,
-             double stopLoss, double stopGain,int waitBars,RuleChain ruleChain) {
+            double stoThresholdLow, double stoThresholdHigh, int stoOscKThresholdLow, int stoOscKThresholdHigh,
+            double stopLoss, double stopGain, int waitBars, EntryRuleChain entryRuleChain, ExitRuleChain exitRuleChain) {
         StrategyInputParams result = new StrategyInputParams();
         result.setBarMultiplikator(barMultiplikator);
         result.setExtraMultiplikator(extraMultiplikator);
@@ -47,7 +47,8 @@ public final class StrategyInputParamsBuilder {
         result.setStopLoss(stopLoss);
         result.setStopGain(stopGain);
         result.setWaitBars(waitBars);
-        result.setRuleChain(ruleChain);
+        result.setEntryRuleChain(entryRuleChain);
+        result.setExitRuleChain(exitRuleChain);
         return result;
     }
 

@@ -36,8 +36,10 @@ public class StrategyInputParams {
     private boolean extraMultiplikator;
     private float extraMultiplikatorValue;
     
-    private RuleChain ruleChain;
-
+    //entry and exitRuleChain
+    private EntryRuleChain entryRuleChain;
+    private ExitRuleChain exitRuleChain;
+    
     /// indicators
         // simple MA indays
     private int smaShort;
@@ -93,9 +95,15 @@ public class StrategyInputParams {
         return barDuration;
     }
 
-    public RuleChain getRuleChain() {
-        return ruleChain;
+    public EntryRuleChain getEntryRuleChain() {
+        return entryRuleChain;
     }
+
+    public ExitRuleChain getExitRuleChain() {
+        return exitRuleChain;
+    }
+    
+    
 
     public int getSmaShort() {
         return smaShort * getMAMultiplicator();

@@ -191,6 +191,7 @@ public class SpringBootAppUI extends Application {
         tfBottomLeft.setPrefWidth(700);
         tfBottomRight.setPrefWidth(700);
         progressBar.setProgress(0d);
+        progressBar.setPrefWidth(300);
         bpBottom.setCenter(progressBar);
         bpBottom.setLeft(tfBottomLeft);
         bpBottom.setRight(tfBottomRight);

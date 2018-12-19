@@ -16,7 +16,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class RuleChain {
+public class EntryRuleChain {
 
     //1- RSI is low and pointing up (v)
 //2- Stochastic is low and pointing up (v)

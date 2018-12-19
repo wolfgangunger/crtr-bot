@@ -9,7 +9,8 @@ import com.unw.crypto.Config;
 import com.unw.crypto.chart.AbstractPanel;
 import com.unw.crypto.chart.ChartUtil;
 import com.unw.crypto.model.Tick;
-import com.unw.crypto.strategy.to.RuleChain;
+import com.unw.crypto.strategy.to.EntryRuleChain;
+import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import com.unw.crypto.ui.NumericTextField;
@@ -65,7 +66,7 @@ public class StrategyPanel extends AbstractPanel {
     // the series 2 month before the period ( to be able to create a MA200 for 10 min bars)
     private TimeSeries preSeries;
     // the complete series for the forward testing
-    private TimeSeries completeSeries; 
+    private TimeSeries completeSeries;
     // progress bar of the main window
     private ProgressBar progressBar;
     // required for the chart
@@ -90,8 +91,10 @@ public class StrategyPanel extends AbstractPanel {
     private int iMAShort = 3;
     private int iMALong = 8;
     private XYPlot plot;
-    private static final String LB = "\n";
-    private static final String TAB = "\t";
+
+    // backward or forward testing
+    private JCheckBox forwardTesting;
+    // the final strategy input params
     private JCheckBox chkBarMultiplikator;
     private JCheckBox chkExtraMultiplikator;
     private JTextField tfExtraMultiplikator;
@@ -117,6 +120,7 @@ public class StrategyPanel extends AbstractPanel {
     private JTextField tfStopLoss;
     private JTextField tfStopGain;
     private NumericTextField tfWaitBars;
+    //entry rules
     private JCheckBox chkRsiLow;
     private JCheckBox chkStoLow;
     private JCheckBox chkAboveSMA;
@@ -126,6 +130,15 @@ public class StrategyPanel extends AbstractPanel {
     private JCheckBox chkRsiUp;
     private JCheckBox chkStoUp;
     private JCheckBox chkMovMom;
+    //exit rules
+    private JCheckBox chkExitRsiHigh;
+    private JCheckBox chkExitStoHigh;
+    private JCheckBox chkExit8MaDown;
+    private JCheckBox chkExitRsiDown;
+    private JCheckBox chkExitStoDown;
+
+    private static final String LB = "\n";
+    private static final String TAB = "\t";
 
     public StrategyPanel(TimeSeries series, TimeSeries preSeries) {
         this.series = series;
@@ -178,9 +191,9 @@ public class StrategyPanel extends AbstractPanel {
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
         //Strategy str = currentStrategy.buildStrategy(series, getBarDuration());
         if (currentStrategy instanceof FinalTradingStrategy) {
-              ChartUtil.addBuySellSignals(completeSeries, finalStrategy, plot);
+            ChartUtil.addBuySellSignals(completeSeries, finalStrategy, plot);
         } else {
-              ChartUtil.addBuySellSignals(series, currentStrategy.buildStrategy(series, getBarDuration()), plot);
+            ChartUtil.addBuySellSignals(series, currentStrategy.buildStrategy(series, getBarDuration()), plot);
         }
 
     }
@@ -315,10 +328,16 @@ public class StrategyPanel extends AbstractPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 //executeFinalStrategy();
-                executeFinalStrategy2();
+                executeFinalStrategy();
             }
         });
         toolbarTop.add(bttFinalStrategy);
+
+        JLabel lblForwardTesting = new JLabel("Forward Testing");
+        toolbarTop.add(lblForwardTesting);
+        forwardTesting = new JCheckBox();
+        forwardTesting.setSelected(true);
+        toolbarTop.add(forwardTesting);
 
         // input fields
         maShort = new NumericTextField();
@@ -347,15 +366,37 @@ public class StrategyPanel extends AbstractPanel {
     private void executeFinalStrategy() {
         currentStrategy = finalTradingStrategy;
         StrategyInputParams params = createStrategyInputParams();
-
-        TimeSeries completeSeries = preSeries;
-        int first = series.getBeginIndex();
-        int last = series.getEndIndex();
+        completeSeries = preSeries;
         boolean entered = false;
-        List<Order> orders = new ArrayList<Order>();
-        for (int i = first; i <= last; i++) {
-            if (series.getBar(i).getBeginTime().compareTo(completeSeries.getLastBar().getBeginTime()) > 0) {
-                completeSeries.addBar(series.getBar(i));
+        List<Order> orders = new ArrayList();
+        double ticksSize = ticks.size();
+        double progressBarCounter = 0;
+        progressBar.setProgress(0d);
+        ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
+        for (Tick tick : ticks) {
+            //System.out.println(tick.getTradeTime());
+            if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
+                System.out.println("overlap");
+                progressBarCounter++;
+                continue;
+            }
+            if (beginTimeCurrentBar.plusMinutes(barDuration.getIntValue())
+                    .isBefore(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
+                completeSeries.addBar(createNewBar(tick));
+                beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
+                progressBar.setProgress(progressBarCounter / ticksSize);
+                //System.out.println((progressBarCounter / ticksSize) * 100 + " %");
+            } else {
+                completeSeries.getLastBar().addTrade(Decimal.valueOf(tick.getAmount()),
+                        Decimal.valueOf(tick.getPrice()));
+            }
+            // now lets check if we execute the strategy ( once in a minute)
+            int time = getTimeInHoursAndMinutes(tick);
+            int prevTime = progressBarCounter > 1 ? getTimeInHoursAndMinutes(ticks.get((int) progressBarCounter - 1)) : getTimeInHoursAndMinutes(tick);
+            if (time == prevTime) {
+                // we execute the strategy only once in a minute, if there are more ticks, we do nothing
+            } else {
+                // execute the strategy at least every minute
                 finalStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
                 if (finalStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
                     orders.add(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
@@ -365,53 +406,16 @@ public class StrategyPanel extends AbstractPanel {
                     entered = false;
                 }
             }
-        }
-        updateLog3(orders);
-        update();
-    }
-
-    private void executeFinalStrategy2() {
-        currentStrategy = finalTradingStrategy;
-        StrategyInputParams params = createStrategyInputParams();
-        completeSeries = preSeries;
-        boolean entered = false;
-        List<Order> orders = new ArrayList();
-        double ticksSize = ticks.size();
-        double progressBarCounter = 0;
-        progressBar.setProgress(0d);
-        ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
-        for (Tick tick : ticks) {
             progressBarCounter++;
-            //System.out.println(tick.getTradeTime());
-             if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))){
-                 System.out.println("overlap");
-                 continue;
-             }
-             if (beginTimeCurrentBar.plusMinutes(barDuration.getIntValue())
-                    .isBefore(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
-                completeSeries.addBar(createNewBar(tick));
-                beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
-                progressBar.setProgress(Double.valueOf((progressBarCounter/ticksSize))*100);
-                System.out.println(Double.valueOf((progressBarCounter/ticksSize))*100 + " %");
-            } else {
-                completeSeries.getLastBar().addTrade(Decimal.valueOf(tick.getAmount()),
-                        Decimal.valueOf(tick.getPrice()));
-            }
-
-            finalStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
-            if (finalStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
-                orders.add(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
-                entered = true;
-            } else if (finalStrategy.shouldExit(completeSeries.getEndIndex()) && entered) {
-                orders.add(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
-                entered = false;
-            }
         }
         progressBar.setProgress(100d);
         TradingRecord record = buildTradingRecord(orders);
         updateLog(record);
-        //updateLog3(orders);
         update();
+    }
+
+    private int getTimeInHoursAndMinutes(Tick tick) {
+        return tick.getTradeTime().getHours() + tick.getTradeTime().getMinutes();
     }
 
     private Bar createNewBar(Tick tick) {
@@ -447,12 +451,15 @@ public class StrategyPanel extends AbstractPanel {
         double stopLoss = Double.valueOf(tfStopLoss.getText());
         double stopGain = Double.valueOf(tfStopGain.getText());
         int waitBars = Integer.valueOf(tfWaitBars.getText());
-        RuleChain ruleChain = RuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).rule3_priceAboveSMA200(chkAboveSMA.isSelected()).
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).rule3_priceAboveSMA200(chkAboveSMA.isSelected()).
                 rule4_ma8PointingUp(chkMaPointingUp.isSelected()).rule5_priceBelow8MA(chkBelow8MA.isSelected()).rule7_emaBandsPointingUp(chkMAsUp.isSelected())
                 .rule11_isRsiPointingUp(chkRsiUp.isSelected()).rule12_isStoPointingUp(chkStoUp.isSelected()).rule13_movingMomentum(chkMovMom.isSelected()).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(chkExitRsiHigh.isSelected()).rule2_stoHigh(chkExitStoHigh.isSelected())
+                .rule3_8maDown(chkExit8MaDown.isSelected()).rule11_rsiPointingDown(chkExitRsiDown.isSelected())
+                .rule12_StoPointingDown(chkExitStoDown.isSelected()).build();
         result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
                 rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, ruleChain);
+                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
 
@@ -674,80 +681,117 @@ public class StrategyPanel extends AbstractPanel {
         tfWaitBars.setColumns(4);
         result.add(tfWaitBars);
 
-        // rule chain
-        JPanel rules = new JPanel();
-        rules.setLayout(new FlowLayout());
-        rules.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        // entry rule chain
+        JPanel entryRules = new JPanel();
+        entryRules.setLayout(new FlowLayout());
+        entryRules.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 
         JLabel lblRuleRSI = new JLabel("1 RSI Low");
-        rules.add(lblRuleRSI);
+        entryRules.add(lblRuleRSI);
         chkRsiLow = new JCheckBox();
         chkRsiLow.setSelected(true);
-        rules.add(chkRsiLow);
+        entryRules.add(chkRsiLow);
 
         JLabel lblRuleSTO = new JLabel("2 STO Low");
-        rules.add(lblRuleSTO);
+        entryRules.add(lblRuleSTO);
         chkStoLow = new JCheckBox();
         chkStoLow.setSelected(true);
-        rules.add(chkStoLow);
+        entryRules.add(chkStoLow);
 
         JLabel lblAboveSMA = new JLabel("3 Above SMA200");
-        rules.add(lblAboveSMA);
+        entryRules.add(lblAboveSMA);
         chkAboveSMA = new JCheckBox();
         chkAboveSMA.setSelected(true);
-        rules.add(chkAboveSMA);
+        entryRules.add(chkAboveSMA);
 
         JLabel lblMaUp = new JLabel("4 8MA pointing up");
-        rules.add(lblMaUp);
+        entryRules.add(lblMaUp);
         chkMaPointingUp = new JCheckBox();
         chkMaPointingUp.setSelected(true);
-        rules.add(chkMaPointingUp);
+        entryRules.add(chkMaPointingUp);
 
         JLabel lblBelow8MA = new JLabel("5 Below 8MA");
-        rules.add(lblBelow8MA);
+        entryRules.add(lblBelow8MA);
         chkBelow8MA = new JCheckBox();
         chkBelow8MA.setSelected(false);
-        rules.add(chkBelow8MA);
+        entryRules.add(chkBelow8MA);
 
         JLabel lblMAsUp = new JLabel("7 EMA-Bands ups");
-        rules.add(lblMAsUp);
+        entryRules.add(lblMAsUp);
         chkMAsUp = new JCheckBox();
         chkMAsUp.setSelected(true);
-        rules.add(chkMAsUp);
+        entryRules.add(chkMAsUp);
 
         JLabel lblRsiUp = new JLabel("11 RSI ->up");
-        rules.add(lblRsiUp);
+        entryRules.add(lblRsiUp);
         chkRsiUp = new JCheckBox();
         chkRsiUp.setSelected(false);
-        rules.add(chkRsiUp);
+        entryRules.add(chkRsiUp);
 
         JLabel lblStoUp = new JLabel("12 Sto ->up");
-        rules.add(lblStoUp);
+        entryRules.add(lblStoUp);
         chkStoUp = new JCheckBox();
         chkStoUp.setSelected(false);
-        rules.add(chkStoUp);
+        entryRules.add(chkStoUp);
 
         JLabel lblMovingMom = new JLabel("13 MovMom");
-        rules.add(lblMovingMom);
+        entryRules.add(lblMovingMom);
         chkMovMom = new JCheckBox();
         chkMovMom.setSelected(false);
-        rules.add(chkMovMom);
+        entryRules.add(chkMovMom);
 
-        result.add(rules);
+        result.add(entryRules);
+
+        // exit rule chain
+        JPanel exitRules = new JPanel();
+        exitRules.setLayout(new FlowLayout());
+        exitRules.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+
+        JLabel lblRuleRSIDown = new JLabel("1 RSI High");
+        exitRules.add(lblRuleRSIDown);
+        chkExitRsiHigh = new JCheckBox();
+        chkExitRsiHigh.setSelected(true);
+        exitRules.add(chkExitRsiHigh);
+
+        JLabel lblRuleStoDown = new JLabel("2 Sto High");
+        exitRules.add(lblRuleStoDown);
+        chkExitStoHigh = new JCheckBox();
+        chkExitStoHigh.setSelected(true);
+        exitRules.add(chkExitStoHigh);
+
+        JLabel lblRule8MADown = new JLabel("3 8MA ->Down");
+        exitRules.add(lblRule8MADown);
+        chkExit8MaDown = new JCheckBox();
+        chkExit8MaDown.setSelected(true);
+        exitRules.add(chkExit8MaDown);
+        
+        JLabel lblRuleRSIPontingDown = new JLabel("11 RSI ->Down");
+        exitRules.add(lblRuleRSIPontingDown);
+        chkExitRsiDown = new JCheckBox();
+        chkExitRsiDown.setSelected(false);
+        exitRules.add(chkExitRsiDown);
+        
+        JLabel lblRuleStoPontingDown = new JLabel("11 Sto ->Down");
+        exitRules.add(lblRuleStoPontingDown);
+        chkExitStoDown = new JCheckBox();
+        chkExitStoDown.setSelected(false);
+        exitRules.add(chkExitStoDown);
+
+        result.add(exitRules);
+
         return result;
     }
 
     private TradingRecord buildTradingRecord(List<Order> orders) {
         Order[] orderArray = new Order[orders.size()];
         orderArray = orders.toArray(orderArray);
-        return new BaseTradingRecord(orderArray);
+        return orders.size()> 0 ? new BaseTradingRecord(orderArray) : new BaseTradingRecord();
     }
 
     private void updateLog2(List<Order> orders) {
         System.out.println("--");
         int i = 0;
         for (Order o : orders) {
-            //System.out.println("Index" + o.getIndex() + " Type " + o.getType() + " Amount " + o.getAmount() + " Price " + o.getPrice() );
             if (o.getType() == Order.OrderType.SELL) {
                 Order buyOrder = orders.get(i - 1);
                 System.out.println("Index" + buyOrder.getIndex() + " Type " + buyOrder.getType() + " Amount " + buyOrder.getAmount() + " Price " + buyOrder.getPrice());
@@ -760,7 +804,6 @@ public class StrategyPanel extends AbstractPanel {
                 String percent = NumberFormat.getNumberInstance().format(diffPercent);
                 System.out.println("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
             }
-
             i++;
         }
         System.out.println("--");

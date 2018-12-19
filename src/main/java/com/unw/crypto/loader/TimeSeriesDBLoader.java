@@ -111,6 +111,9 @@ public class TimeSeriesDBLoader {
      * @return 
      */
     public TimeSeries loadSeriesByTicks(List<Tick> ticks,  int barDurationInMinutes) {
+        if(ticks == null || ticks.isEmpty()){
+            throw new IllegalArgumentException("Ticks must not be empty");
+        }
         ZonedDateTime beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime()), ZoneId.systemDefault());
         ZonedDateTime endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime()), ZoneId.systemDefault());
         List<Bar> bars = bars = buildBars(beginTime, endTime, ticks, barDurationInMinutes);
