@@ -63,7 +63,6 @@ public class MovingMomentumStrategyUnw extends AbstractStrategy {
     }
 
     public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
-
         // Building the trading strategy
         Strategy strategy = buildStrategy(series, barDuration);
 
