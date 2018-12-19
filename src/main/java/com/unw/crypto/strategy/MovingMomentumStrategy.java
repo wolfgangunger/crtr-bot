@@ -24,8 +24,7 @@ import org.ta4j.core.trading.rules.WaitForRule;
 @Component
 public class MovingMomentumStrategy extends AbstractStrategy {
 
-    private int iMAShort = 9;
-    private int iMALong = 26;
+
     /**
      * @param series a time series
      * @return a moving momentum strategy
@@ -78,21 +77,6 @@ public class MovingMomentumStrategy extends AbstractStrategy {
         return tradingRecord;
     }
 
-    public int getiMAShort() {
-        return iMAShort;
-    }
-
-    public void setiMAShort(int iMAShort) {
-        this.iMAShort = iMAShort;
-    }
-
-    public int getiMALong() {
-        return iMALong;
-    }
-
-    public void setiMALong(int iMALong) {
-        this.iMALong = iMALong;
-    }
     
     
 }

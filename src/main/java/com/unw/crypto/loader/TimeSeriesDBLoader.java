@@ -5,12 +5,12 @@
  */
 package com.unw.crypto.loader;
 
-import com.unw.crypto.Config;
 import com.unw.crypto.db.TickRepository;
 import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
 import com.unw.crypto.model.Tick;
-import java.time.Duration;
+import com.unw.crypto.strategy.BarUtil;
+import static com.unw.crypto.strategy.BarUtil.buildBars;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,10 +20,8 @@ import java.util.Collections;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.Bar;
-import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseTimeSeries;
 import org.ta4j.core.TimeSeries;
 
@@ -100,7 +98,7 @@ public class TimeSeriesDBLoader {
         ZonedDateTime beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime()), ZoneId.systemDefault());
         ZonedDateTime endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime()), ZoneId.systemDefault());
 
-        List<Bar> bars = bars = buildBars(beginTime, endTime, ticks, barDurationInMinutes);
+        List<Bar> bars = bars = BarUtil.buildBars(beginTime, endTime, ticks, barDurationInMinutes);
         return new BaseTimeSeries("bitstamp_trades", bars);
     }
 
@@ -154,53 +152,11 @@ public class TimeSeriesDBLoader {
             }
             // build the list of populated bars
             //duration in seconds ( 300 = 5 min)
-            bars = buildBars(beginTime, endTime, ticks, barDurationInMinutes);
+            bars = BarUtil.buildBars(beginTime, endTime, ticks, barDurationInMinutes);
         }
         return new BaseTimeSeries("bitstamp_trades", bars);
     }
 
-    /**
-     *
-     * @param beginTime
-     * @param endTime
-     * @param duration
-     * @param ticks
-     * @return
-     */
-    private List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, List<Tick> ticks, int barDurationInMinutes) {
-        List<Bar> bars = new ArrayList<>();
-        Duration barDuration = Duration.ofSeconds(barDurationInMinutes * 60);
-        ZonedDateTime barEndTime = beginTime;
-        int i = 0;
-        // line number of trade data
-        do {
-            // build a bar
-            barEndTime = barEndTime.plus(barDuration);
-            Bar bar = new BaseBar(barDuration, barEndTime);
-            do {
-                // get a trade
-                Tick t = ticks.get(i);
-                ZonedDateTime tradeTimeStamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(t.getTradeTime().getTime()), ZoneId.systemDefault());
-                // if the trade happened during the bar
-                if (bar.inPeriod(tradeTimeStamp)) {
-                    // add the trade to the bar
-                    double tradePrice = t.getPrice();
-                    double tradeAmount = t.getAmount();
-                    bar.addTrade(tradeAmount, tradePrice);
-                } else {
-                    // should not happen - order problem ?
-                    // the trade happened after the end of the bar
-                    // go to the next bar but stay with the same trade (don't increment i)
-                    // this break will drop us after the inner "while", skipping the increment
-                    break;
-                }
-                i++;
-            } while (i < ticks.size());
-            if (bar.getTrades() > 0) {
-                bars.add(bar);
-            }
-        } while (barEndTime.isBefore(endTime));
-        return bars;
-    }
+
 
 }

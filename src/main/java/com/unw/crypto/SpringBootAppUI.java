@@ -28,7 +28,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javax.swing.JProgressBar;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -64,12 +63,14 @@ public class SpringBootAppUI extends Application {
     //strategy
     private StrategyPanel strategyPanel;
     //
-    //private DataLoaderDB dataLoader;
     private TimeSeriesDBLoader timeSeriesDBLoader;
+    // series and ticks for the selected period
     private TimeSeries series;
     private List<Tick> ticks;
     // series for live testing, 2 month before series 
     private TimeSeries preSeries;
+    // month to load  before the period, should be 2 to be able to build MA200 for 10 Min Bar, for faster testing it is reduced to one 
+    private static final int PRE_MONTH = 1;
 
     public static void main(String[] args) {
         launch(SpringBootAppUI.class, args);
@@ -175,9 +176,8 @@ public class SpringBootAppUI extends Application {
 
         barDuration = new ComboBox<>();
         barDuration.getItems().setAll(BarDuration.values());
-        barDuration.setValue(BarDuration.TWENTY_MIN);
+        barDuration.setValue(BarDuration.TEN_MIN);
         barDurationInMinutes = barDuration.getValue().getIntValue();
-        //JLabel barDurationLable = new JLabel("BarSize in Min");
 
         tb.getItems().add(cmbCurrency);
         tb.getItems().add(cmbExchange);
@@ -188,8 +188,8 @@ public class SpringBootAppUI extends Application {
 
     private void createBottomBar(BorderPane root) {
         bpBottom = new BorderPane();
-        tfBottomLeft.setPrefWidth(700);
-        tfBottomRight.setPrefWidth(700);
+        tfBottomLeft.setPrefWidth(550);
+        tfBottomRight.setPrefWidth(550);
         progressBar.setProgress(0d);
         progressBar.setPrefWidth(300);
         bpBottom.setCenter(progressBar);
@@ -204,7 +204,7 @@ public class SpringBootAppUI extends Application {
         //series = timeSeriesDBLoader.loadSeriesWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
         series = timeSeriesDBLoader.loadSeriesByTicks(ticks, barDurationInMinutes);
         // loading the pre-series ( 2 month before from)
-        LocalDate preFrom = from.getValue().minusMonths(2);
+        LocalDate preFrom = from.getValue().minusMonths(PRE_MONTH);
         preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
 
         String txtLeft = createBottomTextLeft();
@@ -256,18 +256,18 @@ public class SpringBootAppUI extends Application {
     }
 
     private void refreshData() {
-        progressBar.setProgress(0d);
+        progressBar.setProgress(0.1d);
         System.out.println(" Load data for " + from.getValue() + " " + until.getValue() + " " + cmbCurrency.getValue() + " " + cmbExchange.getValue());
         barDurationInMinutes = barDuration.getValue().getIntValue();
 
         ticks = timeSeriesDBLoader.loadTicksWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
-        progressBar.setProgress(30d);
+        progressBar.setProgress(0.3d);
         series = timeSeriesDBLoader.loadSeriesByTicks(ticks, barDurationInMinutes);
-        progressBar.setProgress(60d);
+        progressBar.setProgress(0.6d);
         // loading the pre-series ( 2 month before from)
-        LocalDate preFrom = from.getValue().minusMonths(2);
+        LocalDate preFrom = from.getValue().minusMonths(PRE_MONTH);
         preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
-        progressBar.setProgress(90d);
+        progressBar.setProgress(0.9d);
         String txtLeft = createBottomTextLeft();
         String txtRight = createBottomTextRight();
         setBottomText(txtLeft, txtRight);
@@ -296,6 +296,6 @@ public class SpringBootAppUI extends Application {
         strategyPanel.setPreSeries(preSeries);
         strategyPanel.setTicks(ticks);
         strategyPanel.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
-        progressBar.setProgress(100d);
+        progressBar.setProgress(1d);
     }
 }

@@ -6,7 +6,7 @@
 package com.unw.crypto.strategy.to;
 
 import com.unw.crypto.model.BarDuration;
-import com.unw.crypto.strategy.BarDurationUtil;
+import com.unw.crypto.strategy.BarUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -84,7 +84,7 @@ public class StrategyInputParams {
     private int getMAMultiplicator(){
         float tmp = 1;
         if(barMultiplikator){
-            tmp = (float)BarDurationUtil.getMAMultiplicator(barDuration);
+            tmp = (float)BarUtil.getMAMultiplicator(barDuration);
         }
         if (extraMultiplikator){
             tmp = tmp * extraMultiplikatorValue;

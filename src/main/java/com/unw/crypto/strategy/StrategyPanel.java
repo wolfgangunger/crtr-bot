@@ -8,6 +8,7 @@ package com.unw.crypto.strategy;
 import com.unw.crypto.Config;
 import com.unw.crypto.chart.AbstractPanel;
 import com.unw.crypto.chart.ChartUtil;
+import com.unw.crypto.model.ExtOrder;
 import com.unw.crypto.model.Tick;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
@@ -21,7 +22,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -41,9 +41,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.ta4j.core.Bar;
-import org.ta4j.core.BaseBar;
-import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Decimal;
 import org.ta4j.core.Order;
 import org.ta4j.core.Strategy;
@@ -71,6 +68,8 @@ public class StrategyPanel extends AbstractPanel {
     private ProgressBar progressBar;
     // required for the chart
     private TimeSeriesCollection dataset = new TimeSeriesCollection();
+    // list of orders by forward testing
+    private List<ExtOrder> forwardTestOrders = new ArrayList<>();
     // the strategies
     private RSI2Strategy rsi2 = new RSI2Strategy();
     private MovingMomentumStrategy mm = new MovingMomentumStrategy();
@@ -82,7 +81,8 @@ public class StrategyPanel extends AbstractPanel {
     private AbstractStrategy currentStrategy;
     // the trading record for the output
     private TradingRecord tradingRecord;
-    private Strategy finalStrategy;
+    // the current selected strategy to execute in tests
+    private Strategy tradingStrategy;
     private JTextArea textArea;
     private JSplitPane mainPanel;
     protected JFreeChart chart;
@@ -93,7 +93,7 @@ public class StrategyPanel extends AbstractPanel {
     private XYPlot plot;
 
     // backward or forward testing
-    private JCheckBox forwardTesting;
+    private JCheckBox chkForwardTesting = new JCheckBox();
     // the final strategy input params
     private JCheckBox chkBarMultiplikator;
     private JCheckBox chkExtraMultiplikator;
@@ -182,20 +182,36 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void updateChart() {
-        ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         dataset = new TimeSeriesCollection();
+        // must be done here to avoid nullpointer on first call when launching
+        chart = createChart(dataset, legend, "Date", "Price", true);
+        // is called on start when ui elements are not initialized yet, we don't need to update the chart in this case
+        if (chkBarMultiplikator == null) {
+            return;
+        }
+        // in case series are not initialized proper
+        if ((completeSeries == null && chkForwardTesting.isSelected())) {
+            return;
+        }
+
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         dataset.addSeries(buildChartTimeSeries(series, closePrice, legend));
         chart = createChart(dataset, legend, "Date", "Price", true);
+
         plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
-        //Strategy str = currentStrategy.buildStrategy(series, getBarDuration());
-        if (currentStrategy instanceof FinalTradingStrategy) {
-            ChartUtil.addBuySellSignals(completeSeries, finalStrategy, plot);
-        } else {
-            ChartUtil.addBuySellSignals(series, currentStrategy.buildStrategy(series, getBarDuration()), plot);
+        StrategyInputParams params = createStrategyInputParams();
+        if (chkForwardTesting.isSelected()) {
+            ChartUtil.addBuySellSignals(forwardTestOrders, plot);
+        } else { // backward
+            if (currentStrategy instanceof FinalTradingStrategy) {
+                tradingStrategy = ((FinalTradingStrategy) currentStrategy).buildStrategyWithParams(series, params);
+            } else {
+                tradingStrategy = currentStrategy.buildStrategy(series, barDuration);
+            }
+            ChartUtil.addBuySellSignals(series, tradingStrategy, plot);
         }
-
     }
 
     private void initMainPanel() {
@@ -232,113 +248,6 @@ public class StrategyPanel extends AbstractPanel {
         toolbarComplete.setBorder(BorderFactory.createEtchedBorder());
         toolbarTop.setBorder(BorderFactory.createEtchedBorder());
 
-        JButton bttRSI2 = new JButton();
-        bttRSI2.setText("RSI2 Strategy");
-        bttRSI2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                currentStrategy = rsi2;
-                tradingRecord = rsi2.execute(series, getBarDuration());
-                updateLog(tradingRecord);
-                update();
-            }
-        });
-        toolbarTop.add(bttRSI2);
-
-        JButton bttMm = new JButton();
-        bttMm.setText("Moving Momentumg Strategy");
-        bttMm.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                currentStrategy = mm;
-                iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
-                iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
-                mm.setiMAShort(iMAShort);
-                mm.setiMALong(iMALong);
-                tradingRecord = mm.execute(series, getBarDuration());
-                updateLog(tradingRecord);
-                update();
-            }
-        });
-        toolbarTop.add(bttMm);
-
-        JButton bttCCI = new JButton();
-        bttCCI.setText("CCI Strategy");
-        bttCCI.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                currentStrategy = cciCorrectionStrategy;
-                tradingRecord = cciCorrectionStrategy.execute(series, getBarDuration());
-                updateLog(tradingRecord);
-                update();
-            }
-        });
-        toolbarTop.add(bttCCI);
-
-        JButton bttGE = new JButton();
-        bttGE.setText("Global Extrema Strategy");
-        bttGE.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                currentStrategy = globalExtremaStrategy;
-                tradingRecord = globalExtremaStrategy.execute(series, getBarDuration());
-                updateLog(tradingRecord);
-                update();
-            }
-        });
-        toolbarTop.add(bttGE);
-
-        JButton bttMmUnger = new JButton();
-        bttMmUnger.setText("Moving Momentumg Strategy Unger");
-        bttMmUnger.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                currentStrategy = mmUnger;
-                iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
-                iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
-                mmUnger.setiMALong(iMALong);
-                mmUnger.setiMAShort(iMAShort);
-                tradingRecord = mmUnger.execute(series, getBarDuration());
-                updateLog(tradingRecord);
-                update();
-            }
-        });
-        toolbarTop.add(bttMmUnger);
-
-        JButton bttTestStrategy = new JButton();
-        bttTestStrategy.setText("Test Strategy");
-        bttTestStrategy.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                currentStrategy = testStrategy;
-                iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
-                iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
-                testStrategy.setiMALong(iMALong);
-                testStrategy.setiMAShort(iMAShort);
-                tradingRecord = testStrategy.execute(series, getBarDuration());
-                updateLog(tradingRecord);
-                update();
-            }
-        });
-        toolbarTop.add(bttTestStrategy);
-
-        JButton bttFinalStrategy = new JButton();
-        bttFinalStrategy.setText("Final Strategy");
-        bttFinalStrategy.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                //executeFinalStrategy();
-                executeFinalStrategy();
-            }
-        });
-        toolbarTop.add(bttFinalStrategy);
-
-        JLabel lblForwardTesting = new JLabel("Forward Testing");
-        toolbarTop.add(lblForwardTesting);
-        forwardTesting = new JCheckBox();
-        forwardTesting.setSelected(true);
-        toolbarTop.add(forwardTesting);
-
         // input fields
         maShort = new NumericTextField();
         maShort.setText(String.valueOf(iMAShort));
@@ -356,6 +265,89 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(lblLongMA);
         toolbarTop.add(maLong);
 
+        // buttons for strategies
+        JButton bttRSI2 = new JButton();
+        bttRSI2.setText("RSI2 Strategy");
+        bttRSI2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = rsi2;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttRSI2);
+
+        JButton bttMm = new JButton();
+        bttMm.setText("Moving Momentumg Strategy");
+        bttMm.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = mm;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttMm);
+
+        JButton bttCCI = new JButton();
+        bttCCI.setText("CCI Strategy");
+        bttCCI.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = cciCorrectionStrategy;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttCCI);
+
+        JButton bttGE = new JButton();
+        bttGE.setText("Global Extrema Strategy");
+        bttGE.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = globalExtremaStrategy;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttGE);
+
+        JButton bttMmUnger = new JButton();
+        bttMmUnger.setText("Moving Momentumg Strategy Unger");
+        bttMmUnger.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = mmUnger;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttMmUnger);
+
+        JButton bttTestStrategy = new JButton();
+        bttTestStrategy.setText("Test Strategy");
+        bttTestStrategy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = testStrategy;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttTestStrategy);
+
+        JButton bttFinalStrategy = new JButton();
+        bttFinalStrategy.setText("Final Strategy");
+        bttFinalStrategy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = finalTradingStrategy;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttFinalStrategy);
+
+        JLabel lblForwardTesting = new JLabel("Forward Testing");
+        toolbarTop.add(lblForwardTesting);
+        chkForwardTesting.setSelected(true);
+        toolbarTop.add(chkForwardTesting);
+
         toolbarComplete.add(toolbarTop, BorderLayout.NORTH);
         JPanel finalStrategyToolbar = createFinalStrategyToolbar();
         toolbarComplete.add(finalStrategyToolbar, BorderLayout.CENTER);
@@ -363,12 +355,37 @@ public class StrategyPanel extends AbstractPanel {
 
     }
 
-    private void executeFinalStrategy() {
-        currentStrategy = finalTradingStrategy;
+    private void executeTest() {
+        iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
+        iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
+        currentStrategy.setiMALong(iMALong);
+        currentStrategy.setiMAShort(iMAShort);
+        if (chkForwardTesting.isSelected()) {
+            executeForwardTest();
+        } else {
+            executeBackwardTest();
+        }
+    }
+
+    private void executeBackwardTest() {
+        if (currentStrategy instanceof FinalTradingStrategy) {
+            StrategyInputParams params = createStrategyInputParams();
+            tradingStrategy = finalTradingStrategy.buildStrategyWithParams(series, params);
+            tradingRecord = finalTradingStrategy.executeWithParams(series, params, tradingStrategy);
+        } else {
+            tradingStrategy = currentStrategy.buildStrategy(series, barDuration);
+            tradingRecord = currentStrategy.execute(series, getBarDuration());
+        }
+        updateLog(tradingRecord);
+        update();
+    }
+
+    private void executeForwardTest() {
         StrategyInputParams params = createStrategyInputParams();
-        completeSeries = preSeries;
+        forwardTestOrders = new ArrayList<>();
+        completeSeries = StrategyUtil.copySeries(preSeries);
+        //completeSeries = preSeries;
         boolean entered = false;
-        List<Order> orders = new ArrayList();
         double ticksSize = ticks.size();
         double progressBarCounter = 0;
         progressBar.setProgress(0d);
@@ -376,13 +393,13 @@ public class StrategyPanel extends AbstractPanel {
         for (Tick tick : ticks) {
             //System.out.println(tick.getTradeTime());
             if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
-                System.out.println("overlap");
+                System.out.println("overlap " + tick.getTradeTime());
                 progressBarCounter++;
                 continue;
             }
             if (beginTimeCurrentBar.plusMinutes(barDuration.getIntValue())
                     .isBefore(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
-                completeSeries.addBar(createNewBar(tick));
+                completeSeries.addBar(BarUtil.createNewBar(tick));
                 beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
                 progressBar.setProgress(progressBarCounter / ticksSize);
                 //System.out.println((progressBarCounter / ticksSize) * 100 + " %");
@@ -391,37 +408,37 @@ public class StrategyPanel extends AbstractPanel {
                         Decimal.valueOf(tick.getPrice()));
             }
             // now lets check if we execute the strategy ( once in a minute)
-            int time = getTimeInHoursAndMinutes(tick);
-            int prevTime = progressBarCounter > 1 ? getTimeInHoursAndMinutes(ticks.get((int) progressBarCounter - 1)) : getTimeInHoursAndMinutes(tick);
+            int time = StrategyUtil.getTimeInHoursAndMinutes(tick);
+            int prevTime = progressBarCounter > 1 ? StrategyUtil.getTimeInHoursAndMinutes(ticks.get((int) progressBarCounter - 1)) : StrategyUtil.getTimeInHoursAndMinutes(tick);
             if (time == prevTime) {
                 // we execute the strategy only once in a minute, if there are more ticks, we do nothing
             } else {
                 // execute the strategy at least every minute
-                finalStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
-                if (finalStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
-                    orders.add(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
+                if (currentStrategy instanceof FinalTradingStrategy) {
+                    tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
+                } else {
+                    tradingStrategy = currentStrategy.buildStrategy(completeSeries, barDuration);
+                }
+                if (tradingStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
+                    ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
+                    order.setTradeTime(tick.getTradeTime());
+                    //forwardTestOrders.add(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
+                    forwardTestOrders.add(order);
                     entered = true;
-                } else if (finalStrategy.shouldExit(completeSeries.getEndIndex()) && entered) {
-                    orders.add(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex()) && entered) {
+                    ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                    order.setTradeTime(tick.getTradeTime());
+                    //forwardTestOrders.add(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                    forwardTestOrders.add(order);
                     entered = false;
                 }
             }
             progressBarCounter++;
         }
         progressBar.setProgress(100d);
-        TradingRecord record = buildTradingRecord(orders);
+        TradingRecord record = StrategyUtil.buildTradingRecord(forwardTestOrders);
         updateLog(record);
         update();
-    }
-
-    private int getTimeInHoursAndMinutes(Tick tick) {
-        return tick.getTradeTime().getHours() + tick.getTradeTime().getMinutes();
-    }
-
-    private Bar createNewBar(Tick tick) {
-        ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tick.getTradeTime().getTime()), ZoneId.systemDefault());
-        return new BaseBar(dateTime, tick.getPrice(), tick.getPrice(), tick.getPrice(), tick.getPrice(),
-                tick.getAmount());
     }
 
     private StrategyInputParams createStrategyInputParams() {
@@ -764,13 +781,13 @@ public class StrategyPanel extends AbstractPanel {
         chkExit8MaDown = new JCheckBox();
         chkExit8MaDown.setSelected(true);
         exitRules.add(chkExit8MaDown);
-        
+
         JLabel lblRuleRSIPontingDown = new JLabel("11 RSI ->Down");
         exitRules.add(lblRuleRSIPontingDown);
         chkExitRsiDown = new JCheckBox();
         chkExitRsiDown.setSelected(false);
         exitRules.add(chkExitRsiDown);
-        
+
         JLabel lblRuleStoPontingDown = new JLabel("11 Sto ->Down");
         exitRules.add(lblRuleStoPontingDown);
         chkExitStoDown = new JCheckBox();
@@ -782,32 +799,6 @@ public class StrategyPanel extends AbstractPanel {
         return result;
     }
 
-    private TradingRecord buildTradingRecord(List<Order> orders) {
-        Order[] orderArray = new Order[orders.size()];
-        orderArray = orders.toArray(orderArray);
-        return orders.size()> 0 ? new BaseTradingRecord(orderArray) : new BaseTradingRecord();
-    }
-
-    private void updateLog2(List<Order> orders) {
-        System.out.println("--");
-        int i = 0;
-        for (Order o : orders) {
-            if (o.getType() == Order.OrderType.SELL) {
-                Order buyOrder = orders.get(i - 1);
-                System.out.println("Index" + buyOrder.getIndex() + " Type " + buyOrder.getType() + " Amount " + buyOrder.getAmount() + " Price " + buyOrder.getPrice());
-                System.out.println("Index" + o.getIndex() + " Type " + o.getType() + " Amount " + o.getAmount() + " Price " + o.getPrice());
-                Decimal diff = buyOrder.getPrice().minus(o.getPrice());
-                System.out.println("  Diff " + diff);
-                Decimal diffPercent = o.getPrice().dividedBy(buyOrder.getPrice());
-                diffPercent = diffPercent.minus(Decimal.ONE);
-                diffPercent = diffPercent.multipliedBy(Decimal.HUNDRED);
-                String percent = NumberFormat.getNumberInstance().format(diffPercent);
-                System.out.println("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
-            }
-            i++;
-        }
-        System.out.println("--");
-    }
 
     private void updateLog3(List<Order> orders) {
         StringBuilder sb = new StringBuilder();

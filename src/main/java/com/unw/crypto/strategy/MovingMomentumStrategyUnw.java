@@ -24,8 +24,6 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
 @Component
 public class MovingMomentumStrategyUnw extends AbstractStrategy {
 
-    private int iMAShort = 9;
-    private int iMALong = 26;
 
     /**
      * @param series a time series
@@ -78,20 +76,5 @@ public class MovingMomentumStrategyUnw extends AbstractStrategy {
         System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
         return tradingRecord;
     }
-    
-        public int getiMAShort() {
-        return iMAShort;
-    }
 
-    public void setiMAShort(int iMAShort) {
-        this.iMAShort = iMAShort;
-    }
-
-    public int getiMALong() {
-        return iMALong;
-    }
-
-    public void setiMALong(int iMALong) {
-        this.iMALong = iMALong;
-    }
 }

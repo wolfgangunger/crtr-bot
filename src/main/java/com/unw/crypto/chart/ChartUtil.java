@@ -5,6 +5,7 @@
  */
 package com.unw.crypto.chart;
 
+import com.unw.crypto.model.ExtOrder;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
@@ -19,6 +20,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.DefaultHighLowDataset;
 import org.jfree.data.xy.OHLCDataset;
 import org.ta4j.core.Bar;
+import org.ta4j.core.Order;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TimeSeriesManager;
@@ -48,7 +50,7 @@ public final class ChartUtil {
         return dataset;
     }
 
-    public  static OHLCDataset createOHLCDataset(TimeSeries series) {
+    public static OHLCDataset createOHLCDataset(TimeSeries series) {
         final int nbBars = series.getBarCount();
 
         Date[] dates = new Date[nbBars];
@@ -81,6 +83,10 @@ public final class ChartUtil {
      */
     public static void addBuySellSignals(TimeSeries series, Strategy strategy, XYPlot plot) {
         // Running the strategy
+        if (series == null || strategy == null) {
+            // should not happen
+            return;
+        }
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         List<Trade> trades = seriesManager.run(strategy).getTrades();
         // Adding markers to plot
@@ -101,6 +107,36 @@ public final class ChartUtil {
             sellMarker.setStroke(stroke);
             plot.addDomainMarker(sellMarker);
         }
+    }
+
+    public static void addBuySellSignals(List<ExtOrder> orders, XYPlot plot) {
+        if (orders == null || orders.isEmpty()) {
+            return;
+        }
+        Stroke stroke = new BasicStroke(3);
+        for (ExtOrder o : orders) {
+            // Buy order
+            if (o.getType().equals(Order.OrderType.BUY)) {
+                double buySignalBarTime = new Minute(Date.from(o.getTradeTime().toInstant())).getFirstMillisecond();
+                Marker buyMarker = new ValueMarker(buySignalBarTime);
+                buyMarker.setPaint(Color.GREEN);
+                buyMarker.setLabel("B");
+                buyMarker.setStroke(stroke);
+                plot.addDomainMarker(buyMarker);
+            }
+
+            // Sell order
+            if (o.getType().equals(Order.OrderType.SELL)) {
+                double sellSignalBarTime = new Minute(Date.from(o.getTradeTime().toInstant())).getFirstMillisecond();
+                Marker sellMarker = new ValueMarker(sellSignalBarTime);
+                sellMarker.setPaint(Color.RED);
+                sellMarker.setLabel("S");
+                sellMarker.setStroke(stroke);
+                plot.addDomainMarker(sellMarker);
+            }
+
+        }
+
     }
 
 }
