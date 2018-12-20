@@ -11,8 +11,9 @@ import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.trading.rules.IsFallingRule;
-import org.ta4j.core.trading.rules.UnderIndicatorRule;
+import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
+import org.ta4j.core.trading.rules.IsRisingRule;
+import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  * Moving momentum strategy.
@@ -67,7 +68,7 @@ public class TestStrategy extends AbstractStrategy {
         // sma is pointing up (v) - second parameter can be varied - brute force ?
         //Rule entryRule = new IsRisingRule(smaLong, iMAShort);
         // // Price is (near or) below the 8-MA
-        Rule entryRule = new UnderIndicatorRule(closePrice, smaLong);
+        //Rule entryRule = new UnderIndicatorRule(closePrice, smaLong);
         // RSI
         // simple rule when RSI moves over 20 (v)
         //Rule entryRule = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(10));
@@ -80,6 +81,15 @@ public class TestStrategy extends AbstractStrategy {
 //                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(20))) // Signal 1
 //                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
         //Rule entryRule = new OverIndicatorRule(shortEma, longEma) ;// Trend    
+        
+        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, Decimal.valueOf(20));
+        // 2  STO is crossing low threshold 
+        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.18d));
+        
+                // rule 11 rsi pointing up
+        Rule entryRule3 = new IsRisingRule(rsiIndicator, 1 , 0.1d);
+        
+        Rule entryRule = entryRule1.and(entryRule3);
         // Exit rules --------------
         // Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
         // .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80))) // Signal 1
@@ -94,9 +104,9 @@ public class TestStrategy extends AbstractStrategy {
 //        Rule exitRule = new StopGainRule(closePrice, Decimal.valueOf(2))
 //                .and(new StopLossRule(closePrice, Decimal.valueOf(1)));
         //Rule exitRule = new FixedRule(indexes);
-        //Rule exitRule = new WaitForRule(Order.OrderType.BUY, 15);
+        Rule exitRule = new WaitForRule(Order.OrderType.BUY, 15);
         // checks only the timeframe not the volume
-        Rule exitRule = new IsFallingRule(closePrice, 3);
+        //Rule exitRule = new IsFallingRule(closePrice, 3);
         //Rule exitRule = new FixedRule(1,2,4,5);
         return new BaseStrategy(entryRule, exitRule);
     }

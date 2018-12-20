@@ -20,6 +20,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringBootApp {
 
     public static void main(String[] args) throws BeansException, IOException {
+        // to activate this app :
+        // uncomment @SpringBootApplication in this class
+        // comment @SpringBootApplication in SpringBootAppUI
+        // uncomment @Component in TimerService
+        // uncomment @Component in TradingManager
+        
         ConfigurableApplicationContext context = SpringApplication.run(SpringBootApp.class);
         // start the timer 
         TimerService timerService = context.getBean(TimerService.class);

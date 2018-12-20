@@ -33,7 +33,7 @@ public class TradingManager {
     private int counter = 0;
 
     @Autowired
-    private Analyzer analyzer;
+    private MarketAnalyzer analyzer;
     @Autowired
     private TimeSeriesDBLoader timeSeriesDBLoader;
 

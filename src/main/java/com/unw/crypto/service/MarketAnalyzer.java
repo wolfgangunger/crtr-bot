@@ -19,7 +19,7 @@ import org.ta4j.core.trading.rules.OverIndicatorRule;
  * @author UNGERW
  */
 @Component
-public class Analyzer {
+public class MarketAnalyzer {
 
     /**
      *

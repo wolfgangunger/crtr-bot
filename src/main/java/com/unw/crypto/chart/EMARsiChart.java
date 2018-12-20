@@ -59,7 +59,7 @@ public class EMARsiChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrame = 4;
+        timeFrame = 2;
     }
 
     @Override

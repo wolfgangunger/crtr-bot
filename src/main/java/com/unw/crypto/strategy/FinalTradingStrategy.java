@@ -154,10 +154,10 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
         // rule 11 rsi pointing up
-        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe());
+        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), 0.3d);
 
         //rule 12 sto pointing up
-        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe());
+        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),0.3d);
 
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -183,15 +183,15 @@ public class FinalTradingStrategy extends AbstractStrategy {
         //////////// exit rules
         // rsi is falling - isFalling or CrossedUp ?
         Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(params.getRsiThresholdHigh()));
-        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe());
+        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(),0.5d);
 
         Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe());
+        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),0.5d);
 
-        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe());
+        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(),0.5d);
 
-        // we don't have a timeframe parameter yet, do we need one ?
-        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame());
+        // 
+        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(),0.5d);
 
         Rule exitRule22 = new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
