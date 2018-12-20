@@ -5,7 +5,7 @@
  */
 package com.unw.crypto;
 
-import com.unw.crypto.service.TradingManager;
+import com.unw.crypto.service.TimerService;
 import java.io.IOException;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.SpringApplication;
@@ -21,9 +21,9 @@ public class SpringBootApp {
 
     public static void main(String[] args) throws BeansException, IOException {
         ConfigurableApplicationContext context = SpringApplication.run(SpringBootApp.class);
-        // dataLoader = context.getBean(DataLoaderDB.class);
-        TradingManager manager = context.getBean(TradingManager.class);
-        manager.execute();
+        // start the timer 
+        TimerService timerService = context.getBean(TimerService.class);
+        //timerService.start();
     }
 
 }

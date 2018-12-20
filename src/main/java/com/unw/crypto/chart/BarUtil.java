@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BaseBar;
+import org.ta4j.core.TimeSeries;
 
 /**
  *
@@ -74,6 +75,14 @@ public final class BarUtil {
         ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tick.getTradeTime().getTime()), ZoneId.systemDefault());
         return new BaseBar(dateTime, tick.getPrice(), tick.getPrice(), tick.getPrice(), tick.getPrice(),
                 tick.getAmount());
+    }
+    
+    public static List<Bar> createBarList(int start, int end, TimeSeries series) {
+        List<Bar> result = new ArrayList();
+        for (int i = start; i < end; i++) {
+            result.add(series.getBar(i));
+        }
+        return result;
     }
 
     public static int getMAMultiplicator(BarDuration barDuration) {

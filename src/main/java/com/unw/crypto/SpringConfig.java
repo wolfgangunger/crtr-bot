@@ -5,6 +5,10 @@
  */
 package com.unw.crypto;
 
+import com.unw.crypto.model.Currency;
+import com.unw.crypto.model.Exchange;
+import com.unw.crypto.service.SingleCoinTradingService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -15,5 +19,21 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class SpringConfig {
-    
+
+    @Bean
+    public SingleCoinTradingService btcTrader() {
+        return new SingleCoinTradingService(Currency.BTC, Exchange.BINANCE);
+    }
+
+    @Bean
+    public SingleCoinTradingService ltcTrader() {
+        return new SingleCoinTradingService(Currency.LTC, Exchange.BINANCE);
+    }
+
+    @Bean
+    public SingleCoinTradingService ethTrader() {
+        return new SingleCoinTradingService(Currency.ETH, Exchange.BINANCE);
+    }
+
+
 }
