@@ -655,7 +655,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblRsiThresholdHigh);
 
         tfRsiThresholdHigh = new NumericTextField();
-        tfRsiThresholdHigh.setText(String.valueOf(80));
+        tfRsiThresholdHigh.setText(String.valueOf(75));
         tfRsiThresholdHigh.setColumns(4);
         result.add(tfRsiThresholdHigh);
         // sto
@@ -671,7 +671,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoThresholdHigh);
 
         tfStoThresholdHigh = new JTextField();
-        tfStoThresholdHigh.setText(String.valueOf(0.85f));
+        tfStoThresholdHigh.setText(String.valueOf(0.8f));
         tfStoThresholdHigh.setColumns(4);
         result.add(tfStoThresholdHigh);
 
@@ -705,7 +705,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblFallingStrength);
 
         tfFallingStrenght = new JTextField();
-        tfFallingStrenght.setText(String.valueOf(0.7d));
+        tfFallingStrenght.setText(String.valueOf(0.6d));
         tfFallingStrenght.setColumns(4);
         result.add(tfFallingStrenght);
 

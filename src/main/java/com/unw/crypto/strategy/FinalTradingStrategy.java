@@ -47,6 +47,54 @@ public class FinalTradingStrategy extends AbstractStrategy {
     private int iMAShort = 9;
     private int iMALong = 26;
 
+    /**
+     * use this method to execute strategy from outside with params
+     *
+     * @param series
+     * @param params
+     * @return
+     */
+    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params) {
+        Strategy strategy = buildStrategyWithParams(series, params);
+        // Running the strategy
+        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+        TradingRecord tradingRecord = seriesManager.run(strategy);
+        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
+        // Analysis
+        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
+        return tradingRecord;
+    }
+
+    /**
+     * use this method to execute strategy from outside with params
+     *
+     * @param series
+     * @param params
+     * @param strategy
+     * @return
+     */
+    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) {
+        // Running the strategy
+        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+        TradingRecord tradingRecord = seriesManager.run(strategy);
+        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
+        // Analysis
+        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
+        return tradingRecord;
+    }
+
+    public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
+        // Building the trading strategy
+        Strategy strategy = buildStrategy(series, barDuration);
+        // Running the strategy
+        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+        TradingRecord tradingRecord = seriesManager.run(strategy);
+        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
+        // Analysis
+        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
+        return tradingRecord;
+    }
+
     @Override
     public Strategy buildStrategy(TimeSeries series, BarDuration barDuration) {
 
@@ -80,7 +128,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
                 .rule3_8maDown(true).rule11_rsiPointingDown(false).rule12_StoPointingDown(false).build();
         StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
                 stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh,risingStrenght,fallingStrenght,  stopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
 
         return buildStrategyWithParams(series, params);
     }
@@ -159,7 +207,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
 
         //rule 12 sto pointing up
-        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),params.getRisingStrenght());
+        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
 
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -183,74 +231,28 @@ public class FinalTradingStrategy extends AbstractStrategy {
         Rule exitRuleb = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 
         //////////// exit rules
-        // rsi is falling - isFalling or CrossedUp ?
+        // rsi is falling - isFalling or CrossedUp ? don't work together
         Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(params.getRsiThresholdHigh()));
-        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(),params.getFallingStrenght());
+        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
 
         Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),params.getFallingStrenght());
+        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
+        // ma 8 is falling
+        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
 
-        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(),params.getFallingStrenght());
-
-        // 
-        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(),params.getFallingStrenght());
+        // prive is falling
+        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(), params.getFallingStrenght());
+        // strict falling ruing
+        Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
 
         Rule exitRule22 = new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()));
 
-        Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11, 
-                exitRule12, exitRule21, exitRule22, exitRule23);
+        Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
+                exitRule12, exitRule21, exitRule21b, exitRule22, exitRule23);
 
         return new BaseStrategy(entryRule, exitRule);
-    }
-
-    /**
-     * use this method to execute strategy from outside with params
-     *
-     * @param series
-     * @param params
-     * @return
-     */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params) {
-        Strategy strategy = buildStrategyWithParams(series, params);
-        // Running the strategy
-        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
-        TradingRecord tradingRecord = seriesManager.run(strategy);
-        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
-        // Analysis
-        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
-        return tradingRecord;
-    }
-
-    /**
-     * use this method to execute strategy from outside with params
-     *
-     * @param series
-     * @param params
-     * @param strategy
-     * @return
-     */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) {
-        // Running the strategy
-        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
-        TradingRecord tradingRecord = seriesManager.run(strategy);
-        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
-        // Analysis
-        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
-        return tradingRecord;
-    }
-
-    public TradingRecord execute(TimeSeries series, BarDuration barDuration) {
-        // Building the trading strategy
-        Strategy strategy = buildStrategy(series, barDuration);
-        // Running the strategy
-        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
-        TradingRecord tradingRecord = seriesManager.run(strategy);
-        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
-        // Analysis
-        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
-        return tradingRecord;
     }
 
     /**
@@ -264,7 +266,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
      * @param rule4
      * @param rule5
      * @param rule7
-     * @return
+     * @return the complete Rule Chain
      */
     private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, EntryRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5,
             Rule rule7, Rule rule11, Rule rule12, Rule rule13) {
@@ -302,11 +304,26 @@ public class FinalTradingStrategy extends AbstractStrategy {
         return result;
     }
 
+    /**
+     * concatenate the rules depending on the boolean params
+     * @param closePrice
+     * @param ruleChain
+     * @param rule1
+     * @param rule2
+     * @param rule3
+     * @param rule11
+     * @param rule12
+     * @param rule21
+     * @param rule21b
+     * @param rule22
+     * @param rule23
+     * @return the complete Rule Chain
+     */
     private Rule buildCompleteExitRule(ClosePriceIndicator closePrice, ExitRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3,
-            Rule rule11, Rule rule12, Rule rule21, Rule rule22, Rule rule23) {
+            Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22, Rule rule23) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
-        // todo - some rules must be OR chained like stop loss
+
         if (ruleChain.isRule1_rsiHigh()) {
             result = result.and(rule1);
         }
@@ -326,15 +343,17 @@ public class FinalTradingStrategy extends AbstractStrategy {
         if (ruleChain.isRule21_priceFalling()) {
             result = result.and(rule21);
         }
+        /// or rules - single rule will cause sell
         if (ruleChain.isRule22_stopLoss()) {
             result = result.or(rule22);
         }
         if (ruleChain.isRule23_stopGain()) {
             result = result.or(rule23);
         }
+        // strict price falling rule
+        // result = result.or(rule21b);
 
         return result;
     }
-
 
 }
