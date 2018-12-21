@@ -119,6 +119,9 @@ public class StrategyPanel extends AbstractPanel {
     private JTextField tfStoThresholdHigh;
     private NumericTextField tfStoOscKThresholdLow;
     private NumericTextField tfStoOscKThresholdHigh;
+    private JTextField tfFallingStrenght;
+    private JTextField tfRisingStrenght;
+
     private JTextField tfStopLoss;
     private JTextField tfStopGain;
     private NumericTextField tfWaitBars;
@@ -469,6 +472,8 @@ public class StrategyPanel extends AbstractPanel {
         double stoThresholdHigh = Double.valueOf(tfStoThresholdHigh.getText());
         int stoOscKThresholdLow = Integer.valueOf(tfStoOscKThresholdLow.getText());
         int stoOscKThresholdHigh = Integer.valueOf(tfStoOscKThresholdHigh.getText());
+        double isRisingStrenght = Double.valueOf(tfRisingStrenght.getText());
+        double isFallingStrenght = Double.valueOf(tfFallingStrenght.getText());
         double stopLoss = Double.valueOf(tfStopLoss.getText());
         double stopGain = Double.valueOf(tfStopGain.getText());
         int waitBars = Integer.valueOf(tfWaitBars.getText());
@@ -481,7 +486,7 @@ public class StrategyPanel extends AbstractPanel {
                 .rule23_stopGain(chkExitStopGain.isSelected()).rule22_stopLoss(chkExitStopLoss.isSelected()).build();
         result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
                 rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrame, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+                stoOscKThresholdLow, stoOscKThresholdHigh,isRisingStrenght, isFallingStrenght, stopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
 
@@ -522,38 +527,38 @@ public class StrategyPanel extends AbstractPanel {
 
         result.add(timeframes);
 
-        // ma - fix MAs
+        // ma - fix MAs - removed by now - wont be changed
         JLabel lblMA8 = new JLabel("MA8");
-        result.add(lblMA8);
+        //result.add(lblMA8);
 
         tfMA8 = new NumericTextField();
         tfMA8.setText(String.valueOf(8));
         tfMA8.setColumns(4);
-        result.add(tfMA8);
+        //result.add(tfMA8);
 
         JLabel lblMA14 = new JLabel("MA14");
-        result.add(lblMA14);
+        //result.add(lblMA14);
 
         tfMA14 = new NumericTextField();
         tfMA14.setText(String.valueOf(14));
         tfMA14.setColumns(4);
-        result.add(tfMA14);
+        //result.add(tfMA14);
 
         JLabel lblMA200 = new JLabel("MA200");
-        result.add(lblMA200);
+        //result.add(lblMA200);
 
         tfMA200 = new NumericTextField();
         tfMA200.setText(String.valueOf(200));
         tfMA200.setColumns(4);
-        result.add(tfMA200);
+        //result.add(tfMA200);
 
         JLabel lblMA314 = new JLabel("MA314");
-        result.add(lblMA314);
+        //result.add(lblMA314);
 
         tfMA314 = new NumericTextField();
         tfMA314.setText(String.valueOf(314));
         tfMA314.setColumns(4);
-        result.add(tfMA314);
+        //result.add(tfMA314);
         //ma
         JLabel lblShortSMA = new JLabel("Short SMA");
         result.add(lblShortSMA);
@@ -686,6 +691,23 @@ public class StrategyPanel extends AbstractPanel {
         tfStoOscKThresholdHigh.setText(String.valueOf(80));
         tfStoOscKThresholdHigh.setColumns(4);
         result.add(tfStoOscKThresholdHigh);
+
+        // is rising and is falling strenthg
+        JLabel lblRiseStrength = new JLabel("Rising Strength");
+        result.add(lblRiseStrength);
+
+        tfRisingStrenght = new JTextField();
+        tfRisingStrenght.setText(String.valueOf(0.7d));
+        tfRisingStrenght.setColumns(4);
+        result.add(tfRisingStrenght);
+
+        JLabel lblFallingStrength = new JLabel("Falling Strength");
+        result.add(lblFallingStrength);
+
+        tfFallingStrenght = new JTextField();
+        tfFallingStrenght.setText(String.valueOf(0.7d));
+        tfFallingStrenght.setColumns(4);
+        result.add(tfFallingStrenght);
 
         // stopp loss
         JLabel lblstopLoss = new JLabel("Stop Loss");

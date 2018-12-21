@@ -28,20 +28,19 @@ public class StrategyInputParams {
     // set with the timeframe value ( days * bar multiplicator) from outside 
     /// todo : timeframe values must be calculated with factor of barsize
     //  smaLong = smaLon * BarDurationUtil.getMAMultiplicator
-    
     // bar / candle size
     private BarDuration barDuration;
-    
+
     private boolean barMultiplikator;
     private boolean extraMultiplikator;
     private float extraMultiplikatorValue;
-    
+
     //entry and exitRuleChain
     private EntryRuleChain entryRuleChain;
     private ExitRuleChain exitRuleChain;
-    
+
     /// indicators
-        // simple MA indays
+    // simple MA indays
     private int smaShort;
     private int smaLong;
     private int sma8 = 8;
@@ -52,12 +51,11 @@ public class StrategyInputParams {
     private int emaShort;
     private int emaLong;
 
-
     // RSI
     private int rsiTimeframe;
     //StochasticRSIIndicator
     private int stoRsiTimeframe;
-  //StochasticOscillatorKIndicator
+    //StochasticOscillatorKIndicator
     private int stoOscKTimeFrame;
     //SMAIndicator
     private int smaIndicatorTimeframe;
@@ -65,17 +63,20 @@ public class StrategyInputParams {
     private int emaIndicatorTimeframe;
     // for closed price e.g. isFalling
     private int priceTimeFrame;
-    
+
     /// rules
     // rsi 
     private int rsiThresholdLow;
-    private int rsiThresholdHigh;    
+    private int rsiThresholdHigh;
     // sto
     private double stoThresholdLow;
-    private double stoThresholdHigh;    
+    private double stoThresholdHigh;
     //stochasticOscillK
     private int stoOscKThresholdLow;
     private int stoOscKThresholdHigh;
+    // the strength for the is falling and is rising rules
+    private double fallingStrenght;
+    private double risingStrenght;
     // stopp loss
     private double stopLoss;
     // stop gain
@@ -83,16 +84,17 @@ public class StrategyInputParams {
     // wait rule
     private int waitBars;
 
-    private int getMAMultiplicator(){
+    private int getMAMultiplicator() {
         float tmp = 1;
-        if(barMultiplikator){
-            tmp = (float)BarUtil.getMAMultiplicator(barDuration);
+        if (barMultiplikator) {
+            tmp = (float) BarUtil.getMAMultiplicator(barDuration);
         }
-        if (extraMultiplikator){
+        if (extraMultiplikator) {
             tmp = tmp * extraMultiplikatorValue;
         }
-        return (int)tmp;
+        return (int) tmp;
     }
+
     public BarDuration getBarDuration() {
         return barDuration;
     }
@@ -104,8 +106,6 @@ public class StrategyInputParams {
     public ExitRuleChain getExitRuleChain() {
         return exitRuleChain;
     }
-    
-    
 
     public int getSmaShort() {
         return smaShort * getMAMultiplicator();
@@ -120,7 +120,7 @@ public class StrategyInputParams {
     }
 
     public int getSma14() {
-        return sma14  * getMAMultiplicator();
+        return sma14 * getMAMultiplicator();
     }
 
     public int getSma200() {
@@ -162,7 +162,6 @@ public class StrategyInputParams {
     public int getPriceTimeFrame() {
         return priceTimeFrame;
     }
-    
 
     public int getRsiThresholdLow() {
         return rsiThresholdLow;
@@ -199,7 +198,15 @@ public class StrategyInputParams {
     public int getWaitBars() {
         return waitBars;
     }
+
+    public double getFallingStrenght() {
+        return fallingStrenght;
+    }
+
+    public double getRisingStrenght() {
+        return risingStrenght;
+    }
     
     
-    
+
 }

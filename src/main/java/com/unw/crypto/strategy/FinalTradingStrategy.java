@@ -69,6 +69,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
         double stoThresholdHigh = 0.85d;
         int stoOscKThresholdLow = 20;
         int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.7d;
+        double fallingStrenght = 0.7d;
         double stopLoss = 1;
         double stopGain = -1d;
         int waitBars = 50;
@@ -78,7 +80,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
                 .rule3_8maDown(true).rule11_rsiPointingDown(false).rule12_StoPointingDown(false).build();
         StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
                 stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, stopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
+                stoOscKThresholdLow, stoOscKThresholdHigh,risingStrenght,fallingStrenght,  stopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
 
         return buildStrategyWithParams(series, params);
     }
@@ -143,7 +145,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // 3 - to be done - does it make sense ?
         Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         // 4 8-MA is pointing up - second param to check
-        Rule entryRule4 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe());
+        Rule entryRule4 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
         //5- Price is near or below the 8-MA 
         Rule entryRule5 = new UnderIndicatorRule(closePrice, sma8);
         // Rule 6 TODO 
@@ -154,10 +156,10 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
         // rule 11 rsi pointing up
-        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), 0.3d);
+        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
 
         //rule 12 sto pointing up
-        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),0.3d);
+        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),params.getRisingStrenght());
 
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -183,15 +185,15 @@ public class FinalTradingStrategy extends AbstractStrategy {
         //////////// exit rules
         // rsi is falling - isFalling or CrossedUp ?
         Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(params.getRsiThresholdHigh()));
-        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(),0.5d);
+        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(),params.getFallingStrenght());
 
         Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),0.5d);
+        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(),params.getFallingStrenght());
 
-        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(),0.5d);
+        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(),params.getFallingStrenght());
 
         // 
-        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(),0.5d);
+        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(),params.getFallingStrenght());
 
         Rule exitRule22 = new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
