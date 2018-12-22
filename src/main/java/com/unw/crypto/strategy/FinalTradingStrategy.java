@@ -339,7 +339,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
         if (ruleChain.isRule12_StoPointingDown()) {
             result = result.and(rule12);
         }
-
+        
         if (ruleChain.isRule21_priceFalling()) {
             result = result.and(rule21);
         }

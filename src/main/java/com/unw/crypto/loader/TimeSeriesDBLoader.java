@@ -94,7 +94,9 @@ public class TimeSeriesDBLoader {
      */
     public TimeSeries loadSeriesWithParams(LocalDate from, LocalDate until, Currency currency, Exchange exchange, int barDurationInMinutes) {
         List<Tick> ticks = loadTicksWithParams(from, until, currency, exchange, barDurationInMinutes);
-
+        if(ticks.isEmpty()){
+            return new BaseTimeSeries("bitstamp_trades", new ArrayList<Bar>());
+        }
         ZonedDateTime beginTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(0).getTradeTime().getTime()), ZoneId.systemDefault());
         ZonedDateTime endTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ticks.get(ticks.size() - 1).getTradeTime().getTime()), ZoneId.systemDefault());
 

@@ -11,6 +11,7 @@ import org.ta4j.core.TimeSeries;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 
@@ -27,9 +28,23 @@ public class MarketAnalyzer {
      * @param durationTimeframe
      * @return
      */
-    public boolean isClosedPriceRising(TimeSeries s, int durationTimeframe) {
+    public boolean isClosedPriceRising(TimeSeries s, int durationTimeframe, double strenght) {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
-        Rule rule1 = new IsRisingRule(closePrice, durationTimeframe);
+        Rule rule1 = new IsRisingRule(closePrice, durationTimeframe, strenght);
+        boolean satisfied = rule1.isSatisfied(s.getEndIndex());
+        System.out.println("Price is rising :" + satisfied);
+        return satisfied;
+    }
+
+    /**
+     * 
+     * @param s
+     * @param durationTimeframe
+     * @return 
+     */
+    public boolean isClosedPriceFallingStrict(TimeSeries s, int durationTimeframe) {
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
+        Rule rule1 = new IsFallingRule(closePrice, durationTimeframe);
         boolean satisfied = rule1.isSatisfied(s.getEndIndex());
         System.out.println("Price is rising :" + satisfied);
         return satisfied;
@@ -68,12 +83,12 @@ public class MarketAnalyzer {
     }
 
     /**
-     * 
+     *
      * @param s TimeSeries
      * @param smaShort ( use 5 for example)
      * @param smaLong ( use 200 for example)
      * @param durationTimeframe
-     * @return 
+     * @return
      */
     public boolean isSMALongTimeBullish(TimeSeries s, int smaShort, int smaLong, int durationTimeframe) {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);

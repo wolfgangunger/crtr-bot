@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
  * @author UNGERW
  */
 @Component
-public class TestComp {
+public class ExchangeService {
     
     
     public void foo(){
-        System.out.println("test com");
+        System.out.println("foo");
     }
     
     public String getStr(){
-        return "from TestComp";
+        return "from ExchangeService";
     }
 }

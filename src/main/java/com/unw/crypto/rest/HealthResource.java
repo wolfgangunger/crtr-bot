@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
  */
 @Component
 @Path("/crtr/")
-public class HealthService {
+public class HealthResource {
 
     @GET
     @Path("/health")

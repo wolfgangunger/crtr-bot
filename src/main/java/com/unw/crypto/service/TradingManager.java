@@ -5,12 +5,12 @@
  */
 package com.unw.crypto.service;
 
-import com.unw.crypto.SpringConfig;
 import com.unw.crypto.chart.BarUtil;
 import com.unw.crypto.loader.TimeSeriesDBLoader;
 import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BaseTimeSeries;
+import org.ta4j.core.Order;
 import org.ta4j.core.TimeSeries;
 
 /**
@@ -28,8 +29,9 @@ import org.ta4j.core.TimeSeries;
  * @author UNGERW
  */
 //@Component
-public class TradingManager {
+public class TradingManager implements TradeListener {
 
+    // just needed for simulation of live trading
     private int counter = 0;
 
     @Autowired
@@ -39,23 +41,24 @@ public class TradingManager {
 
 //    @Autowired
 //    private List<SingleCoinTrader> traders;
+    // the trading service - for each currency to trade on service
     @Autowired
     private SingleCoinTradingService[] traders;
-
+    // saving the indexes for the services by currency in this map
     private Map<Currency, Integer> currencyIndex = new HashMap<>();
 
-    @Autowired
-    private SpringConfig springConfig;
-
     private TimeSeries series;
+    // is there a trade going on - just one trade at one time
+    private boolean entered = false;
 
     @PostConstruct
     public void init() {
         initTraders();
         if (series == null) {
-            LocalDate from = LocalDate.now().minusMonths(8);
-            LocalDate until = LocalDate.now().minusMonths(6);
-            series = timeSeriesDBLoader.loadSeriesWithParams(from, until, Currency.BTC, Exchange.COINBASE, 60);
+            LocalDate from = LocalDate.now().minusMonths(20);
+            LocalDate until = LocalDate.now().minusMonths(18);
+            //series = timeSeriesDBLoader.loadSeriesWithParams(from, until, Currency.BTC, Exchange.COINBASE, 60);
+            series = timeSeriesDBLoader.loadSeriesWithParams(from, until, Currency.BTC, Exchange.BITSTAMP, 60);
         }
     }
 
@@ -73,6 +76,9 @@ public class TradingManager {
     }
 
     private void watchBTCMarket() {
+        if(series.getBeginIndex()== -1){
+            return;
+        }
         int beginIndex = series.getBeginIndex();
         int endIndex = series.getEndIndex();
         int medium = endIndex / 2;
@@ -81,7 +87,7 @@ public class TradingManager {
         List<Bar> bars = BarUtil.createBarList(first, last, series);
         TimeSeries rollingSeries = new BaseTimeSeries("bitstamp_trades", bars);
         log(rollingSeries);
-        analyzer.isClosedPriceRising(rollingSeries, 2);
+        analyzer.isClosedPriceRising(rollingSeries, 2, 0.7d);
         // sma 8
         analyzer.isSmaRising(rollingSeries, 8, 2);
         // sma 50
@@ -101,11 +107,41 @@ public class TradingManager {
         } else {
             traders[currencyIndex.get(Currency.BTC)].setActive(false);
         }
+        // btc price falling strict, deactivate all traders
+        if (analyzer.isClosedPriceFallingStrict(series, 2)) {
+            for (int i = 0; i < traders.length; i++) {
+                traders[i].setActive(false);
+            }
+        }
         counter++;
     }
 
     private void watchAllMarkets() {
 
+    }
+
+    public int getNumberOfTraders() {
+        return traders.length;
+    }
+
+    public int getNumberOfActiveTraders() {
+        int result = 0;
+        for (int i = 0; i < traders.length; i++) {
+            if (traders[i].isActive()) {
+                result++;
+            };
+        }
+        return result;
+    }
+
+    public List<String> getActiveTraders() {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < traders.length; i++) {
+            if (traders[i].isActive()) {
+                result.add(traders[i].getInfo());
+            };
+        }
+        return result;
     }
 
     /**
@@ -119,14 +155,37 @@ public class TradingManager {
             if (singleCoinTrader.getCurrency() == null) {
                 index2Remove = i;
             }
-            // saving the indexes for each currency in this map
-            currencyIndex.put(singleCoinTrader.getCurrency(), i);
+
         }
         traders = ArrayUtils.remove(traders, index2Remove);
 
+        // correct list of traders, register listener and init map
         for (int i = 0; i < traders.length; i++) {
             SingleCoinTradingService singleCoinTrader = traders[i];
-            singleCoinTrader.foo();
+            System.out.println(singleCoinTrader.getInfo());
+            traders[i].registerListener(this);
+            // saving the indexes for each currency in this map
+            currencyIndex.put(singleCoinTrader.getCurrency(), i);
+        }
+    }
+
+    private void notifyTraders() {
+        for (int i = 0; i < traders.length; i++) {
+            SingleCoinTradingService singleCoinTrader = traders[i];
+            if (!singleCoinTrader.isEntered()) {
+                singleCoinTrader.setActive(singleCoinTrader.isActive() && !entered);
+            }
+        }
+    }
+
+    @Override
+    public void tradeExecuted(Order.OrderType orderType) {
+        if (orderType.equals(orderType.BUY)) {
+            System.out.println("Notified : Trade ongoing ..");
+            entered = true;
+        } else {
+            System.out.println("Notified : Trade completed ..");
+            entered = false;
         }
     }
 
@@ -134,5 +193,10 @@ public class TradingManager {
         Bar b = s.getBar(0);
         System.out.println(b.getBeginTime() + " " + b.getClosePrice());
     }
+
+    public boolean isEntered() {
+        return entered;
+    }
+    
 
 }
