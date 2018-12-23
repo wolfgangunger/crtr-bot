@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.unw.crypto.data;
+package com.unw.crypto.loader;
 
 import com.unw.crypto.Config;
 import com.unw.crypto.loader.CSVAdapter;

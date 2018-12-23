@@ -6,7 +6,7 @@ import com.unw.crypto.chart.EMARsiChart;
 import com.unw.crypto.chart.EMAStoChart;
 import com.unw.crypto.chart.MovingAverageChart;
 import com.unw.crypto.chart.SimpleClosedPriceChart;
-import com.unw.crypto.data.DataLoader;
+import com.unw.crypto.loader.DataLoader;
 import com.unw.crypto.strategy.StrategyPanel;
 import com.unw.crypto.ui.TabUtil;
 import javafx.application.Application;
