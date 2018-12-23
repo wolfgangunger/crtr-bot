@@ -41,6 +41,7 @@ import org.ta4j.core.BaseTimeSeries;
 import org.ta4j.core.TimeSeries;
 
 import com.opencsv.CSVReader;
+import org.ta4j.core.num.DoubleNum;
 
 /**
  * This class build a Ta4j time series from a CSV file containing bars.
@@ -69,7 +70,7 @@ public class CsvBarsLoader {
                 double close = Double.parseDouble(line[4]);
                 double volume = Double.parseDouble(line[5]);
 
-                bars.add(new BaseBar(date, open, high, low, close, volume));
+                bars.add(new BaseBar(date, open, high, low, close, volume,DoubleNum::valueOf));
             }
         } catch (IOException ioe) {
             Logger.getLogger(CsvBarsLoader.class.getName()).log(Level.SEVERE, "Unable to load bars from CSV", ioe);

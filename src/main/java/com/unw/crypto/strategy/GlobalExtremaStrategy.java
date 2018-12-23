@@ -38,11 +38,11 @@ public class GlobalExtremaStrategy extends AbstractStrategy{
         LowestValueIndicator weekMinPrice = new LowestValueIndicator(minPrices, NB_BARS_PER_WEEK);
 
         // Going long if the close price goes below the min price
-        MultiplierIndicator downWeek = new MultiplierIndicator(weekMinPrice, Decimal.valueOf("1.004"));
+        MultiplierIndicator downWeek = new MultiplierIndicator(weekMinPrice, Double.valueOf("1.004"));
         Rule buyingRule = new UnderIndicatorRule(closePrices, downWeek);
 
         // Going short if the close price goes above the max price
-        MultiplierIndicator upWeek = new MultiplierIndicator(weekMaxPrice, Decimal.valueOf("0.996"));
+        MultiplierIndicator upWeek = new MultiplierIndicator(weekMaxPrice, Double.valueOf("0.996"));
         Rule sellingRule = new OverIndicatorRule(closePrices, upWeek);
 
         return new BaseStrategy(buyingRule, sellingRule);

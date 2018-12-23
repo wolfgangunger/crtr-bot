@@ -40,7 +40,7 @@ public final class ChartUtil {
         for (int i = 0; i < series.getBarCount(); i++) {
             Bar bar = series.getBar(i);
             try {
-                chartTimeSeries.add(new Second(new Date(bar.getEndTime().toEpochSecond() * 1000)), indicator.getValue(i).toDouble());
+                chartTimeSeries.add(new Second(new Date(bar.getEndTime().toEpochSecond() * 1000)), indicator.getValue(i).doubleValue());
                 //chartTimeSeries.addAndOrUpdate(new Second(new Date(bar.getEndTime().toEpochSecond() * 1000)), indicator.getValue(i).toDouble());
             } catch (Exception e) {
                 e.printStackTrace();

@@ -2,10 +2,13 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
+import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.CCIIndicator;
+import org.ta4j.core.num.DoubleNum;
+import org.ta4j.core.num.Num;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
@@ -30,8 +33,8 @@ public class CCICorrectionStrategy extends AbstractStrategy{
 
         CCIIndicator longCci = new CCIIndicator(series, 200);
         CCIIndicator shortCci = new CCIIndicator(series, 5);
-        Decimal plus100 = Decimal.HUNDRED;
-        Decimal minus100 = Decimal.valueOf(-100);
+        Num plus100 = DoubleNum.valueOf(BigDecimal.valueOf(100));
+        Num minus100 = DoubleNum.valueOf(BigDecimal.valueOf(- 100));
         
         Rule entryRule = new OverIndicatorRule(longCci, plus100) // Bull trend
                 .and(new UnderIndicatorRule(shortCci, minus100)); // Signal

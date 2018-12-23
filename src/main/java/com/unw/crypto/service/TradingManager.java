@@ -28,7 +28,7 @@ import org.ta4j.core.TimeSeries;
  *
  * @author UNGERW
  */
-//@Component
+@Component
 public class TradingManager implements TradeListener {
 
     // just needed for simulation of live trading

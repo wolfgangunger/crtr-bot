@@ -16,6 +16,7 @@ import java.util.List;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BaseBar;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.num.DoubleNum;
 
 /**
  *
@@ -44,7 +45,8 @@ public final class BarUtil {
         do {
             // build a bar
             barEndTime = barEndTime.plus(barDuration);
-            Bar bar = new BaseBar(barDuration, barEndTime);
+            // TODO ; null ok ?
+            Bar bar = new BaseBar(barDuration, barEndTime, DoubleNum::valueOf);
             do {
                 // get a trade
                 Tick t = ticks.get(i);
@@ -54,7 +56,7 @@ public final class BarUtil {
                     // add the trade to the bar
                     double tradePrice = t.getPrice();
                     double tradeAmount = t.getAmount();
-                    bar.addTrade(tradeAmount, tradePrice);
+                    bar.addTrade(DoubleNum.valueOf(tradeAmount),DoubleNum.valueOf( tradePrice));
                 } else {
                     // should not happen - order problem ?
                     // the trade happened after the end of the bar
@@ -74,7 +76,7 @@ public final class BarUtil {
     public static Bar createNewBar(Tick tick) {
         ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tick.getTradeTime().getTime()), ZoneId.systemDefault());
         return new BaseBar(dateTime, tick.getPrice(), tick.getPrice(), tick.getPrice(), tick.getPrice(),
-                tick.getAmount());
+                tick.getAmount(),DoubleNum::valueOf);
     }
     
     public static List<Bar> createBarList(int start, int end, TimeSeries series) {
