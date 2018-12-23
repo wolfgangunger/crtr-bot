@@ -6,9 +6,9 @@
 package com.unw.crypto.model;
 
 import java.util.Date;
-import org.ta4j.core.Decimal;
 import org.ta4j.core.Order;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.num.Num;
 
 /**
  *
@@ -26,7 +26,7 @@ public class ExtOrder extends Order{
         super(index, series, type);
     }
 
-    public ExtOrder(int index, OrderType type, Decimal price, Decimal amount) {
+    public ExtOrder(int index, OrderType type, Num price, Num amount) {
         super(index, type, price, amount);
     }
 

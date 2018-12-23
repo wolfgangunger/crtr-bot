@@ -42,7 +42,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.ta4j.core.Decimal;
 import org.ta4j.core.Order;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
@@ -50,6 +49,8 @@ import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.num.DoubleNum;
+import org.ta4j.core.num.Num;
 
 /**
  *
@@ -410,8 +411,8 @@ public class StrategyPanel extends AbstractPanel {
                 progressBar.setProgress(progressBarCounter / ticksSize);
                 //System.out.println((progressBarCounter / ticksSize) * 100 + " %");
             } else {
-                completeSeries.getLastBar().addTrade(Decimal.valueOf(tick.getAmount()),
-                        Decimal.valueOf(tick.getPrice()));
+                completeSeries.getLastBar().addTrade(DoubleNum.valueOf(tick.getAmount()),
+                        DoubleNum.valueOf(tick.getPrice()));
             }
             // now lets check if we execute the strategy ( once in a minute)
             int time = StrategyUtil.getTimeInHoursAndMinutes(tick);
@@ -862,18 +863,18 @@ public class StrategyPanel extends AbstractPanel {
         sb.append("" + LB);
         sb.append("Trades:" + LB);
         List<Trade> trades = tradingRecord.getTrades();
-        Decimal sum = Decimal.ZERO;
-        Decimal averagePercent = Decimal.ZERO;
+        Num sum = DoubleNum.valueOf(0d);
+        Num averagePercent = DoubleNum.valueOf(0d);
         for (Trade trade : trades) {
             //sb.append( "trade amount " + trade.getEntry().getAmount() );
             //System.out.println("index" + trade.getEntry().getIndex());
             sb.append("Entry " + trade.getEntry().getPrice() + TAB + " : Exit " + trade.getExit().getPrice() + TAB);
-            Decimal diff = trade.getExit().getPrice().minus(trade.getEntry().getPrice());
-            Decimal diffPercent = trade.getExit().getPrice().dividedBy(trade.getEntry().getPrice());
-            diffPercent = diffPercent.minus(Decimal.ONE);
-            diffPercent = diffPercent.multipliedBy(Decimal.HUNDRED);
+            Num diff = trade.getExit().getPrice().minus(trade.getEntry().getPrice());
+            Num diffPercent = trade.getExit().getPrice().dividedBy(trade.getEntry().getPrice());
+            diffPercent = diffPercent.minus(DoubleNum.valueOf(1));
+            diffPercent = diffPercent.multipliedBy(DoubleNum.valueOf(100));
             //Decimal diffPercent = diff.plus(trade.getEntry().getPrice());
-            String percent = NumberFormat.getNumberInstance().format(diffPercent);
+            String percent = NumberFormat.getNumberInstance().format(diffPercent.doubleValue());
             sb.append("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
             sb.append("Index-Diff " + (trade.getExit().getIndex() - trade.getEntry().getIndex()) + " ");
             sb.append(LB);
@@ -883,11 +884,11 @@ public class StrategyPanel extends AbstractPanel {
         }
         sb.append("" + LB);
         sb.append("Total " + sum + LB);
-        String percent = NumberFormat.getNumberInstance().format(averagePercent);
+        String percent = NumberFormat.getNumberInstance().format(averagePercent.doubleValue());
         sb.append("Total Percent " + percent + " % " + LB);
 
-        averagePercent = averagePercent.dividedBy(trades.size());
-        percent = NumberFormat.getNumberInstance().format(averagePercent);
+        averagePercent = averagePercent.dividedBy(DoubleNum.valueOf(trades.size()));
+        percent = NumberFormat.getNumberInstance().format(averagePercent.doubleValue());
         sb.append("Average Percent " + percent + " % " + LB);
 
         textArea.setText(sb.toString());
@@ -925,19 +926,19 @@ public class StrategyPanel extends AbstractPanel {
         //
         sb.append("" + LB);
         sb.append("Trades:" + LB);
-        Decimal sum = Decimal.ZERO;
-        Decimal averagePercent = Decimal.ZERO;
+        Num sum = DoubleNum.valueOf(0);
+        Num averagePercent = DoubleNum.valueOf(0);
         int i = 0;
         for (Order o : orders) {
             if (o.getType() == Order.OrderType.SELL) {
                 Order buyOrder = orders.get(i - 1);
                 sb.append("Entry " + buyOrder.getPrice() + TAB + " : Exit " + o.getPrice() + TAB);
-                Decimal diff = o.getPrice().minus(buyOrder.getPrice());
-                Decimal diffPercent = o.getPrice().dividedBy(buyOrder.getPrice());
-                diffPercent = diffPercent.minus(Decimal.ONE);
-                diffPercent = diffPercent.multipliedBy(Decimal.HUNDRED);
+                Num diff = o.getPrice().minus(buyOrder.getPrice());
+                Num diffPercent = o.getPrice().dividedBy(buyOrder.getPrice());
+                diffPercent = diffPercent.minus(DoubleNum.valueOf(1));
+                diffPercent = diffPercent.multipliedBy(DoubleNum.valueOf(100));
                 //Decimal diffPercent = diff.plus(trade.getEntry().getPrice());
-                String percent = NumberFormat.getNumberInstance().format(diffPercent);
+                String percent = NumberFormat.getNumberInstance().format(diffPercent.doubleValue());
                 sb.append("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
                 sb.append("Index-Diff " + (o.getIndex() - buyOrder.getIndex()) + " ");
                 sb.append(LB);
@@ -951,7 +952,7 @@ public class StrategyPanel extends AbstractPanel {
         String percent = NumberFormat.getNumberInstance().format(averagePercent);
         sb.append("Total Percent " + percent + " % " + LB);
 
-        averagePercent = averagePercent.dividedBy(orders.size() / 2);
+        averagePercent = averagePercent.dividedBy(DoubleNum.valueOf(orders.size() / 2));
         percent = NumberFormat.getNumberInstance().format(averagePercent);
         sb.append("Average Percent " + percent + " % " + LB);
 

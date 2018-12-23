@@ -14,6 +14,7 @@ import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Order;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TradingRecord;
+import org.ta4j.core.num.DoubleNum;
 
 /**
  *
@@ -25,7 +26,7 @@ public final class StrategyUtil {
     }
 
     public static BaseTimeSeries copySeries(TimeSeries source) {
-        BaseTimeSeries result = new BaseTimeSeries();
+        BaseTimeSeries result = new BaseTimeSeries("series" , DoubleNum::valueOf);
         List<Bar> bars = source.getBarData();
         bars.forEach((b) -> {
             result.addBar(b);

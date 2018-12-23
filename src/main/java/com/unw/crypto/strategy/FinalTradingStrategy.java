@@ -12,7 +12,6 @@ import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.BaseStrategy;
-import org.ta4j.core.Decimal;
 import org.ta4j.core.Order;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
@@ -27,6 +26,7 @@ import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsFallingRule;
@@ -187,9 +187,9 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // ----------
         // rules 
         // 1 - RSI is crossing low threshold 
-        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, Decimal.valueOf(params.getRsiThresholdLow()));
+        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdLow()));
         // 2  STO is crossing low threshold 
-        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdLow()));
+        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
         // 3 - to be done - does it make sense ?
         Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         // 4 8-MA is pointing up - second param to check
@@ -211,7 +211,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
 
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(params.getStoThresholdLow()))) // Signal 1
+                .and(new CrossedDownIndicatorRule(stochasticOscillK, DoubleNum.valueOf(params.getStoThresholdLow()))) // Signal 1
                 .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
 
         // build the complete final rule 
@@ -232,10 +232,10 @@ public class FinalTradingStrategy extends AbstractStrategy {
 
         //////////// exit rules
         // rsi is falling - isFalling or CrossedUp ? don't work together
-        Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, Decimal.valueOf(params.getRsiThresholdHigh()));
+        Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdHigh()));
         Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
 
-        Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(params.getStoThresholdHigh()));
+        Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
         Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
         // ma 8 is falling
         Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
@@ -245,9 +245,9 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // strict falling ruing
         Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
 
-        Rule exitRule22 = new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss()));
+        Rule exitRule22 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
-        Rule exitRule23 = new StopGainRule(closePrice, Decimal.valueOf(params.getStopGain()));
+        Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
 
         Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
                 exitRule12, exitRule21, exitRule21b, exitRule22, exitRule23);
@@ -271,7 +271,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
     private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, EntryRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5,
             Rule rule7, Rule rule11, Rule rule12, Rule rule13) {
         // first create a rule, which will always be chained and is always true
-        Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
+        Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(0));
 
         if (ruleChain.isRule1_rsiLow()) {
             result = result.and(rule1);
@@ -322,7 +322,7 @@ public class FinalTradingStrategy extends AbstractStrategy {
     private Rule buildCompleteExitRule(ClosePriceIndicator closePrice, ExitRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3,
             Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22, Rule rule23) {
         // first create a rule, which will always be chained and is always true
-        Rule result = new OverIndicatorRule(closePrice, Decimal.ZERO);
+        Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(0));
 
         if (ruleChain.isRule1_rsiHigh()) {
             result = result.and(rule1);

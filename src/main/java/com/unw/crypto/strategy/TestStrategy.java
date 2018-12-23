@@ -11,6 +11,7 @@ import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.WaitForRule;
@@ -82,9 +83,9 @@ public class TestStrategy extends AbstractStrategy {
 //                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
         //Rule entryRule = new OverIndicatorRule(shortEma, longEma) ;// Trend    
         
-        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, Decimal.valueOf(20));
+        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(20));
         // 2  STO is crossing low threshold 
-        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.18d));
+        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(0.18d));
         
                 // rule 11 rsi pointing up
         Rule entryRule3 = new IsRisingRule(rsiIndicator, 1 , 0.1d);

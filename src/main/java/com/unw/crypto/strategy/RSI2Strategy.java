@@ -8,6 +8,7 @@ import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.RSIIndicator;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
@@ -42,13 +43,13 @@ public class RSI2Strategy extends AbstractStrategy{
         // Entry rule
         // The long-term trend is up when a security is above its 200-period SMA.
         Rule entryRule = new OverIndicatorRule(shortSma, longSma) // Trend
-                .and(new CrossedDownIndicatorRule(rsi, Decimal.valueOf(5))) // Signal 1
+                .and(new CrossedDownIndicatorRule(rsi, DoubleNum.valueOf(5))) // Signal 1
                 .and(new OverIndicatorRule(shortSma, closePrice)); // Signal 2
         
         // Exit rule
         // The long-term trend is down when a security is below its 200-period SMA.
         Rule exitRule = new UnderIndicatorRule(shortSma, longSma) // Trend
-                .and(new CrossedUpIndicatorRule(rsi, Decimal.valueOf(95))) // Signal 1
+                .and(new CrossedUpIndicatorRule(rsi, DoubleNum.valueOf(95))) // Signal 1
                 .and(new UnderIndicatorRule(shortSma, closePrice)); // Signal 2
         
         // TODO: Finalize the strategy

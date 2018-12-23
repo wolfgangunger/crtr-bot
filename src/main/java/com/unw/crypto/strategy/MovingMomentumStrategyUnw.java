@@ -8,6 +8,7 @@ import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.MACDIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
@@ -48,15 +49,15 @@ public class MovingMomentumStrategyUnw extends AbstractStrategy {
 
         // Entry rule
         Rule entryRule = new OverIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedDownIndicatorRule(stochasticOscillK, Decimal.valueOf(20))) // Signal 1
+                .and(new CrossedDownIndicatorRule(stochasticOscillK, DoubleNum.valueOf(20))) // Signal 1
                 .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
 
         // Exit rule
         Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedUpIndicatorRule(stochasticOscillK, Decimal.valueOf(80))) // Signal 1
+                .and(new CrossedUpIndicatorRule(stochasticOscillK, DoubleNum.valueOf(80))) // Signal 1
                 .and(new UnderIndicatorRule(macd, emaMacd))
                 // .or(new StopLossRule(closePrice, Decimal.valueOf(1)));
-                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
+                .and(new StopGainRule(closePrice, DoubleNum.valueOf(-1))); // works
         //.and(new IsFallingRule(closePrice, 1, 0.5d)); 
 
         return new BaseStrategy(entryRule, exitRule);

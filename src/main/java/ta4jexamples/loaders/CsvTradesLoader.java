@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ta4j.core.num.DoubleNum;
 
 /**
  * This class builds a Ta4j time series from a CSV file containing trades.
@@ -112,7 +113,7 @@ public class CsvTradesLoader {
     	do {
     		// build a bar
     		barEndTime = barEndTime.plus(barDuration);
-    		Bar bar = new BaseBar(barDuration, barEndTime);
+    		Bar bar = new BaseBar(barDuration, barEndTime, null);
     		do {
     			// get a trade
     			String[] tradeLine = lines.get(i);
@@ -122,7 +123,7 @@ public class CsvTradesLoader {
     				// add the trade to the bar
     				double tradePrice = Double.parseDouble(tradeLine[1]);
     				double tradeAmount = Double.parseDouble(tradeLine[2]);
-    				bar.addTrade(tradeAmount, tradePrice);
+    				bar.addTrade(DoubleNum.valueOf(tradeAmount), DoubleNum.valueOf(tradePrice));
     			} else {
     				// the trade happened after the end of the bar
     				// go to the next bar but stay with the same trade (don't increment i)
