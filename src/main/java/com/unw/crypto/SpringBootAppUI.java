@@ -7,6 +7,7 @@ import com.unw.crypto.chart.EMARsiChart;
 import com.unw.crypto.chart.EMAStoChart;
 import com.unw.crypto.chart.MovingAverageChart;
 import com.unw.crypto.chart.SimpleClosedPriceChart;
+import com.unw.crypto.chart.TickUtil;
 import com.unw.crypto.loader.TimeSeriesDBLoader;
 import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
@@ -14,6 +15,7 @@ import com.unw.crypto.model.Tick;
 import com.unw.crypto.strategy.StrategyPanel;
 import com.unw.crypto.ui.TabUtil;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -198,10 +200,16 @@ public class SpringBootAppUI extends Application {
         root.setBottom(bpBottom);
     }
 
+
     private void initTabPane(BorderPane root) {
         barDurationInMinutes = barDuration.getValue().getIntValue();
         ticks = timeSeriesDBLoader.loadTicksWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
         //series = timeSeriesDBLoader.loadSeriesWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
+        if (ticks.isEmpty()) {
+            System.out.println("no data found" + cmbCurrency.getValue() + " " + cmbExchange.getValue() + " ; please reload with different params");
+            // create a dummy tick to avoid NPE
+            ticks.add(TickUtil.createDummyTick(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue()));
+        }
         series = timeSeriesDBLoader.loadSeriesByTicks(ticks, barDurationInMinutes);
         // loading the pre-series ( 2 month before from)
         LocalDate preFrom = from.getValue().minusMonths(PRE_MONTH);

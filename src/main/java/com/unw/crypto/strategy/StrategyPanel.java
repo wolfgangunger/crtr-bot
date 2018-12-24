@@ -866,25 +866,28 @@ public class StrategyPanel extends AbstractPanel {
         Num sum = DoubleNum.valueOf(0d);
         Num averagePercent = DoubleNum.valueOf(0d);
         for (Trade trade : trades) {
-            //sb.append( "trade amount " + trade.getEntry().getAmount() );
-            //System.out.println("index" + trade.getEntry().getIndex());
             sb.append("Entry " + trade.getEntry().getPrice() + TAB + " : Exit " + trade.getExit().getPrice() + TAB);
             Num diff = trade.getExit().getPrice().minus(trade.getEntry().getPrice());
             Num diffPercent = trade.getExit().getPrice().dividedBy(trade.getEntry().getPrice());
             diffPercent = diffPercent.minus(DoubleNum.valueOf(1));
             diffPercent = diffPercent.multipliedBy(DoubleNum.valueOf(100));
-            //Decimal diffPercent = diff.plus(trade.getEntry().getPrice());
-            String percent = NumberFormat.getNumberInstance().format(diffPercent.doubleValue());
-            sb.append("  Diff amount : " + diff + TAB + " Diff Percent : " + percent + " %  ");
+            String percent = NumberFormat.getCurrencyInstance().format(diffPercent.doubleValue());
+            percent = percent.replace("€", "");
+            String strDiff = NumberFormat.getCurrencyInstance().format(diff.floatValue());
+            strDiff = strDiff.replace("€", "");
+            sb.append("  Diff amount : " + strDiff + TAB + " Diff Percent : " + percent + " %  ");
             sb.append("Index-Diff " + (trade.getExit().getIndex() - trade.getEntry().getIndex()) + " ");
             sb.append(LB);
             sum = sum.plus(diff);
             averagePercent = averagePercent.plus(diffPercent);
-
         }
         sb.append("" + LB);
-        sb.append("Total " + sum + LB);
+        String strSum = NumberFormat.getCurrencyInstance().format(sum.doubleValue());
+        strSum = strSum.replace("€", "");
+        sb.append("Total " + strSum + LB);
+        //String percent = NumberFormat.getCurrencyInstance().format(averagePercent.doubleValue());
         String percent = NumberFormat.getNumberInstance().format(averagePercent.doubleValue());
+        //percent = percent.replace("€", "");
         sb.append("Total Percent " + percent + " % " + LB);
 
         averagePercent = averagePercent.dividedBy(DoubleNum.valueOf(trades.size()));
