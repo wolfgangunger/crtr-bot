@@ -33,7 +33,7 @@ import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.StopLossRule;
+import org.ta4j.core.trading.rules.TrailingStopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
@@ -245,7 +245,8 @@ public class FinalTradingStrategy extends AbstractStrategy {
         // strict falling ruing
         Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
 
-        Rule exitRule22 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        //Rule exitRule22 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));        
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
 
