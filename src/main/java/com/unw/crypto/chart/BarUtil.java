@@ -27,14 +27,13 @@ public final class BarUtil {
     private BarUtil() {
     }
 
-
     /**
-     * 
+     *
      * @param beginTime
      * @param endTime
      * @param ticks
      * @param barDurationInMinutes
-     * @return 
+     * @return
      */
     public static List<Bar> buildBars(ZonedDateTime beginTime, ZonedDateTime endTime, List<Tick> ticks, int barDurationInMinutes) {
         List<Bar> bars = new ArrayList<>();
@@ -56,7 +55,7 @@ public final class BarUtil {
                     // add the trade to the bar
                     double tradePrice = t.getPrice();
                     double tradeAmount = t.getAmount();
-                    bar.addTrade(DoubleNum.valueOf(tradeAmount),DoubleNum.valueOf( tradePrice));
+                    bar.addTrade(DoubleNum.valueOf(tradeAmount), DoubleNum.valueOf(tradePrice));
                 } else {
                     // should not happen - order problem ?
                     // the trade happened after the end of the bar
@@ -76,9 +75,9 @@ public final class BarUtil {
     public static Bar createNewBar(Tick tick) {
         ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(tick.getTradeTime().getTime()), ZoneId.systemDefault());
         return new BaseBar(dateTime, tick.getPrice(), tick.getPrice(), tick.getPrice(), tick.getPrice(),
-                tick.getAmount(),DoubleNum::valueOf);
+                tick.getAmount(), DoubleNum::valueOf);
     }
-    
+
     public static List<Bar> createBarList(int start, int end, TimeSeries series) {
         List<Bar> result = new ArrayList();
         for (int i = start; i < end; i++) {
@@ -87,8 +86,10 @@ public final class BarUtil {
         return result;
     }
 
-    public static int getMAMultiplicator(BarDuration barDuration) {
+    public static float getMAMultiplicator(BarDuration barDuration) {
         switch (barDuration) {
+            case TWO_HOURS:
+                return 0.5f;
             case SIXTY_MIN:
                 return 1;
             case THIRTY_MIN:

@@ -17,7 +17,8 @@ public enum BarDuration {
     TEN_MIN(10),
     TWENTY_MIN(20),
     THIRTY_MIN(30),
-    SIXTY_MIN(60);
+    SIXTY_MIN(60),
+    TWO_HOURS(120);
 
     private final int intValue;
 

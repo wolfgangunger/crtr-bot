@@ -363,8 +363,8 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void executeTest() {
-        iMAShort = Integer.valueOf(maShort.getText()) * getMAMultiplicator();
-        iMALong = Integer.valueOf(maLong.getText()) * getMAMultiplicator();
+        iMAShort = Integer.valueOf((int)(Float.valueOf(maShort.getText()) * getMAMultiplicator()));
+        iMALong = Integer.valueOf((int)(Float.valueOf(maLong.getText()) * getMAMultiplicator()));
         currentStrategy.setiMALong(iMALong);
         currentStrategy.setiMAShort(iMAShort);
         if (chkForwardTesting.isSelected()) {

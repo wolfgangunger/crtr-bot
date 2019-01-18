@@ -73,15 +73,15 @@ public class MovingAverageChart extends AbstractChartPanel {
     protected void initData() {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         // multiplicator depends on candle size : candle size 60 min = 1 ; 5 min candle = 12
-        int shortMa =  timeFrameShort * getMAMultiplicator();
-        int longMa = timeFrameLong * getMAMultiplicator();
+        int shortMa =  (int)(timeFrameShort * getMAMultiplicator());
+        int longMa = (int)(timeFrameLong * getMAMultiplicator());
         //EMAIndicator avgShort = new EMAIndicator(closePrice, shortMa);
         //EMAIndicator avgLong = new EMAIndicator(closePrice, longMa);
         SMAIndicator avgShort = new SMAIndicator(closePrice, shortMa);
         SMAIndicator avgLong = new SMAIndicator(closePrice, longMa);        
         // time frame
-        int ma200 = 200 * getMAMultiplicator();
-        int ma314 = 314 * getMAMultiplicator();
+        int ma200 = (int)(200 * getMAMultiplicator());
+        int ma314 = (int)(314 * getMAMultiplicator());
         //EMAIndicator avg200 = new EMAIndicator(closePrice, ma200);
         //EMAIndicator avg314 = new EMAIndicator(closePrice, ma314);
         SMAIndicator avg200 = new SMAIndicator(closePrice, ma200);

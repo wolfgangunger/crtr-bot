@@ -105,7 +105,7 @@ public class AbstractPanel extends JPanel {
     }
     
 
-    protected int getMAMultiplicator() {
+    protected float getMAMultiplicator() {
         return BarUtil.getMAMultiplicator(barDuration);
     }
 
