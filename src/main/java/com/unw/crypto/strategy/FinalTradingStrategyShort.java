@@ -12,7 +12,6 @@ import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.BaseStrategy;
-import org.ta4j.core.Order;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
@@ -35,14 +34,13 @@ import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
 import org.ta4j.core.trading.rules.TrailingStopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
-import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  *
  * @author UNGERW
  */
 @Component
-public class FinalTradingStrategy extends AbstractStrategy implements IFinalTradingStrategy {
+public class FinalTradingStrategyShort extends AbstractStrategy implements IFinalTradingStrategy{
 
     private int iMAShort = 9;
     private int iMALong = 26;
@@ -187,32 +185,42 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         // ----------
         // rules 
         // 1 - RSI is crossing low threshold 
-        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdLow()));
+        //Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdLow()));
+        Rule entryRule1 = new CrossedUpIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdHigh()));
         // 2  STO is crossing low threshold 
-        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
+        //Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
+        Rule entryRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
         // 3 - to be done - does it make sense ?
-        Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
+        //Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
+        Rule entryRule3 = new UnderIndicatorRule(closePrice, sma200);
         // 4 8-MA is pointing up - second param to check
-        Rule entryRule4 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
+        //Rule entryRule4 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
+        Rule entryRule4 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
         //5- Price is near or below the 8-MA 
-        Rule entryRule5 = new UnderIndicatorRule(closePrice, sma8);
+        //Rule entryRule5 = new UnderIndicatorRule(closePrice, sma8);
+        Rule entryRule5 = new OverIndicatorRule(closePrice, sma8);
         // Rule 6 TODO 
 
         // Rule 7
-        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe())
-                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe()));
+//        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe())
+//                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe()));
+          Rule entryRule7 = new IsFallingRule(shortEma, params.getEmaIndicatorTimeframe())
+                .and(new IsFallingRule(longEma, params.getEmaIndicatorTimeframe()));
         // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
         // rule 11 rsi pointing up
-        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
-
+       // Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
+        Rule entryRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
+        
         //rule 12 sto pointing up
-        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
-
+        //Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
+        Rule entryRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
+        
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
                 .and(new CrossedDownIndicatorRule(stochasticOscillK, DoubleNum.valueOf(params.getStoThresholdLow()))) // Signal 1
                 .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
+        // TODO
 
         // build the complete final rule 
         Rule entryRule = buildCompleteEntryRule(closePrice, params.getEntryRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5,
@@ -228,25 +236,34 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
 //                .and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         //Rule exitRule2 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars()).
         //        or(new StopLossRule(closePrice, Decimal.valueOf(params.getStopLoss())));
-        Rule exitRuleb = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
+       //Rule exitRuleb = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 
         //////////// exit rules
         // rsi is falling - isFalling or CrossedUp ? don't work together
-        Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdHigh()));
-        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
-
-        Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
+        //Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdHigh()));
+        Rule exitRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdLow()));
+                
+        //Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
+        Rule exitRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
+        
+       // Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
+        Rule exitRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));        
+        
+        //Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
+        Rule exitRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
         // ma 8 is falling
-        Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
-
+        //Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
+        Rule exitRule3 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
+                
         // prive is falling
-        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(), params.getFallingStrenght());
+        //Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(), params.getFallingStrenght());
+        Rule exitRule21 = new IsRisingRule(closePrice, params.getPriceTimeFrame(), params.getFallingStrenght());
         // strict falling ruing
-        Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
-
-        //Rule exitRule22 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
-        Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));        
+        //Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
+        Rule exitRule21b = new IsRisingRule(closePrice, 1, 1d);
+        
+        Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        // TODO
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
 
@@ -307,6 +324,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
 
     /**
      * concatenate the rules depending on the boolean params
+     *
      * @param closePrice
      * @param ruleChain
      * @param rule1
@@ -340,7 +358,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         if (ruleChain.isRule12_StoPointingDown()) {
             result = result.and(rule12);
         }
-        
+
         if (ruleChain.isRule21_priceFalling()) {
             result = result.and(rule21);
         }

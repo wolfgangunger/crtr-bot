@@ -13,11 +13,10 @@ import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
-import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.TrailingStopLossRule;
-import org.ta4j.core.trading.rules.UnderIndicatorRule;
+import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  * Moving momentum strategy.
@@ -109,10 +108,10 @@ public class TestStrategy extends AbstractStrategy {
         //Rule exitRule = new FixedRule(indexes);
         
         //Rule exitRule = new WaitForRule(Order.OrderType.BUY, 15);
-       // Rule exitRule = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(0.5d));
-                Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedUpIndicatorRule(stochasticOscillK, DoubleNum.valueOf(80))) // Signal 1
-                .and(new UnderIndicatorRule(macd, emaMacd)).or( new TrailingStopLossRule(closePrice, DoubleNum.valueOf(1.5d)));
+         Rule exitRule = new WaitForRule(Order.OrderType.BUY, 25).or(new TrailingStopLossRule(closePrice, DoubleNum.valueOf(0.5d)));
+//                Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
+//                .and(new CrossedUpIndicatorRule(stochasticOscillK, DoubleNum.valueOf(80))) // Signal 1
+//                .and(new UnderIndicatorRule(macd, emaMacd)).or( new TrailingStopLossRule(closePrice, DoubleNum.valueOf(1.5d)));
         
         
         // checks only the timeframe not the volume

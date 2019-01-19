@@ -84,7 +84,7 @@ public class StrategyInputParams {
     // wait rule
     private int waitBars;
 
-    private int getMAMultiplicator() {
+    private float getMAMultiplicator() {
         float tmp = 1;
         if (barMultiplikator) {
             tmp = (float) BarUtil.getMAMultiplicator(barDuration);
@@ -92,7 +92,7 @@ public class StrategyInputParams {
         if (extraMultiplikator) {
             tmp = tmp * extraMultiplikatorValue;
         }
-        return (int) tmp;
+        return tmp;
     }
 
     public BarDuration getBarDuration() {
@@ -108,55 +108,55 @@ public class StrategyInputParams {
     }
 
     public int getSmaShort() {
-        return smaShort * getMAMultiplicator();
+        return (int)(smaShort * getMAMultiplicator());
     }
 
     public int getSmaLong() {
-        return smaLong * getMAMultiplicator();
+        return (int)(smaLong * getMAMultiplicator());
     }
 
     public int getSma8() {
-        return sma8 * getMAMultiplicator();
+        return (int)(sma8 * getMAMultiplicator());
     }
 
     public int getSma14() {
-        return sma14 * getMAMultiplicator();
+        return (int)(sma14 * getMAMultiplicator());
     }
 
     public int getSma200() {
-        return sma200 * getMAMultiplicator();
+        return (int)(sma200 * getMAMultiplicator());
     }
 
     public int getSma314() {
-        return sma314 * getMAMultiplicator();
+        return (int)(sma314 * getMAMultiplicator());
     }
 
     public int getEmaShort() {
-        return emaShort * getMAMultiplicator();
+        return (int)(emaShort * getMAMultiplicator());
     }
 
     public int getEmaLong() {
-        return emaLong * getMAMultiplicator();
+        return (int)(emaLong * getMAMultiplicator());
     }
 
     public int getRsiTimeframe() {
-        return rsiTimeframe * getMAMultiplicator();
+        return (int)(rsiTimeframe * getMAMultiplicator());
     }
 
     public int getStoRsiTimeframe() {
-        return stoRsiTimeframe * getMAMultiplicator();
+        return (int)(stoRsiTimeframe * getMAMultiplicator());
     }
 
     public int getStoOscKTimeFrame() {
-        return stoOscKTimeFrame * getMAMultiplicator();
+        return (int)(stoOscKTimeFrame * getMAMultiplicator());
     }
 
     public int getEmaIndicatorTimeframe() {
-        return emaIndicatorTimeframe * getMAMultiplicator();
+        return (int)(emaIndicatorTimeframe * getMAMultiplicator());
     }
 
     public int getSmaIndicatorTimeframe() {
-        return smaIndicatorTimeframe * getMAMultiplicator();
+        return (int)(smaIndicatorTimeframe * getMAMultiplicator());
     }
 
     public int getPriceTimeFrame() {
