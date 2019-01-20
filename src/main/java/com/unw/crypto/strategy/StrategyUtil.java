@@ -40,7 +40,7 @@ public final class StrategyUtil {
     }
 
     public static TradingRecord buildTradingRecord(List<ExtOrder> orders) {
-        Order[] orderArray = new Order[orders.size()];
+        ExtOrder[] orderArray = new ExtOrder[orders.size()];
         orderArray = orders.toArray(orderArray);
         return orders.size() > 0 ? new BaseTradingRecord(orderArray) : new BaseTradingRecord();
     }

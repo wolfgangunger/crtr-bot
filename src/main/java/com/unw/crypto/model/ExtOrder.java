@@ -17,6 +17,7 @@ import org.ta4j.core.num.Num;
 public class ExtOrder extends Order{
     
     private Date tradeTime;
+    private AddOrderInfo addOrderInfo;
 
     public ExtOrder(Order order) {
           super(order.getIndex(), order.getType(), order.getPrice(), order.getAmount());
@@ -36,6 +37,14 @@ public class ExtOrder extends Order{
 
     public void setTradeTime(Date tradeTime) {
         this.tradeTime = tradeTime;
+    }
+
+    public AddOrderInfo getAddOrderInfo() {
+        return addOrderInfo;
+    }
+
+    public void setAddOrderInfo(AddOrderInfo addOrderInfo) {
+        this.addOrderInfo = addOrderInfo;
     }
     
     

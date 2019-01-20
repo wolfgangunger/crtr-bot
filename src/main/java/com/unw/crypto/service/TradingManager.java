@@ -28,7 +28,7 @@ import org.ta4j.core.TimeSeries;
  *
  * @author UNGERW
  */
-@Component
+//@Component
 public class TradingManager implements TradeListener {
 
     // just needed for simulation of live trading
@@ -64,6 +64,7 @@ public class TradingManager implements TradeListener {
 
     public void minuteExecution() {
         watchBTCMarket();
+        //watchBTCMarket2();
         watchAllMarkets();
         tradeAllMarkets();
     }
@@ -73,6 +74,24 @@ public class TradingManager implements TradeListener {
             SingleCoinTradingService sct = traders[i];
             sct.trade();
         }
+    }
+
+    private void watchBTCMarket2() {
+        if (series.getBeginIndex() == -1) {
+            return;
+        }
+        int beginIndex = series.getBeginIndex();
+        int endIndex = series.getEndIndex();
+        int medium = endIndex / 2;
+        int first = beginIndex + counter;
+        int last = medium + counter;
+        List<Bar> bars = BarUtil.createBarList(first, last, series);
+        TimeSeries rollingSeries = new BaseTimeSeries("bitstamp_trades", bars);
+        log(rollingSeries);
+        // check the MAs
+
+        counter++;
+
     }
 
     private void watchBTCMarket() {
@@ -87,40 +106,52 @@ public class TradingManager implements TradeListener {
         List<Bar> bars = BarUtil.createBarList(first, last, series);
         TimeSeries rollingSeries = new BaseTimeSeries("bitstamp_trades", bars);
         log(rollingSeries);
-        analyzer.isClosedPriceRising(rollingSeries, 2, 0.7d);
+        analyzer.isClosedPriceRising(rollingSeries, 2, 0.1d);
+        double cp = analyzer.determineClosedPriceStrength(rollingSeries, 2);
+        System.out.println("ClosedPirce : " + cp);
+        // sma 3
+        analyzer.isSmaRising(rollingSeries, 3, 2, 0.1d);
+        double sma3 = analyzer.determineSMAStrength(rollingSeries, 3, 2);
+        System.out.println("SMA 3 : " + sma3);
         // sma 8
-        analyzer.isSmaRising(rollingSeries, 8, 2);
+        analyzer.isSmaRising(rollingSeries, 8, 2, 0.1d);
+        double sma8 = analyzer.determineSMAStrength(rollingSeries, 8, 2);
+        System.out.println("SMA 8 : " + sma8);
         // sma 50
-        analyzer.isSmaRising(rollingSeries, 50, 2);
+        analyzer.isSmaRising(rollingSeries, 50, 2, 0.1d);
+        double sma50 = analyzer.determineSMAStrength(rollingSeries, 50, 2);
+        System.out.println("SMA 50 : " + sma50);
         // sma 200
-        analyzer.isSmaRising(rollingSeries, 200, 2);
+        analyzer.isSmaRising(rollingSeries, 200, 2, 0.1d);
+        double sma200 = analyzer.determineSMAStrength(rollingSeries, 200, 2);
+        System.out.println("SMA 200 : " + sma200);
+        // sma 314
+        analyzer.isSmaRising(rollingSeries, 314, 2, 0.1d);
+        double sma314 = analyzer.determineSMAStrength(rollingSeries, 314, 2);
+        System.out.println("SMA 314: " + sma314);
         // ema 14
-        analyzer.isEmaRising(rollingSeries, 14, 2);
+        analyzer.isEmaRising(rollingSeries, 14, 2, 0.1d);
+        double ema14 = analyzer.determineEMAStrength(rollingSeries, 14, 2);
+        System.out.println("EMA 14: " + ema14);
         // ema 50
-        analyzer.isEmaRising(rollingSeries, 50, 3);
+        analyzer.isEmaRising(rollingSeries, 50, 3, 0.1d);
+        double ema50 = analyzer.determineEMAStrength(rollingSeries, 50, 2);
+        System.out.println("EMA 50: " + ema50);
         // long time trend
-        analyzer.isSMALongTimeBullish(rollingSeries, 3, 80, 2);
+        boolean b = analyzer.isSMALongTimeBullish(rollingSeries, 3, 80, 2);
+        System.out.println("Long time bullish " + b);
+        // 
+        b = analyzer.isPriceAboveSMA200and314(rollingSeries);
+        System.out.println("Price over SMA200 & 314 " + b);
         //
-        analyzer.determineClosedPriceStrength(rollingSeries, 2);
-
-        analyzer.determineMAStrength(rollingSeries, 8, 2);
-        // analyze MAs
-        System.out.println("####SMAs#####");
-        double sma3 = analyzer.determineMAStrength(rollingSeries, 3, 2);
-        System.out.println("SMA : " + sma3);
-        double sma8 = analyzer.determineMAStrength(rollingSeries, 8, 2);
-        System.out.println("SMA : " + sma8);
-        double sma14 = analyzer.determineMAStrength(rollingSeries, 14, 2);
-        System.out.println("SMA : " + sma14);
-        double sma50 = analyzer.determineMAStrength(rollingSeries, 50, 2);
-        System.out.println("SMA : " + sma50);
-        double sma200 = analyzer.determineMAStrength(rollingSeries, 200, 2);
-        System.out.println("SMA : " + sma200);
-        double sma314 = analyzer.determineMAStrength(rollingSeries, 314, 2);
-        System.out.println("SMA : " + sma314);
-
+        int rsi = analyzer.calculateRSI(rollingSeries, 2);
+        System.out.println("RSI : " + rsi);
+        double sto = analyzer.calculateSTO(rollingSeries, 4);
+        System.out.println("STO : " + sto);
+//        double sma14 = analyzer.determineMAStrength(rollingSeries, 14, 2);
+//        System.out.println("SMA : " + sma14);
         // notificate the traders
-        if (analyzer.isSmaRising(rollingSeries, 8, 2)) {
+        if (analyzer.isSmaRising(rollingSeries, 8, 2, 0.1d)) {
             traders[currencyIndex.get(Currency.BTC)].setActive(true);
         } else {
             traders[currencyIndex.get(Currency.BTC)].setActive(false);

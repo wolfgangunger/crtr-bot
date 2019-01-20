@@ -147,7 +147,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         // these rules are designed for hour candles - in case of shorter candles and bars the timeframe params (MA ...) must be adapted
 //1- RSI is low and pointing up (v) only crossed down implemented, see rule 11 for pointing up
 //2- Stochastic is low and pointing up (v) only crossed down implemented, see rule 12 for pointing up
-//3- Price is above SMA200&314 (v) really ?
+//3- Price is above SMA200&314 (v) 
 //4- 8-MA is pointing up (v)
 //5- Price is near or below the 8-MA (v) (the further away from the 8-MA price is, the higher probability price will turn back towards it)
 //6- Price is _above_ a known area of resistance (use Fib levels to determine those zones) TODO
@@ -174,7 +174,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         SMAIndicator sma8 = new SMAIndicator(closePrice, params.getSma8());
         // simple MA200
         SMAIndicator sma200 = new SMAIndicator(closePrice, params.getSma200());
-
+        SMAIndicator sma2314 = new SMAIndicator(closePrice, params.getSma314());
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframe());
         // stochastik
@@ -190,7 +190,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdLow()));
         // 2  STO is crossing low threshold 
         Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
-        // 3 - to be done - does it make sense ?
+        // 3 - prive over SMA 200 (and 314)
         Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         // 4 8-MA is pointing up - second param to check
         Rule entryRule4 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());

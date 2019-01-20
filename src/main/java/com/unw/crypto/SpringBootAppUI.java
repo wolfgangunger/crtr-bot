@@ -39,7 +39,7 @@ import org.ta4j.core.TimeSeries;
  * the app for the UI Application
  *
  */
-//@SpringBootApplication
+@SpringBootApplication
 public class SpringBootAppUI extends Application {
 
     private ConfigurableApplicationContext context;
@@ -235,7 +235,7 @@ public class SpringBootAppUI extends Application {
         bollingerChart = new BollingerBandsChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
         //strategy
-        strategyPanel = new StrategyPanel(ticks, series, preSeries, progressBar);
+        strategyPanel = new StrategyPanel(ticks, series, preSeries, progressBar,context);
         strategyPanel.setBarDuration(barDuration.getValue());
         tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));
         //root.setCenter(sc);

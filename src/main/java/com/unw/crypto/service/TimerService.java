@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * main timer service
  * @author UNGERW
  */
-@Component
+//@Component
 public class TimerService {
 
     private int counter = 0;

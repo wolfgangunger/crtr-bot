@@ -9,8 +9,11 @@ import com.unw.crypto.chart.BarUtil;
 import com.unw.crypto.Config;
 import com.unw.crypto.chart.AbstractPanel;
 import com.unw.crypto.chart.ChartUtil;
+import com.unw.crypto.loader.TimeSeriesDBLoader;
+import com.unw.crypto.model.AddOrderInfo;
 import com.unw.crypto.model.ExtOrder;
 import com.unw.crypto.model.Tick;
+import com.unw.crypto.service.MarketAnalyzer;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
@@ -42,6 +45,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.ta4j.core.Order;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
@@ -57,6 +62,10 @@ import org.ta4j.core.num.Num;
  * @author UNGERW
  */
 public class StrategyPanel extends AbstractPanel {
+
+    private MarketAnalyzer marketAnalyzer;
+
+    private ConfigurableApplicationContext context;
 
     // the series for the selected period
     private TimeSeries series;
@@ -151,19 +160,23 @@ public class StrategyPanel extends AbstractPanel {
     private static final String LB = "\n";
     private static final String TAB = "\t";
 
-    public StrategyPanel(TimeSeries series, TimeSeries preSeries) {
+    public StrategyPanel(TimeSeries series, TimeSeries preSeries, ConfigurableApplicationContext context) {
         this.series = series;
         this.preSeries = preSeries;
+        this.context = context;
+        marketAnalyzer = context.getBean(MarketAnalyzer.class);
         this.setLayout(new BorderLayout());
         initData();
         initUi();
     }
 
-    public StrategyPanel(List<Tick> ticks, TimeSeries series, TimeSeries preSeries, ProgressBar progressBar) {
+    public StrategyPanel(List<Tick> ticks, TimeSeries series, TimeSeries preSeries, ProgressBar progressBar, ConfigurableApplicationContext context) {
         this.ticks = ticks;
         this.series = series;
         this.preSeries = preSeries;
         this.progressBar = progressBar;
+        this.context = context;
+        marketAnalyzer = context.getBean(MarketAnalyzer.class);
         this.setLayout(new BorderLayout());
         initData();
         initUi();
@@ -415,7 +428,6 @@ public class StrategyPanel extends AbstractPanel {
         progressBar.setProgress(0d);
         ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
         for (Tick tick : ticks) {
-            //System.out.println(tick.getTradeTime());
             if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
                 System.out.println("overlap " + tick.getTradeTime());
                 progressBarCounter++;
@@ -446,13 +458,15 @@ public class StrategyPanel extends AbstractPanel {
                 if (tradingStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    //forwardTestOrders.add(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
+                    order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
                 } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex()) && entered) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    //forwardTestOrders.add(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
+                    order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = false;
                 }
@@ -462,6 +476,7 @@ public class StrategyPanel extends AbstractPanel {
         progressBar.setProgress(100d);
         TradingRecord record = StrategyUtil.buildTradingRecord(forwardTestOrders);
         updateLog(record);
+        printAddOrderInfo(forwardTestOrders);
         update();
     }
 
@@ -914,6 +929,28 @@ public class StrategyPanel extends AbstractPanel {
         textArea.setText(sb.toString());
     }
 
+    private void printAddOrderInfo(List<ExtOrder> orders) {
+        for (ExtOrder order : orders) {
+            System.out.println("###add Order Info");
+            System.out.println(order.getType());
+            System.out.println(order.getPrice());
+            System.out.println(order.getIndex());
+            System.out.println("RSI " + order.getAddOrderInfo().getRsi());
+            System.out.println("Sto " + order.getAddOrderInfo().getSto());
+            System.out.println("SMA3 Strength " + order.getAddOrderInfo().getSma3());
+            System.out.println("SMA8 Strength " + order.getAddOrderInfo().getSma8());
+            System.out.println("SMA50 Strength " + order.getAddOrderInfo().getSma50());
+            System.out.println("SMA200 Strength " + order.getAddOrderInfo().getSma200());
+            System.out.println("SMA314 Strength " + order.getAddOrderInfo().getSma314());
+            System.out.println("EMA14 Strength " + order.getAddOrderInfo().getEma14());
+            System.out.println("EMA50 Strength " + order.getAddOrderInfo().getEma50());
+            System.out.println("Price over SMA 200 " + order.getAddOrderInfo().isPriceAboveSma200());
+            System.out.println("Price over SMA 314 " + order.getAddOrderInfo().isPriceAboveSma3141());
+            System.out.println("Price is long time Bullish " + order.getAddOrderInfo().isSMALongTimeBullish());
+            System.out.println("###end add Order Info");
+        }
+    }
+
     public TimeSeries getSeries() {
         return series;
     }
@@ -937,6 +974,5 @@ public class StrategyPanel extends AbstractPanel {
     public void setTicks(List<Tick> ticks) {
         this.ticks = ticks;
     }
-
 
 }
