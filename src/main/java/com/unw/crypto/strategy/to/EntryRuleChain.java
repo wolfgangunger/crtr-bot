@@ -31,6 +31,7 @@ public class EntryRuleChain {
     private boolean rule1_rsiLow;
     private boolean rule2_stoLow;
     private boolean rule3_priceAboveSMA200;
+    private boolean rule3b_priceAboveSMA314;
     private boolean rule4_ma8PointingUp;
     private boolean rule5_priceBelow8MA;
     private boolean rule7_emaBandsPointingUp;

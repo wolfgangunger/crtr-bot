@@ -192,6 +192,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
         // 3 - prive over SMA 200 (and 314)
         Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
+        Rule entryRule3b = new OverIndicatorRule(closePrice, sma2314);
         // 4 8-MA is pointing up - second param to check
         Rule entryRule4 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
         //5- Price is near or below the 8-MA 
@@ -215,7 +216,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
                 .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
 
         // build the complete final rule 
-        Rule entryRule = buildCompleteEntryRule(closePrice, params.getEntryRuleChain(), entryRule1, entryRule2, entryRule3, entryRule4, entryRule5,
+        Rule entryRule = buildCompleteEntryRule(closePrice, params.getEntryRuleChain(), entryRule1, entryRule2, entryRule3,entryRule3b, entryRule4, entryRule5,
                 entryRule7, entryRule11, entryRule12, entryRule13);
 
         // exit rule - todo
@@ -246,7 +247,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
 
         //Rule exitRule22 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
-        Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));        
+        Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
 
@@ -269,7 +270,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
      * @param rule7
      * @return the complete Rule Chain
      */
-    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, EntryRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule4, Rule rule5,
+    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, EntryRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3,Rule rule3b, Rule rule4, Rule rule5,
             Rule rule7, Rule rule11, Rule rule12, Rule rule13) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(0));
@@ -282,6 +283,9 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         }
         if (ruleChain.isRule3_priceAboveSMA200()) {
             result = result.and(rule3);
+        }
+        if (ruleChain.isRule3b_priceAboveSMA314()) {
+            result = result.and(rule3b);
         }
         if (ruleChain.isRule4_ma8PointingUp()) {
             result = result.and(rule4);
@@ -307,6 +311,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
 
     /**
      * concatenate the rules depending on the boolean params
+     *
      * @param closePrice
      * @param ruleChain
      * @param rule1
@@ -340,7 +345,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         if (ruleChain.isRule12_StoPointingDown()) {
             result = result.and(rule12);
         }
-        
+
         if (ruleChain.isRule21_priceFalling()) {
             result = result.and(rule21);
         }

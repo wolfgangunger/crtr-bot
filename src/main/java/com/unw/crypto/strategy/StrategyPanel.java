@@ -140,7 +140,8 @@ public class StrategyPanel extends AbstractPanel {
     //entry rules
     private JCheckBox chkRsiLow;
     private JCheckBox chkStoLow;
-    private JCheckBox chkAboveSMA;
+    private JCheckBox chkAboveSMA200;
+    private JCheckBox chkAboveSMA314;
     private JCheckBox chkMaPointingUp;
     private JCheckBox chkBelow8MA;
     private JCheckBox chkMAsUp;
@@ -510,7 +511,8 @@ public class StrategyPanel extends AbstractPanel {
         double stopLoss = Double.valueOf(tfStopLoss.getText());
         double stopGain = Double.valueOf(tfStopGain.getText());
         int waitBars = Integer.valueOf(tfWaitBars.getText());
-        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).rule3_priceAboveSMA200(chkAboveSMA.isSelected()).
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).
+                rule3_priceAboveSMA200(chkAboveSMA200.isSelected()).rule3b_priceAboveSMA314(chkAboveSMA314.isSelected()).
                 rule4_ma8PointingUp(chkMaPointingUp.isSelected()).rule5_priceBelow8MA(chkBelow8MA.isSelected()).rule7_emaBandsPointingUp(chkMAsUp.isSelected())
                 .rule11_isRsiPointingUp(chkRsiUp.isSelected()).rule12_isStoPointingUp(chkStoUp.isSelected()).rule13_movingMomentum(chkMovMom.isSelected()).build();
         ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(chkExitRsiHigh.isSelected()).rule2_stoHigh(chkExitStoHigh.isSelected())
@@ -786,9 +788,15 @@ public class StrategyPanel extends AbstractPanel {
 
         JLabel lblAboveSMA = new JLabel("3 Above SMA200");
         entryRules.add(lblAboveSMA);
-        chkAboveSMA = new JCheckBox();
-        chkAboveSMA.setSelected(true);
-        entryRules.add(chkAboveSMA);
+        chkAboveSMA200 = new JCheckBox();
+        chkAboveSMA200.setSelected(true);
+        entryRules.add(chkAboveSMA200);
+        
+        JLabel lblAboveSMA314 = new JLabel("3b Above SMA314");
+        entryRules.add(lblAboveSMA314);
+        chkAboveSMA314 = new JCheckBox();
+        chkAboveSMA314.setSelected(false);
+        entryRules.add(chkAboveSMA314);
 
         JLabel lblMaUp = new JLabel("4 8MA pointing up");
         entryRules.add(lblMaUp);
@@ -821,10 +829,10 @@ public class StrategyPanel extends AbstractPanel {
         entryRules.add(chkStoUp);
 
         JLabel lblMovingMom = new JLabel("13 MovMom");
-        entryRules.add(lblMovingMom);
+        //entryRules.add(lblMovingMom);
         chkMovMom = new JCheckBox();
         chkMovMom.setSelected(false);
-        entryRules.add(chkMovMom);
+        //entryRules.add(chkMovMom);
 
         result.add(entryRules);
 
