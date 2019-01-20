@@ -9,7 +9,6 @@ import com.unw.crypto.chart.BarUtil;
 import com.unw.crypto.Config;
 import com.unw.crypto.chart.AbstractPanel;
 import com.unw.crypto.chart.ChartUtil;
-import com.unw.crypto.loader.TimeSeriesDBLoader;
 import com.unw.crypto.model.AddOrderInfo;
 import com.unw.crypto.model.ExtOrder;
 import com.unw.crypto.model.Tick;
@@ -45,8 +44,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Order;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
@@ -428,6 +427,8 @@ public class StrategyPanel extends AbstractPanel {
         double progressBarCounter = 0;
         progressBar.setProgress(0d);
         ZonedDateTime beginTimeCurrentBar = completeSeries.getLastBar().getEndTime();
+        // for trailing stop loss
+        TradingRecord tr = new BaseTradingRecord();
         for (Tick tick : ticks) {
             if (beginTimeCurrentBar.isAfter(ZonedDateTime.of(LocalDateTime.ofInstant(tick.getTradeTime().toInstant(), ZoneId.systemDefault()), ZoneId.systemDefault()))) {
                 System.out.println("overlap " + tick.getTradeTime());
@@ -456,19 +457,23 @@ public class StrategyPanel extends AbstractPanel {
                 } else {
                     tradingStrategy = currentStrategy.buildStrategy(completeSeries, barDuration);
                 }
-                if (tradingStrategy.shouldEnter(completeSeries.getEndIndex()) && !entered) {
+                // needed for stop loss
+                
+                if (tradingStrategy.shouldEnter(completeSeries.getEndIndex(),tr) && !entered) {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
+                    tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
                     AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
-                } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex()) && entered) {
+                } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(),tr) && entered) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
+                    tr.exit(order.getIndex());
                     entered = false;
                 }
             }

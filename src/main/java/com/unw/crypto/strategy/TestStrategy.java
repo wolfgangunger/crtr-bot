@@ -1,6 +1,7 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
@@ -16,7 +17,6 @@ import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.TrailingStopLossRule;
-import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  * Moving momentum strategy.
@@ -28,7 +28,7 @@ import org.ta4j.core.trading.rules.WaitForRule;
 @Component
 public class TestStrategy extends AbstractStrategy {
 
-
+    private  Rule exitRuleStopLosss = new TrailingStopLossRuleUnger(null, DoubleNum.valueOf("0.5"));
     /**
      * @param series a time series
      * @return a moving momentum strategy
@@ -79,10 +79,11 @@ public class TestStrategy extends AbstractStrategy {
         //Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(20));
         // simple rule when Stoch moves up
         // Rule entryRule = new CrossedUpIndicatorRule(stochasticRSIIndicator, Decimal.valueOf(0.1d));
-       Rule entryRule = new OverIndicatorRule(shortEma, longEma) // Trend
-                .and(new CrossedDownIndicatorRule(stochasticOscillK, DoubleNum.valueOf(20))) // Signal 1
-                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
-        //Rule entryRule = new OverIndicatorRule(shortEma, longEma) ;// Trend    
+        
+//       Rule entryRule = new OverIndicatorRule(shortEma, longEma) // Trend
+//                .and(new CrossedDownIndicatorRule(stochasticOscillK, DoubleNum.valueOf(20))) // Signal 1
+//                .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
+        Rule entryRule = new OverIndicatorRule(shortEma, longEma) ;// Trend    
         
         Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(20));
         // 2  STO is crossing low threshold 
@@ -108,7 +109,12 @@ public class TestStrategy extends AbstractStrategy {
         //Rule exitRule = new FixedRule(indexes);
         
         //Rule exitRule = new WaitForRule(Order.OrderType.BUY, 15);
-         Rule exitRule = new WaitForRule(Order.OrderType.BUY, 25).or(new TrailingStopLossRule(closePrice, DoubleNum.valueOf(0.5d)));
+         //Rule exitRule = new WaitForRule(Order.OrderType.BUY, 25);
+        // Rule exitRule =new TrailingStopLossRule(closePrice, DoubleNum.valueOf(0.5d));
+          ((TrailingStopLossRuleUnger)exitRuleStopLosss).rebuildRule(closePrice, DoubleNum.valueOf(2.5d));
+        // Rule exitRule =new StopLossRule(closePrice, DoubleNum.valueOf(1.5d));
+//                 .or(new TrailingStopLossRule(closePrice, DoubleNum.valueOf(0.5d)));
+
 //                Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
 //                .and(new CrossedUpIndicatorRule(stochasticOscillK, DoubleNum.valueOf(80))) // Signal 1
 //                .and(new UnderIndicatorRule(macd, emaMacd)).or( new TrailingStopLossRule(closePrice, DoubleNum.valueOf(1.5d)));
@@ -117,7 +123,7 @@ public class TestStrategy extends AbstractStrategy {
         // checks only the timeframe not the volume
         //Rule exitRule = new IsFallingRule(closePrice, 3);
         //Rule exitRule = new FixedRule(1,2,4,5);
-        return new BaseStrategy(entryRule, exitRule);
+        return new BaseStrategy(entryRule, exitRuleStopLosss);
     }
 
     public TradingRecord execute(TimeSeries series,BarDuration barDuration) {

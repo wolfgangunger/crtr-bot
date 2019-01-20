@@ -6,6 +6,7 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
@@ -33,7 +34,6 @@ import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.TrailingStopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
@@ -46,6 +46,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
 
     private int iMAShort = 9;
     private int iMALong = 26;
+    private  Rule exitRule22 = new TrailingStopLossRuleUnger(null, DoubleNum.valueOf("0.5"));
 
     /**
      * use this method to execute strategy from outside with params
@@ -247,7 +248,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
 
         //Rule exitRule22 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
-        Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        //Rule exitRule22 = new TrailingStopLossRuleUnger(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        ((TrailingStopLossRuleUnger)exitRule22).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
 
