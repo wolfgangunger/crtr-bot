@@ -28,7 +28,7 @@ import org.ta4j.core.TimeSeries;
  *
  * @author UNGERW
  */
-//@Component
+@Component
 public class TradingManager implements TradeListener {
 
     // just needed for simulation of live trading
@@ -76,7 +76,7 @@ public class TradingManager implements TradeListener {
     }
 
     private void watchBTCMarket() {
-        if(series.getBeginIndex()== -1){
+        if (series.getBeginIndex() == -1) {
             return;
         }
         int beginIndex = series.getBeginIndex();
@@ -100,6 +100,24 @@ public class TradingManager implements TradeListener {
         analyzer.isEmaRising(rollingSeries, 50, 3);
         // long time trend
         analyzer.isSMALongTimeBullish(rollingSeries, 3, 80, 2);
+        //
+        analyzer.determineClosedPriceStrength(rollingSeries, 2);
+
+        analyzer.determineMAStrength(rollingSeries, 8, 2);
+        // analyze MAs
+        System.out.println("####SMAs#####");
+        double sma3 = analyzer.determineMAStrength(rollingSeries, 3, 2);
+        System.out.println("SMA : " + sma3);
+        double sma8 = analyzer.determineMAStrength(rollingSeries, 8, 2);
+        System.out.println("SMA : " + sma8);
+        double sma14 = analyzer.determineMAStrength(rollingSeries, 14, 2);
+        System.out.println("SMA : " + sma14);
+        double sma50 = analyzer.determineMAStrength(rollingSeries, 50, 2);
+        System.out.println("SMA : " + sma50);
+        double sma200 = analyzer.determineMAStrength(rollingSeries, 200, 2);
+        System.out.println("SMA : " + sma200);
+        double sma314 = analyzer.determineMAStrength(rollingSeries, 314, 2);
+        System.out.println("SMA : " + sma314);
 
         // notificate the traders
         if (analyzer.isSmaRising(rollingSeries, 8, 2)) {
@@ -197,6 +215,5 @@ public class TradingManager implements TradeListener {
     public boolean isEntered() {
         return entered;
     }
-    
 
 }

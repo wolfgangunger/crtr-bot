@@ -715,7 +715,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblRiseStrength);
 
         tfRisingStrenght = new JTextField();
-        tfRisingStrenght.setText(String.valueOf(0.7d));
+        tfRisingStrenght.setText(String.valueOf(0.6d));
         tfRisingStrenght.setColumns(4);
         result.add(tfRisingStrenght);
 
