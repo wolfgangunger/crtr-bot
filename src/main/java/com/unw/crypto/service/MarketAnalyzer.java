@@ -21,17 +21,17 @@ import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 
 /**
- *
+ * helper class for raw indicator
  * @author UNGERW
  */
 @Component
 public class MarketAnalyzer {
 
     /**
-     *
-     * @param s
+     * determine if the price is rising
+     * @param  s TimeSeries
      * @param durationTimeframe
-     * @param strenght
+     * @param strenght rise or fall strengh(0.5 and 1.0 - no other float values working yet)
      * @return
      */
     public boolean isClosedPriceRising(TimeSeries s, int durationTimeframe, double strenght) {
@@ -43,7 +43,7 @@ public class MarketAnalyzer {
     }
 
     /**
-     *
+     * determine if the price is falling with strength 1
      * @param s
      * @param durationTimeframe
      * @return
@@ -57,10 +57,11 @@ public class MarketAnalyzer {
     }
 
     /**
-     *
-     * @param s
-     * @param durationTimeframe
+     * determine if the Simple MA is rising
+     * @param s TimeSeries
      * @param sma (sma8, sma14, sma200 , pass the value you want )
+     * @param durationTimeframe
+     * @param strenght  rise or fall strengh(0.5 and 1.0 - no other float values working yet)
      * @return
      */
     public boolean isSmaRising(TimeSeries s, int sma, int durationTimeframe, double strenght) {
@@ -73,11 +74,11 @@ public class MarketAnalyzer {
     }
 
     /**
-     *
-     * @param s
-     * @param ema
+     * determine if the Expotential MA is rising
+     * @param s TimeSeries
+     * @param ema (ema8, ema14, ema200 , pass the value you want )
      * @param durationTimeframe
-     * @param strength
+     * @param strength rise or fall strengh(0.5 and 1.0 - no other float values working yet)
      * @return
      */
     public boolean isEmaRising(TimeSeries s, int ema, int durationTimeframe, double strength) {
@@ -90,7 +91,7 @@ public class MarketAnalyzer {
     }
 
     /**
-     *
+     * determine if the Short MA is over the long MA (bullish signal)
      * @param s TimeSeries
      * @param smaShort ( use 5 for example)
      * @param smaLong ( use 200 for example)
@@ -107,7 +108,7 @@ public class MarketAnalyzer {
     }
 
     /**
-     *
+     * determine if the closed price is above SMA200 and SMA314
      * @param series
      * @return
      */
@@ -120,9 +121,9 @@ public class MarketAnalyzer {
     }
 
     /**
-     *
+     * determine if the closed price is above SMA
      * @param series
-     * @param sma
+     * @param sma (the MA, for example 200 or 314)
      * @return
      */
     public boolean isPriceAboveSMA(TimeSeries series, int sma) {
@@ -132,6 +133,13 @@ public class MarketAnalyzer {
         return rule.isSatisfied(series.getEndIndex());
     }
 
+    /**
+     * determine the rise or fall strenth (- is falling, + is rising)
+     * @param s TimeSeries
+     * @param sma
+     * @param durationTimeframe
+     * @return double strenght ( from -1 to +1)
+     */
     public double determineSMAStrength(TimeSeries s, int sma, int durationTimeframe) {
         double result = 0d;
         //System.out.println("determineMAStrength for SMA " + sma);
@@ -143,6 +151,13 @@ public class MarketAnalyzer {
         return result;
     }
 
+    /**
+     * determine the rise or fall strenth (- is falling, + is rising)
+     * @param s TimeSeries
+     * @param ema
+     * @param durationTimeframe
+     * @return double strenght ( from -1 to +1)
+     */
     public double determineEMAStrength(TimeSeries s, int ema, int durationTimeframe) {
         double result = 0d;
         //System.out.println("determineMAStrength for SMA " + ema);
@@ -154,6 +169,12 @@ public class MarketAnalyzer {
         return result;
     }
 
+    /**
+     * determine the rise or fall strenth (- is falling, + is rising)
+     * @param s
+     * @param durationTimeframe
+     * @return double strenght ( from -1 to +1)
+     */
     public double determineClosedPriceStrength(TimeSeries s, int durationTimeframe) {
         double result = 0d;
         //System.out.println("determineClosedPriceStrength ");
@@ -185,6 +206,12 @@ public class MarketAnalyzer {
         return rising ? 1.0d : -1.0d;
     }
 
+    /**
+     * calculate RSI (0-100)
+     * @param s TimeSeries
+     * @param timeFrame
+     * @return 
+     */
     public int calculateRSI(TimeSeries s, int timeFrame) {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, timeFrame);
@@ -192,6 +219,12 @@ public class MarketAnalyzer {
         return result.intValue();
     }
 
+    /**
+     * calculate STO (0.0 -1-0)
+     * @param s
+     * @param timeFrame
+     * @return 
+     */
     public double calculateSTO(TimeSeries s, int timeFrame) {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, timeFrame);
@@ -199,6 +232,13 @@ public class MarketAnalyzer {
         return result.doubleValue();
     }
 
+    /**
+     * create TO AddOrderInfo with current buy/sell params 
+     * @param s TimeSeries
+     * @param rsiTimeframe
+     * @param stoTimeframe
+     * @return AddOrderInfo
+     */
     public AddOrderInfo analyzeOrderParams(TimeSeries s, int rsiTimeframe, int stoTimeframe) {
         int rsi = calculateRSI(s, rsiTimeframe);
         double sto = calculateSTO(s, stoTimeframe);

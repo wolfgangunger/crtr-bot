@@ -88,6 +88,19 @@ public class AbstractPanel extends JPanel {
         return chartTimeSeries;
     }
 
+        protected org.jfree.data.time.TimeSeries buildChartTimeSeriesWithFactor(TimeSeries barseries, Indicator<Num> indicator, String name, double factor) {
+        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
+        for (int i = 0; i < barseries.getBarCount(); i++) {
+            Bar bar = barseries.getBar(i);
+            try {
+                chartTimeSeries.add(new Minute(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue() * factor);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return chartTimeSeries;
+    }
+    
     public String getLegend() {
         return legend;
     }

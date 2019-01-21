@@ -201,8 +201,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         // Rule 6 TODO 
 
         // Rule 7
-        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe())
-                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe()));
+        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe(),params.getRisingStrenght())
+                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe(),params.getRisingStrenght()));
         // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
         // rule 11 rsi pointing up

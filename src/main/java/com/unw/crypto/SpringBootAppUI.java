@@ -4,6 +4,7 @@ import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.chart.BollingerBandsChart;
 import com.unw.crypto.chart.CandleChart;
 import com.unw.crypto.chart.EMARsiChart;
+import com.unw.crypto.chart.EMARsiStoChart;
 import com.unw.crypto.chart.EMAStoChart;
 import com.unw.crypto.chart.MovingAverageChart;
 import com.unw.crypto.chart.SimpleClosedPriceChart;
@@ -61,6 +62,7 @@ public class SpringBootAppUI extends Application {
     private MovingAverageChart movingAverageChart;
     private EMARsiChart emaRsiChart;
     private EMAStoChart emaStoChart;
+    private EMARsiStoChart emaRsiStoChart;
     private BollingerBandsChart bollingerChart;
     //strategy
     private StrategyPanel strategyPanel;
@@ -200,7 +202,6 @@ public class SpringBootAppUI extends Application {
         root.setBottom(bpBottom);
     }
 
-
     private void initTabPane(BorderPane root) {
         barDurationInMinutes = barDuration.getValue().getIntValue();
         ticks = timeSeriesDBLoader.loadTicksWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
@@ -232,10 +233,12 @@ public class SpringBootAppUI extends Application {
         tabPane.getTabs().add(TabUtil.createChartTab(emaRsiChart, "EMA RSI"));
         emaStoChart = new EMAStoChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(emaStoChart, "EMA STO"));
+        emaRsiStoChart = new EMARsiStoChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        tabPane.getTabs().add(TabUtil.createChartTab(emaRsiStoChart, "EMA RSI/STO"));
         bollingerChart = new BollingerBandsChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
         //strategy
-        strategyPanel = new StrategyPanel(ticks, series, preSeries, progressBar,context);
+        strategyPanel = new StrategyPanel(ticks, series, preSeries, progressBar, context);
         strategyPanel.setBarDuration(barDuration.getValue());
         tabPane.getTabs().add(TabUtil.createStrategyTab(strategyPanel, "Strategy"));
         //root.setCenter(sc);
@@ -295,6 +298,9 @@ public class SpringBootAppUI extends Application {
 
         emaStoChart.setSeries(series);
         emaStoChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+
+        emaRsiStoChart.setSeries(series);
+        emaRsiStoChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         bollingerChart.setSeries(series);
         bollingerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());

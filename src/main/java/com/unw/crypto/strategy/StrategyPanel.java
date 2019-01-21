@@ -754,7 +754,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblstopLoss);
 
         tfStopLoss = new JTextField();
-        tfStopLoss.setText(String.valueOf(1));
+        tfStopLoss.setText(String.valueOf(5));
         tfStopLoss.setColumns(4);
         result.add(tfStopLoss);
         // stop gain
