@@ -117,7 +117,8 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
         int stoOscKThresholdHigh = 80;
         double risingStrenght = 0.7d;
         double fallingStrenght = 0.7d;
-        double stopLoss = 1;
+        double stopLoss = 2;
+       double trailingStopLoss = 5;
         double stopGain = -1d;
         int waitBars = 50;
         EntryRuleChain entryRuleChain = EntryRuleChain.builder().rule1_rsiLow(true).rule2_stoLow(true).rule3_priceAboveSMA200(false).
@@ -126,7 +127,7 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
                 .rule3_8maDown(true).rule11_rsiPointingDown(false).rule12_StoPointingDown(false).build();
         StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
                 stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss,trailingStopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
 
         return buildStrategyWithParams(series, params);
     }
@@ -204,17 +205,17 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
         // Rule 7
 //        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe())
 //                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe()));
-          Rule entryRule7 = new IsFallingRule(shortEma, params.getEmaIndicatorTimeframe())
-                .and(new IsFallingRule(longEma, params.getEmaIndicatorTimeframe()));
+          Rule entryRule7 = new IsFallingRule(shortEma, params.getEmaIndicatorTimeframe(),params.getFallingStrenght())
+                .and(new IsFallingRule(longEma, params.getEmaIndicatorTimeframe(), params.getFallingStrenght()));
         // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
         // rule 11 rsi pointing up
        // Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
-        Rule entryRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
+        Rule entryRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
         
         //rule 12 sto pointing up
         //Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
-        Rule entryRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
+        Rule entryRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
         
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -244,7 +245,7 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
         Rule exitRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdLow()));
                 
         //Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
-        Rule exitRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
+        Rule exitRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
         
        // Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
         Rule exitRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));        
@@ -253,16 +254,17 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
         Rule exitRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
         // ma 8 is falling
         //Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
-        Rule exitRule3 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
+        Rule exitRule3 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
                 
         // prive is falling
         //Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(), params.getFallingStrenght());
-        Rule exitRule21 = new IsRisingRule(closePrice, params.getPriceTimeFrame(), params.getFallingStrenght());
+        Rule exitRule21 = new IsRisingRule(closePrice, params.getPriceTimeFrame(), params.getRisingStrenght());
         // strict falling ruing
         //Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
         Rule exitRule21b = new IsRisingRule(closePrice, 1, 1d);
         
-        Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        //Rule exitRule22 = new TrailingStopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        Rule exitRule22 = new StopGainRule(closePrice, params.getStopGain());
         // TODO
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));

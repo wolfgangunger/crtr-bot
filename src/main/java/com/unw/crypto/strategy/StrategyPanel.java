@@ -133,6 +133,7 @@ public class StrategyPanel extends AbstractPanel {
     private JTextField tfFallingStrenght;
     private JTextField tfRisingStrenght;
 
+    private JTextField tfTrailingStopLoss;
     private JTextField tfStopLoss;
     private JTextField tfStopGain;
     private NumericTextField tfWaitBars;
@@ -154,6 +155,7 @@ public class StrategyPanel extends AbstractPanel {
     private JCheckBox chkExitRsiDown;
     private JCheckBox chkExitStoDown;
     private JCheckBox chkExitPriceDown;
+    private JCheckBox chkExitTrailingStopLoss;
     private JCheckBox chkExitStopLoss;
     private JCheckBox chkExitStopGain;
 
@@ -514,6 +516,7 @@ public class StrategyPanel extends AbstractPanel {
         double isRisingStrenght = Double.valueOf(tfRisingStrenght.getText());
         double isFallingStrenght = Double.valueOf(tfFallingStrenght.getText());
         double stopLoss = Double.valueOf(tfStopLoss.getText());
+        double trailingStopLoss = Double.valueOf(tfTrailingStopLoss.getText());
         double stopGain = Double.valueOf(tfStopGain.getText());
         int waitBars = Integer.valueOf(tfWaitBars.getText());
         EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(chkRsiLow.isSelected()).rule2_stoLow(chkStoLow.isSelected()).
@@ -523,10 +526,10 @@ public class StrategyPanel extends AbstractPanel {
         ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(chkExitRsiHigh.isSelected()).rule2_stoHigh(chkExitStoHigh.isSelected())
                 .rule3_8maDown(chkExit8MaDown.isSelected()).rule11_rsiPointingDown(chkExitRsiDown.isSelected())
                 .rule12_StoPointingDown(chkExitStoDown.isSelected()).rule21_priceFalling(chkExitPriceDown.isSelected())
-                .rule23_stopGain(chkExitStopGain.isSelected()).rule22_stopLoss(chkExitStopLoss.isSelected()).build();
+                .rule23_stopGain(chkExitStopGain.isSelected()).rule22_stopLoss(chkExitStopLoss.isSelected()).rule22b_trailingStopLoss(chkExitTrailingStopLoss.isSelected()).build();
         result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
                 rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrame, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, isRisingStrenght, isFallingStrenght, stopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+                stoOscKThresholdLow, stoOscKThresholdHigh, isRisingStrenght, isFallingStrenght, stopLoss,trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
 
@@ -752,11 +755,18 @@ public class StrategyPanel extends AbstractPanel {
         // stopp loss
         JLabel lblstopLoss = new JLabel("Stop Loss");
         result.add(lblstopLoss);
-
         tfStopLoss = new JTextField();
-        tfStopLoss.setText(String.valueOf(5));
+        tfStopLoss.setText(String.valueOf(2));
         tfStopLoss.setColumns(4);
         result.add(tfStopLoss);
+        
+        JLabel lblsTralingtopLoss = new JLabel("Tr. Stop Loss");
+        result.add(lblsTralingtopLoss);
+        tfTrailingStopLoss = new JTextField();
+        tfTrailingStopLoss.setText(String.valueOf(5));
+        tfTrailingStopLoss.setColumns(4);
+        result.add(tfTrailingStopLoss);
+        
         // stop gain
         JLabel lblstopGain = new JLabel("Stop Gain");
         result.add(lblstopGain);
@@ -887,6 +897,12 @@ public class StrategyPanel extends AbstractPanel {
         chkExitStopLoss = new JCheckBox();
         chkExitStopLoss.setSelected(false);
         exitRules.add(chkExitStopLoss);
+        
+        JLabel lblRuleTrailingStopLoss = new JLabel("22b Tr. Stop Loss");
+        exitRules.add(lblRuleTrailingStopLoss);
+        chkExitTrailingStopLoss = new JCheckBox();
+        chkExitTrailingStopLoss.setSelected(false);
+        exitRules.add(chkExitTrailingStopLoss);
 
         JLabel lblRuleStopGain = new JLabel("23 Stop Gain");
         exitRules.add(lblRuleStopGain);

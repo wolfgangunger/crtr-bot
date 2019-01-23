@@ -20,7 +20,7 @@ public final class StrategyInputParamsBuilder {
             int rsiTimeFrame, int stoRsiTimeframe, int stoOscKTimeFrame, int emaIndicatorTimeframe, int smaIndicatorTimeframe,
              int priceTimeFrame , int rsiThresholdLow, int rsiThresholdHigh,
             double stoThresholdLow, double stoThresholdHigh, int stoOscKThresholdLow, int stoOscKThresholdHigh,
-             double isRisingStrenght, double isFallingStrenght , double stopLoss, double stopGain, int waitBars, EntryRuleChain entryRuleChain, ExitRuleChain exitRuleChain) {
+             double isRisingStrenght, double isFallingStrenght , double stopLoss, double trailingStopLoss, double stopGain, int waitBars, EntryRuleChain entryRuleChain, ExitRuleChain exitRuleChain) {
         
         StrategyInputParams result = new StrategyInputParams();
         result.setBarMultiplikator(barMultiplikator);
@@ -50,6 +50,7 @@ public final class StrategyInputParamsBuilder {
         result.setRisingStrenght(isRisingStrenght);
         result.setFallingStrenght(isFallingStrenght);
         result.setStopLoss(stopLoss);
+        result.setTrailingStopLoss(trailingStopLoss);
         result.setStopGain(stopGain);
         result.setWaitBars(waitBars);
         result.setEntryRuleChain(entryRuleChain);

@@ -27,6 +27,7 @@ public class ExitRuleChain {
 
     private boolean rule21_priceFalling;
     private boolean rule22_stopLoss;
+    private boolean rule22b_trailingStopLoss;
     private boolean rule23_stopGain;
     private boolean rule24_macdFalling;
     private boolean rule25_shortEmaFalling;

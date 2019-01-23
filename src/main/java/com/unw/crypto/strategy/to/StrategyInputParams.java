@@ -79,6 +79,7 @@ public class StrategyInputParams {
     private double risingStrenght;
     // stopp loss
     private double stopLoss;
+    private double trailingStopLoss;
     // stop gain
     private double stopGain;
     // wait rule
@@ -190,6 +191,11 @@ public class StrategyInputParams {
     public double getStopLoss() {
         return stopLoss;
     }
+
+    public double getTrailingStopLoss() {
+        return trailingStopLoss;
+    }
+    
 
     public double getStopGain() {
         return stopGain;
