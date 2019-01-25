@@ -54,6 +54,8 @@ public class StopLossRuleUnger extends AbstractRule {
     public void rebuildRule(ClosePriceIndicator closePrice, Num lossPercentage) {
         this.closePrice = closePrice;
         this.lossPercentage = lossPercentage;
+        TimeSeries series = closePrice.getTimeSeries();
+        this.lossRatioThreshold = series.numOf(100).minus(lossPercentage).dividedBy(series.numOf(100));
     }
 
     @Override
