@@ -18,7 +18,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-d64 -Xms512m -Xmx4g -classpath %classpath com.unw.crypto.SpringBootAppUI</exec.args>
+                <exec.args>-d64 -Xms1024m -Xmx8g -classpath %classpath com.unw.crypto.SpringBootAppUI</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -32,7 +32,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -d64 -Xms512m -Xmx4g -classpath %classpath com.unw.crypto.SpringBootAppUI</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -d64 -Xms1024m -Xmx8g -classpath %classpath com.unw.crypto.SpringBootAppUI</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -47,7 +47,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-d64 -Xms512m -Xmx4g -classpath %classpath com.unw.crypto.SpringBootAppUI</exec.args>
+                <exec.args>-d64 -Xms1024m -Xmx8g -classpath %classpath com.unw.crypto.SpringBootAppUI</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
