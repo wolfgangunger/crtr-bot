@@ -47,8 +47,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
 
     private int iMAShort = 9;
     private int iMALong = 26;
-    private  Rule exitRule22 = new StopLossRuleUnger(null, DoubleNum.valueOf("2"));
-    private  Rule exitRule22b = new TrailingStopLossRuleUnger(null, DoubleNum.valueOf("5"));
+    private Rule exitRule22 = new StopLossRuleUnger(null, DoubleNum.valueOf("2"));
+    private Rule exitRule22b = new TrailingStopLossRuleUnger(null, DoubleNum.valueOf("5"));
 
     /**
      * use this method to execute strategy from outside with params
@@ -102,7 +102,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
      * @deprecated use #buildStrategyWithParams
      * @param series
      * @param barDuration
-     * @return 
+     * @return
      */
     @Override
     public Strategy buildStrategy(TimeSeries series, BarDuration barDuration) {
@@ -114,12 +114,15 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         int ma14 = 14;
         int ma200 = 200;
         int ma314 = 314;
-        int rsiTimeframe = 4;
-        int stoRsiTimeframe = 18;
+        int rsiTimeframeBuy = 2;
+        int stoRsiTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int stoRsiTimeframeSell = 4;
         int stoOscKTimeFrame = 14;
         int emaIndicatorTimeframe = 18;
         int smaIndicatorTimeframe = 12;
-        int priceTimeframe = 2;
+        int priceTimeframeBuy = 2;
+        int priceTimeframeSell = 2;
         int rsiThresholdLow = 15;
         int rsiThresholdHigh = 80;
         double stoThresholdLow = 0.15d;
@@ -136,9 +139,11 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
                 rule4_ma8PointingUp(true).rule5_priceBelow8MA(true).rule7_emaBandsPointingUp(true).build();
         ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(true).rule2_stoHigh(true)
                 .rule3_8maDown(true).rule11_rsiPointingDown(false).rule12_StoPointingDown(false).build();
-        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframe,
-                stoRsiTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframe, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
-                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss,trailingStopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
+        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, 
+                extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframeBuy,rsiTimeframeSell,
+                stoRsiTimeframeBuy,stoRsiTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframeBuy,
+                priceTimeframeSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
 
         return buildStrategyWithParams(series, params);
     }
@@ -186,9 +191,9 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         SMAIndicator sma200 = new SMAIndicator(closePrice, params.getSma200());
         SMAIndicator sma2314 = new SMAIndicator(closePrice, params.getSma314());
         // RSI
-        RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframe());
+        RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframeBuy());
         // stochastik
-        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframe());
+        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframeBuy());
         StochasticOscillatorKIndicator stochasticOscillK = new StochasticOscillatorKIndicator(series, params.getStoOscKTimeFrame());
         //MACD
         MACDIndicator macd = new MACDIndicator(closePrice, params.getSmaShort(), params.getSmaLong());
@@ -210,15 +215,15 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         // Rule 6 TODO 
 
         // Rule 7
-        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe(),params.getRisingStrenght())
-                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe(),params.getRisingStrenght()));
+        Rule entryRule7 = new IsRisingRule(shortEma, params.getEmaIndicatorTimeframe(), params.getRisingStrenght())
+                .and(new IsRisingRule(longEma, params.getEmaIndicatorTimeframe(), params.getRisingStrenght()));
         // .and(new OverIndicatorRule(shortEma, longEma)) // Trend
 
         // rule 11 rsi pointing up
-        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframe(), params.getRisingStrenght());
+        Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframeBuy(), params.getRisingStrenght());
 
         //rule 12 sto pointing up
-        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
+        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframeBuy(), params.getRisingStrenght());
 
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -226,7 +231,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
                 .and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
 
         // build the complete final rule 
-        Rule entryRule = buildCompleteEntryRule(closePrice, params.getEntryRuleChain(), entryRule1, entryRule2, entryRule3,entryRule3b, entryRule4, entryRule5,
+        Rule entryRule = buildCompleteEntryRule(closePrice, params.getEntryRuleChain(), entryRule1, entryRule2, entryRule3, entryRule3b, entryRule4, entryRule5,
                 entryRule7, entryRule11, entryRule12, entryRule13);
 
         // exit rule - todo
@@ -244,27 +249,27 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
         //////////// exit rules
         // rsi is falling - isFalling or CrossedUp ? don't work together
         Rule exitRule1 = new CrossedUpIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdHigh()));
-        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframe(), params.getFallingStrenght());
+        Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframeSell(), params.getFallingStrenght());
 
         Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
+        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframeSell(), params.getFallingStrenght());
         // ma 8 is falling
         Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
 
         // prive is falling
-        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrame(), params.getFallingStrenght());
+        Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrameSell(), params.getFallingStrenght());
         // strict falling ruing
         Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
 
         //Rule exitRule22 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         //Rule exitRule22 = new TrailingStopLossRuleUnger(closePrice, DoubleNum.valueOf(params.getStopLoss()));
-         ((StopLossRuleUnger)exitRule22).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
-        ((TrailingStopLossRuleUnger)exitRule22b).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrailingStopLoss()));
+        ((StopLossRuleUnger) exitRule22).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        ((TrailingStopLossRuleUnger) exitRule22b).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrailingStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
 
         Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
-                exitRule12, exitRule21, exitRule21b,exitRule22, exitRule22b, exitRule23);
+                exitRule12, exitRule21, exitRule21b, exitRule22, exitRule22b, exitRule23);
 
         return new BaseStrategy(entryRule, exitRule);
     }
@@ -282,7 +287,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
      * @param rule7
      * @return the complete Rule Chain
      */
-    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, EntryRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3,Rule rule3b, Rule rule4, Rule rule5,
+    private Rule buildCompleteEntryRule(ClosePriceIndicator closePrice, EntryRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3, Rule rule3b, Rule rule4, Rule rule5,
             Rule rule7, Rule rule11, Rule rule12, Rule rule13) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(0));
@@ -338,7 +343,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
      * @return the complete Rule Chain
      */
     private Rule buildCompleteExitRule(ClosePriceIndicator closePrice, ExitRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3,
-            Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22,Rule rule22b, Rule rule23) {
+            Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22, Rule rule22b, Rule rule23) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(0));
 

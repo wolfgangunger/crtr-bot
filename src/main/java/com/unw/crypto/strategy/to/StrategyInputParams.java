@@ -52,9 +52,11 @@ public class StrategyInputParams {
     private int emaLong;
 
     // RSI
-    private int rsiTimeframe;
+    private int rsiTimeframeBuy;
+    private int rsiTimeframeSell;
     //StochasticRSIIndicator
-    private int stoRsiTimeframe;
+    private int stoRsiTimeframeBuy;
+    private int stoRsiTimeframeSell;
     //StochasticOscillatorKIndicator
     private int stoOscKTimeFrame;
     //SMAIndicator
@@ -62,8 +64,8 @@ public class StrategyInputParams {
     //EMAIndicator
     private int emaIndicatorTimeframe;
     // for closed price e.g. isFalling
-    private int priceTimeFrame;
-
+    private int priceTimeFrameBuy;
+    private int priceTimeFrameSell;
     /// rules
     // rsi 
     private int rsiThresholdLow;
@@ -109,60 +111,74 @@ public class StrategyInputParams {
     }
 
     public int getSmaShort() {
-        return (int)(smaShort * getMAMultiplicator());
+        return (int) (smaShort * getMAMultiplicator());
     }
 
     public int getSmaLong() {
-        return (int)(smaLong * getMAMultiplicator());
+        return (int) (smaLong * getMAMultiplicator());
     }
 
     public int getSma8() {
-        return (int)(sma8 * getMAMultiplicator());
+        return (int) (sma8 * getMAMultiplicator());
     }
 
     public int getSma14() {
-        return (int)(sma14 * getMAMultiplicator());
+        return (int) (sma14 * getMAMultiplicator());
     }
 
     public int getSma200() {
-        return (int)(sma200 * getMAMultiplicator());
+        return (int) (sma200 * getMAMultiplicator());
     }
 
     public int getSma314() {
-        return (int)(sma314 * getMAMultiplicator());
+        return (int) (sma314 * getMAMultiplicator());
     }
 
     public int getEmaShort() {
-        return (int)(emaShort * getMAMultiplicator());
+        return (int) (emaShort * getMAMultiplicator());
     }
 
     public int getEmaLong() {
-        return (int)(emaLong * getMAMultiplicator());
+        return (int) (emaLong * getMAMultiplicator());
     }
 
-    public int getRsiTimeframe() {
-        return (int)(rsiTimeframe * getMAMultiplicator());
+    public int getRsiTimeframeBuy() {
+        return (int) (rsiTimeframeBuy * getMAMultiplicator());
     }
 
-    public int getStoRsiTimeframe() {
-        return (int)(stoRsiTimeframe * getMAMultiplicator());
+    public int getStoRsiTimeframeBuy() {
+        return (int) (stoRsiTimeframeBuy * getMAMultiplicator());
     }
+
+    public int getRsiTimeframeSell() {
+        return (int) (rsiTimeframeSell * getMAMultiplicator());
+    }
+
+    public int getStoRsiTimeframeSell() {
+        return (int)(stoRsiTimeframeSell * getMAMultiplicator());
+    }
+    
 
     public int getStoOscKTimeFrame() {
-        return (int)(stoOscKTimeFrame * getMAMultiplicator());
+        return (int) (stoOscKTimeFrame * getMAMultiplicator());
     }
 
     public int getEmaIndicatorTimeframe() {
-        return (int)(emaIndicatorTimeframe * getMAMultiplicator());
+        return (int) (emaIndicatorTimeframe * getMAMultiplicator());
     }
 
     public int getSmaIndicatorTimeframe() {
-        return (int)(smaIndicatorTimeframe * getMAMultiplicator());
+        return (int) (smaIndicatorTimeframe * getMAMultiplicator());
     }
 
-    public int getPriceTimeFrame() {
-        return priceTimeFrame;
+    public int getPriceTimeFrameBuy() {
+        return (int)(priceTimeFrameBuy  * getMAMultiplicator());
     }
+
+    public int getPriceTimeFrameSell() {
+        return (int)(priceTimeFrameSell   * getMAMultiplicator());
+    }
+    
 
     public int getRsiThresholdLow() {
         return rsiThresholdLow;
@@ -195,7 +211,6 @@ public class StrategyInputParams {
     public double getTrailingStopLoss() {
         return trailingStopLoss;
     }
-    
 
     public double getStopGain() {
         return stopGain;
@@ -212,7 +227,6 @@ public class StrategyInputParams {
     public double getRisingStrenght() {
         return risingStrenght;
     }
-    
-    
 
+    
 }

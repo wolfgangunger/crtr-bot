@@ -40,56 +40,36 @@ public class ForwardtestService {
         result.setExchange(exchange.getStringValue());
         result.setPeriodStart(series.getFirstBar().getEndTime().toLocalDateTime());
         result.setPeriodEnd(series.getLastBar().getEndTime().toLocalDateTime());
-       // StringBuilder sb = new StringBuilder();
-        //sb.append("Number of trades for the strategy: " + tradingRecord.getTradeCount() + LB);
         result.setNumberOfTrades(tradingRecord.getTradeCount());
         // Analysis
-        //sb.append("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord) + LB);
         result.setTotalProfit(new TotalProfitCriterion().calculate(series, tradingRecord).doubleValue());
         //
-        //sb.append("" + LB);
-        //sb.append("Trades:" + LB);
         List<org.ta4j.core.Trade> trades = tradingRecord.getTrades();
         List<Trade> resultTrades = new ArrayList<>();
         Num sum = DoubleNum.valueOf(0d);
         Num averagePercent = DoubleNum.valueOf(0d);
         for (org.ta4j.core.Trade trade : trades) {
             Trade resultTrade = new Trade();
-            //sb.append("Entry " + trade.getEntry().getPrice() + TAB + " : Exit " + trade.getExit().getPrice() + TAB);
             resultTrade.setPriceEntry(trade.getEntry().getPrice().doubleValue());
             resultTrade.setPriceExit(trade.getExit().getPrice().doubleValue());
             Num diff = trade.getExit().getPrice().minus(trade.getEntry().getPrice());
             Num diffPercent = trade.getExit().getPrice().dividedBy(trade.getEntry().getPrice());
             diffPercent = diffPercent.minus(DoubleNum.valueOf(1));
             diffPercent = diffPercent.multipliedBy(DoubleNum.valueOf(100));
-            //String percent = NumberFormat.getCurrencyInstance().format(diffPercent.doubleValue());
-            //percent = percent.replace("€", "");
-            //String strDiff = NumberFormat.getCurrencyInstance().format(diff.floatValue());
-            //strDiff = strDiff.replace("€", "");
-            //sb.append("  Diff amount : " + strDiff + TAB + " Diff Percent : " + percent + " %  ");
             resultTrade.setAmount(diff.floatValue());
             resultTrade.setPercent(diffPercent.doubleValue());
-            //sb.append("Index-Diff " + (trade.getExit().getIndex() - trade.getEntry().getIndex()) + " ");
             resultTrade.setIndexDiff(trade.getExit().getIndex() - trade.getEntry().getIndex());
 //            sb.append(LB);
             sum = sum.plus(diff);
             averagePercent = averagePercent.plus(diffPercent);
             resultTrades.add(resultTrade);
         }
-        //sb.append("" + LB);
-        //String strSum = NumberFormat.getCurrencyInstance().format(sum.doubleValue());
-        //strSum = strSum.replace("€", "");
-        //sb.append("Total " + strSum + LB);
         result.setTotal(sum.doubleValue());
-        //String percent = NumberFormat.getCurrencyInstance().format(averagePercent.doubleValue());
-        //String percent = NumberFormat.getNumberInstance().format(averagePercent.doubleValue());
-        //percent = percent.replace("€", "");
-        //sb.append("Total Percent " + percent + " % " + LB);
         result.setTotalPercent(averagePercent.doubleValue());
-
-        averagePercent = averagePercent.dividedBy(DoubleNum.valueOf(trades.size()));
-        //percent = NumberFormat.getNumberInstance().format(averagePercent.doubleValue());
-        //sb.append("Average Percent " + percent + " % " + LB);
+    
+        if(trades.size()> 0){
+            averagePercent = averagePercent.dividedBy(DoubleNum.valueOf(trades.size()));
+        }
         result.setAveragePercent(averagePercent.doubleValue());
 
         result.setTrades(resultTrades);

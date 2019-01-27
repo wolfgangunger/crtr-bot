@@ -17,8 +17,8 @@ public final class StrategyInputParamsBuilder {
     }
 
     public static StrategyInputParams createStrategyInputParams(BarDuration barDuration, boolean barMultiplikator, boolean extraMultiplikator, float extraMultiplikatorValue, int ma8, int ma14, int ma200, int ma314, int smaShort, int smaLong, int emaShort, int emaLong,
-            int rsiTimeFrame, int stoRsiTimeframe, int stoOscKTimeFrame, int emaIndicatorTimeframe, int smaIndicatorTimeframe,
-             int priceTimeFrame , int rsiThresholdLow, int rsiThresholdHigh,
+            int rsiTimeFrameBuy, int rsiTimeFrameSell, int stoRsiTimeframeBuy,int stoRsiTimeframeSell, int stoOscKTimeFrame, int emaIndicatorTimeframe, int smaIndicatorTimeframe,
+             int priceTimeFrameBuy ,int priceTimeFrameSell , int rsiThresholdLow, int rsiThresholdHigh,
             double stoThresholdLow, double stoThresholdHigh, int stoOscKThresholdLow, int stoOscKThresholdHigh,
              double isRisingStrenght, double isFallingStrenght , double stopLoss, double trailingStopLoss, double stopGain, int waitBars, EntryRuleChain entryRuleChain, ExitRuleChain exitRuleChain) {
         
@@ -35,12 +35,15 @@ public final class StrategyInputParamsBuilder {
         result.setSmaLong(smaLong);
         result.setEmaShort(emaShort);
         result.setEmaLong(emaLong);
-        result.setRsiTimeframe(rsiTimeFrame);
-        result.setStoRsiTimeframe(stoRsiTimeframe);
+        result.setRsiTimeframeBuy(rsiTimeFrameBuy);
+        result.setRsiTimeframeSell(rsiTimeFrameSell);
+        result.setStoRsiTimeframeBuy(stoRsiTimeframeBuy);
+        result.setStoRsiTimeframeSell(stoRsiTimeframeSell);
         result.setStoOscKTimeFrame(stoOscKTimeFrame);
         result.setEmaIndicatorTimeframe(emaIndicatorTimeframe);
         result.setSmaIndicatorTimeframe(smaIndicatorTimeframe);
-        result.setPriceTimeFrame(priceTimeFrame);
+        result.setPriceTimeFrameBuy(priceTimeFrameBuy);
+        result.setPriceTimeFrameSell(priceTimeFrameSell);
         result.setRsiThresholdLow(rsiThresholdLow);
         result.setRsiThresholdHigh(rsiThresholdHigh);
         result.setStoThresholdLow(stoThresholdLow);

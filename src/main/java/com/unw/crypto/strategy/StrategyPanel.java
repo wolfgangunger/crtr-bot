@@ -118,12 +118,15 @@ public class StrategyPanel extends AbstractPanel {
     private NumericTextField tfLongSMA;
     private NumericTextField tfShortEMA;
     private NumericTextField tfLongEMA;
-    private NumericTextField tfRsiTimeframe;
-    private NumericTextField tfRsiStoTimeframe;
+    private NumericTextField tfRsiTimeframeBuy;
+    private NumericTextField tfRsiStoTimeframeBuy;
+    private NumericTextField tfRsiTimeframeSell;
+    private NumericTextField tfRsiStoTimeframeSell;
     private NumericTextField tfStoOscKTimeframe;
     private NumericTextField tfEmaIndicatorTimeframe;
     private NumericTextField tfSmaIndicatorTimeframe;
-    private NumericTextField tfPriceTimeframe;
+    private NumericTextField tfPriceTimeframeBuy;
+    private NumericTextField tfPriceTimeframeSell;
     private NumericTextField tfRsiThresholdLow;
     private NumericTextField tfRsiThresholdHigh;
     private JTextField tfStoThresholdLow;
@@ -463,30 +466,33 @@ public class StrategyPanel extends AbstractPanel {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
                 } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) && entered) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     tr.exit(order.getIndex());
                     entered = false;
                 }
-                if (lastTick && entered) {
-                    // if there is still a trade open in last tick, sell anyway
-                    ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
-                    order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
-                    order.setAddOrderInfo(info);
-                    forwardTestOrders.add(order);
-                    tr.exit(order.getIndex());
-                    entered = false;
-                }
+
             }
+            if (lastTick && entered) {
+                // if there is still a trade open in last tick, sell anyway
+                System.out.println("Trade open on last tick- sell anyway");
+                ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                order.setTradeTime(tick.getTradeTime());
+                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
+                order.setAddOrderInfo(info);
+                forwardTestOrders.add(order);
+                tr.exit(order.getIndex());
+                entered = false;
+            }
+
             progressBarCounter++;
         }
         progressBar.setProgress(100d);
@@ -509,12 +515,15 @@ public class StrategyPanel extends AbstractPanel {
         int smaLong = Integer.valueOf(tfLongSMA.getText());
         int emaShort = Integer.valueOf(tfShortEMA.getText());
         int emaLong = Integer.valueOf(tfLongEMA.getText());
-        int rsiTimeframe = Integer.valueOf(tfRsiTimeframe.getText());
-        int rsiStoTimeframe = Integer.valueOf(tfRsiStoTimeframe.getText());
+        int rsiTimeframeBuy = Integer.valueOf(tfRsiTimeframeBuy.getText());
+        int rsiStoTimeframeBuy = Integer.valueOf(tfRsiStoTimeframeBuy.getText());
+        int rsiTimeframeSell = Integer.valueOf(tfRsiTimeframeSell.getText());
+        int rsiStoTimeframeSell = Integer.valueOf(tfRsiStoTimeframeSell.getText());
         int stoOscKTimeFrame = Integer.valueOf(tfStoOscKTimeframe.getText());
         int emaIndicatorTimeframe = Integer.valueOf(tfEmaIndicatorTimeframe.getText());
         int smaIndicatorTimeframe = Integer.valueOf(tfSmaIndicatorTimeframe.getText());
-        int priceTimeFrame = Integer.valueOf(tfPriceTimeframe.getText());
+        int priceTimeFrameBuy = Integer.valueOf(tfPriceTimeframeBuy.getText());
+        int priceTimeFrameSell = Integer.valueOf(tfPriceTimeframeSell.getText());
         int rsiThresholdLow = Integer.valueOf(tfRsiThresholdLow.getText());
         int rsiThresholdHigh = Integer.valueOf(tfRsiThresholdHigh.getText());
         double stoThresholdLow = Double.valueOf(tfStoThresholdLow.getText());
@@ -535,8 +544,10 @@ public class StrategyPanel extends AbstractPanel {
                 .rule3_8maDown(chkExit8MaDown.isSelected()).rule11_rsiPointingDown(chkExitRsiDown.isSelected())
                 .rule12_StoPointingDown(chkExitStoDown.isSelected()).rule21_priceFalling(chkExitPriceDown.isSelected())
                 .rule23_stopGain(chkExitStopGain.isSelected()).rule22_stopLoss(chkExitStopLoss.isSelected()).rule22b_trailingStopLoss(chkExitTrailingStopLoss.isSelected()).build();
-        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframe,
-                rsiStoTimeframe, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrame, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong,
+                rsiTimeframeBuy,rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell,stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, isRisingStrenght, isFallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
@@ -644,21 +655,33 @@ public class StrategyPanel extends AbstractPanel {
         result.add(tfLongEMA);
 
         // RSI 
-        JLabel lblRsiTimeFrame = new JLabel("RSI Timeframe");
-        result.add(lblRsiTimeFrame);
+        JLabel lblRsiTimeFrameBuy = new JLabel("RSI Timeframe Buy");
+        result.add(lblRsiTimeFrameBuy);
+        tfRsiTimeframeBuy = new NumericTextField();
+        tfRsiTimeframeBuy.setText(String.valueOf(2));
+        tfRsiTimeframeBuy.setColumns(4);
+        result.add(tfRsiTimeframeBuy);
 
-        tfRsiTimeframe = new NumericTextField();
-        tfRsiTimeframe.setText(String.valueOf(2));
-        tfRsiTimeframe.setColumns(4);
-        result.add(tfRsiTimeframe);
+        JLabel lblRsiTimeFrameSell = new JLabel("RSI Timeframe Sell");
+        result.add(lblRsiTimeFrameSell);
+        tfRsiTimeframeSell = new NumericTextField();
+        tfRsiTimeframeSell.setText(String.valueOf(2));
+        tfRsiTimeframeSell.setColumns(4);
+        result.add(tfRsiTimeframeSell);
 
-        JLabel lblStoRsiTimeframe = new JLabel("RSI-STO Timeframe");
-        result.add(lblStoRsiTimeframe);
+        JLabel lblStoRsiTimeframeBuy = new JLabel("RSI-STO Timeframe Buy");
+        result.add(lblStoRsiTimeframeBuy);
+        tfRsiStoTimeframeBuy = new NumericTextField();
+        tfRsiStoTimeframeBuy.setText(String.valueOf(4));
+        tfRsiStoTimeframeBuy.setColumns(4);
+        result.add(tfRsiStoTimeframeBuy);
 
-        tfRsiStoTimeframe = new NumericTextField();
-        tfRsiStoTimeframe.setText(String.valueOf(4));
-        tfRsiStoTimeframe.setColumns(4);
-        result.add(tfRsiStoTimeframe);
+        JLabel lblStoRsiTimeframeSell = new JLabel("RSI-STO Timeframe Sell");
+        result.add(lblStoRsiTimeframeSell);
+        tfRsiStoTimeframeSell = new NumericTextField();
+        tfRsiStoTimeframeSell.setText(String.valueOf(4));
+        tfRsiStoTimeframeSell.setColumns(4);
+        result.add(tfRsiStoTimeframeSell);
 
         JLabel lblStoOscKTimeframe = new JLabel("STO-OscK Timeframe");
         result.add(lblStoOscKTimeframe);
@@ -685,13 +708,20 @@ public class StrategyPanel extends AbstractPanel {
         tfEmaIndicatorTimeframe.setColumns(4);
         result.add(tfEmaIndicatorTimeframe);
 
-        //EMAIndicator
-        JLabel lblPriceTimeframe = new JLabel("Price Timeframe");
-        result.add(lblPriceTimeframe);
-        tfPriceTimeframe = new NumericTextField();
-        tfPriceTimeframe.setText(String.valueOf(1));
-        tfPriceTimeframe.setColumns(4);
-        result.add(tfPriceTimeframe);
+        //Closed Price
+        JLabel lblPriceTimeframeBuy = new JLabel("Price Timeframe Buy");
+        result.add(lblPriceTimeframeBuy);
+        tfPriceTimeframeBuy = new NumericTextField();
+        tfPriceTimeframeBuy.setText(String.valueOf(1));
+        tfPriceTimeframeBuy.setColumns(4);
+        result.add(tfPriceTimeframeBuy);
+
+        JLabel lblPriceTimeframeSell = new JLabel("Price Timeframe Sell");
+        result.add(lblPriceTimeframeSell);
+        tfPriceTimeframeSell = new NumericTextField();
+        tfPriceTimeframeSell.setText(String.valueOf(1));
+        tfPriceTimeframeSell.setColumns(4);
+        result.add(tfPriceTimeframeSell);
 
         //RSI threshold
         JLabel lblRsiThresholdLow = new JLabel("RSI Threshold Low");

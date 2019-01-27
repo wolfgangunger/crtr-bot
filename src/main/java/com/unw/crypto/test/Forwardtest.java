@@ -23,7 +23,6 @@ import com.unw.crypto.model.Exchange;
 import com.unw.crypto.model.ExtOrder;
 import com.unw.crypto.model.Tick;
 import com.unw.crypto.service.MarketAnalyzer;
-import com.unw.crypto.strategy.AbstractStrategy;
 import com.unw.crypto.strategy.FinalTradingStrategy;
 import com.unw.crypto.strategy.FinalTradingStrategyShort;
 import com.unw.crypto.strategy.IFinalTradingStrategy;
@@ -64,7 +63,7 @@ public class Forwardtest {
     private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private IFinalTradingStrategy finalTradingStrategy;
-    private AbstractStrategy currentStrategy;
+    //private AbstractStrategy currentStrategy;
     private Strategy tradingStrategy;
 
     // month to load  before the period, should be 2 to be able to build MA200 for 10 Min Bar, for faster testing it is reduced to one 
@@ -81,8 +80,9 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 2;
-
+        int testRun = 7;
+        // set this to false for short strategy
+        boolean tradeLong = true;
         Currency currency = Currency.BTC;
         Exchange exchange = Exchange.BITSTAMP;
         // iterate over 12 month
@@ -92,15 +92,16 @@ public class Forwardtest {
             LocalDate until = from.plusMonths(1);
             //LocalDate until = from.plusWeeks(1);
             //execute test
-            loadSeries(from, until, currency, exchange, BarDuration.TWO_HOURS, testRun);
+            System.out.println("Run test for " + exchange.getStringValue() + " for month " + i);
+            loadSeries(from, until, currency, exchange, BarDuration.TWO_HOURS, testRun, tradeLong);
         }
     }
 
-    public void loadSeries(LocalDate from, LocalDate until, Currency currency, Exchange exchange, BarDuration barDuration, int testRun) {
+    public void loadSeries(LocalDate from, LocalDate until, Currency currency, Exchange exchange, BarDuration barDuration, int testRun, boolean tradeLong) {
 
         int barDurationInMinutes = barDuration.getIntValue();
         // series for live testing, 2 month before series 
-
+        System.out.println("Loading ticks");
         ticks = timeSeriesDBLoader.loadTicksWithParams(from, until, currency, exchange, barDurationInMinutes);
         //series = timeSeriesDBLoader.loadSeriesWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
         if (ticks.isEmpty()) {
@@ -108,18 +109,30 @@ public class Forwardtest {
             // create a dummy tick to avoid NPE
             ticks.add(TickUtil.createDummyTick(currency.getStringValue(), exchange.getStringValue()));
         }
+        System.out.println("Loading series");
         series = timeSeriesDBLoader.loadSeriesByTicks(ticks, barDurationInMinutes);
         // loading the pre-series ( 2 month before from)
         LocalDate preFrom = from.minusMonths(PRE_MONTH);
+        System.out.println("Loading preseriesF");
         preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from, currency, exchange, barDurationInMinutes);
+        if (tradeLong) {
+            //currentStrategy = finalTradingStrategyLong;
+            finalTradingStrategy = finalTradingStrategyLong;
+        } else {
+            //currentStrategy = finalTradingStrategyShort;
+            finalTradingStrategy = finalTradingStrategyShort;
+        }
 
-        currentStrategy = finalTradingStrategyLong;
-        finalTradingStrategy = finalTradingStrategyLong;
         StrategyInputParams params;
-        for (int i = 1; i <= 6; i++) {
+        for (int i = 4; i <= 4; i++) {
             params = StrategyInputParamsCreator.createStrategyInputParams(i, barDuration);
+            System.out.println("-Run test for configuration " + i);
             executeForwardTest(barDurationInMinutes, params, i, currency, exchange, testRun);
         }
+        // short
+//            params = StrategyInputParamsCreator.createStrategyInputParams(-1, barDuration);
+//            System.out.println("-Run test for configuration -1" );
+//            executeForwardTest(barDurationInMinutes, params, -1, currency, exchange, testRun);
     }
 
     private void executeForwardTest(int candleMinutes, StrategyInputParams params, int configNumber, Currency currency, Exchange exchange, int testRun) {
@@ -163,36 +176,37 @@ public class Forwardtest {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
                 } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) && entered) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
-                    order.setAddOrderInfo(info);
-                    forwardTestOrders.add(order);
-                    tr.exit(order.getIndex());
-                    entered = false;
-                }
-                if (lastTick && entered) {
-                    // if there is still a trade open in last tick, sell anyway
-                    ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
-                    order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframe(), params.getStoRsiTimeframe());
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     tr.exit(order.getIndex());
                     entered = false;
                 }
             }
+            if (lastTick && entered) {
+                System.out.println("Trade open on last tick- sell anyway");
+                // if there is still a trade open in last tick, sell anyway
+                ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
+                order.setTradeTime(tick.getTradeTime());
+                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
+                order.setAddOrderInfo(info);
+                forwardTestOrders.add(order);
+                tr.exit(order.getIndex());
+                entered = false;
+            }
             progressBarCounter++;
         }
         TradingRecord record = StrategyUtil.buildTradingRecord(forwardTestOrders);
         updateLog(record);
         forwardtestService.persistForwardtestResult(record, completeSeries, configNumber, "", currency, exchange, testRun, finalTradingStrategy.getClass().getSimpleName());
-        LogUtil.printAddOrderInfo(forwardTestOrders);
+        // LogUtil.printAddOrderInfo(forwardTestOrders);
     }
 
     private void updateLog(TradingRecord tradingRecord) {
@@ -250,17 +264,5 @@ public class Forwardtest {
 //        if (orders.size() > 1) {
 //            forwardtestService.persistForwardtestResult(orders, timeSeries, strategyType, config);
 //        }
-//    }
-//    private Bar createNewBar(Tick tick) {
-//        ZonedDateTime dateTime = ZonedDateTime.of(tick.getTradeTime(), ZoneId.of("UTC"));
-//        return new BaseBar(dateTime, tick.getPrice(), tick.getPrice(), tick.getPrice(), tick.getPrice(),
-//                tick.getAmount(), DoubleNum::valueOf);
-//    }
-//    private List<Tick> getTicksForPeriod(String from, String to) throws ParseException {
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-//        LocalDateTime f = LocalDateTime.parse(from, formatter);
-//        LocalDateTime t = LocalDateTime.parse(to, formatter);
-//        return tickRepository.findByTradeTimeAfterAndTradeTimeBeforeOrderByTradeTimeAsc(f, t);
 //    }
 }

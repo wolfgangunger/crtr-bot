@@ -74,11 +74,11 @@ public final class StrategyUtil {
         System.out.println("Ema Long " + params.getEmaLong());
         System.out.println("Ema Short " + params.getEmaShort());
         System.out.println("Falling Strenth " + params.getFallingStrenght());
-        System.out.println("Price Timeframe " + params.getPriceTimeFrame());
+        System.out.println("Price Timeframe " + params.getPriceTimeFrameBuy());
         System.out.println("Rising Strenth " + params.getRisingStrenght());
         System.out.println("RSI Threshold High " + params.getRsiThresholdHigh());
         System.out.println("RSI Threshold Low " + params.getRsiThresholdLow());
-        System.out.println("RSI Timeframe " + params.getRsiTimeframe());
+        System.out.println("RSI Timeframe " + params.getRsiTimeframeBuy());
         System.out.println("SMA Ind Timeframe " + params.getSmaIndicatorTimeframe());
         System.out.println("SMA Long " + params.getSmaLong());
         System.out.println("SMA Short " + params.getSmaShort());
