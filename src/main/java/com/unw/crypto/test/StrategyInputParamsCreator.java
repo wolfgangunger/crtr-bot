@@ -322,8 +322,8 @@ public final class StrategyInputParamsCreator {
         // time frames rsi 1 ; sto 2
         // buy
         // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
-        //sell
-        // rsi -> down, sto -> down, 8ma down
+        //sell sto time frame 1
+        // rsi -> down, sto -> down, 8ma down --- 
 
         StrategyInputParams result;
         boolean barMultiplikator = false;
@@ -340,7 +340,7 @@ public final class StrategyInputParamsCreator {
         int rsiTimeframeBuy = 1;
         int rsiStoTimeframeBuy = 2;
         int rsiTimeframeSell = 1;
-        int rsiStoTimeframeSell = 2;
+        int rsiStoTimeframeSell = 1;
         int stoOscKTimeFrame = 4;
         int emaIndicatorTimeframe = 4;
         int smaIndicatorTimeframe = 4;
