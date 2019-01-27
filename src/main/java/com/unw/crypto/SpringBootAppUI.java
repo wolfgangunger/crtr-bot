@@ -40,7 +40,7 @@ import org.ta4j.core.TimeSeries;
  * the app for the UI Application
  *
  */
-//@SpringBootApplication
+@SpringBootApplication
 public class SpringBootAppUI extends Application {
 
     private ConfigurableApplicationContext context;
@@ -141,7 +141,7 @@ public class SpringBootAppUI extends Application {
         bttStop.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("-");
+                System.out.println("Refresh");
                 //stopRecord();
             }
         });
@@ -151,7 +151,7 @@ public class SpringBootAppUI extends Application {
         bttRead.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("-");
+                System.out.println("Cancel");
                 //readData();
             }
         });
