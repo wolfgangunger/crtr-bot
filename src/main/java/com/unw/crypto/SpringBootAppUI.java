@@ -137,7 +137,7 @@ public class SpringBootAppUI extends Application {
             }
         });
         Button bttStop = new Button();
-        bttStop.setText("-");
+        bttStop.setText("Refresh");
         bttStop.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -147,7 +147,7 @@ public class SpringBootAppUI extends Application {
         });
 
         Button bttRead = new Button();
-        bttRead.setText("-");
+        bttRead.setText("Cancel");
         bttRead.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -204,6 +204,7 @@ public class SpringBootAppUI extends Application {
 
     private void initTabPane(BorderPane root) {
         barDurationInMinutes = barDuration.getValue().getIntValue();
+        System.out.println("Loading ticks");
         ticks = timeSeriesDBLoader.loadTicksWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
         //series = timeSeriesDBLoader.loadSeriesWithParams(from.getValue(), until.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
         if (ticks.isEmpty()) {
@@ -211,9 +212,11 @@ public class SpringBootAppUI extends Application {
             // create a dummy tick to avoid NPE
             ticks.add(TickUtil.createDummyTick(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue()));
         }
+        System.out.println("Loading series by ticks");
         series = timeSeriesDBLoader.loadSeriesByTicks(ticks, barDurationInMinutes);
         // loading the pre-series ( 2 month before from)
         LocalDate preFrom = from.getValue().minusMonths(PRE_MONTH);
+        System.out.println("Loading preSeries");
         preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from.getValue(), cmbCurrency.getValue(), cmbExchange.getValue(), barDurationInMinutes);
 
         String txtLeft = createBottomTextLeft();
