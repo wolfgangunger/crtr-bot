@@ -80,13 +80,13 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 8;
+        int testRun = 10;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
         Exchange exchange = Exchange.BITSTAMP;
         // iterate over 12 month
-        for (int i = 2; i <= 12; i++) {
+        for (int i = 1; i <= 12; i++) {
             // for (int i = 1; i <= 12; i++) {
             LocalDate from = LocalDate.of(2018, i, 1);
             LocalDate until = from.plusMonths(1);
@@ -124,7 +124,7 @@ public class Forwardtest {
         }
 
         StrategyInputParams params;
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= 6; i++) {
             params = StrategyInputParamsCreator.createStrategyInputParams(i, barDuration);
             System.out.println("-Run test for configuration " + i);
             executeForwardTest(barDurationInMinutes, params, i, currency, exchange, testRun);
