@@ -78,7 +78,9 @@ public final class LogUtil {
             System.out.println(order.getPrice());
             System.out.println(order.getIndex());
             System.out.println("RSI " + order.getAddOrderInfo().getRsi());
+            System.out.println("RSI Strenght" + order.getAddOrderInfo().getRsiSrength());
             System.out.println("Sto " + order.getAddOrderInfo().getSto());
+            System.out.println("Sto Strenght" + order.getAddOrderInfo().getStoStrength());
             System.out.println("SMA3 Strength " + order.getAddOrderInfo().getSma3());
             System.out.println("SMA8 Strength " + order.getAddOrderInfo().getSma8());
             System.out.println("SMA50 Strength " + order.getAddOrderInfo().getSma50());

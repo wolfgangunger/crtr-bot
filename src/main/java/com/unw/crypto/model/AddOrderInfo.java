@@ -21,15 +21,17 @@ public class AddOrderInfo {
     private int rsi;
     private double sto;
     private double closedPriceStrenth;
-    double sma3;
-    double sma8;
-    double sma50;
-    double sma200;
-    double sma314;
-    double ema14;
-    double ema50;
-    boolean priceAboveSma200;
-    boolean priceAboveSma3141;
-    boolean isSMALongTimeBullish;
+    private double rsiSrength;
+    private double stoStrength;
+    private double sma3;
+    private double sma8;
+    private double sma50;
+    private double sma200;
+    private double sma314;
+    private double ema14;
+    private double ema50;
+    private boolean priceAboveSma200;
+    private boolean priceAboveSma3141;
+    private boolean isSMALongTimeBullish;
 
 }
