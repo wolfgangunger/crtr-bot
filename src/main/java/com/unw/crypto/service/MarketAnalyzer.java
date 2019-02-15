@@ -41,7 +41,6 @@ public class MarketAnalyzer {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         Rule rule1 = new IsRisingRule(closePrice, durationTimeframe, strenght);
         boolean satisfied = rule1.isSatisfied(s.getEndIndex());
-        System.out.println("Price is rising :" + satisfied);
         return satisfied;
     }
 
@@ -56,7 +55,6 @@ public class MarketAnalyzer {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         Rule rule1 = new IsFallingRule(closePrice, durationTimeframe);
         boolean satisfied = rule1.isSatisfied(s.getEndIndex());
-        System.out.println("Price is rising :" + satisfied);
         return satisfied;
     }
 
@@ -75,7 +73,6 @@ public class MarketAnalyzer {
         SMAIndicator smaInd = new SMAIndicator(closePrice, sma);
         Rule rule1 = new IsRisingRule(smaInd, durationTimeframe, strenght);
         boolean satisfied = rule1.isSatisfied(s.getEndIndex());
-        System.out.println("SMA " + sma + "  is rising :" + satisfied);
         return satisfied;
     }
 
@@ -154,12 +151,9 @@ public class MarketAnalyzer {
      */
     public double determineSMAStrength(TimeSeries s, int sma, int durationTimeframe) {
         double result = 0d;
-        //System.out.println("determineMAStrength for SMA " + sma);
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         SMAIndicator smaInd = new SMAIndicator(closePrice, sma);
         result = determineSlopeStrength(smaInd, durationTimeframe, s.getEndIndex());
-        //System.out.println("strenght : " + result);
-        //System.out.println("end determineMAStrength ");
         return result;
     }
 
@@ -176,8 +170,6 @@ public class MarketAnalyzer {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         EMAIndicator emaInd = new EMAIndicator(closePrice, ema);
         result = determineSlopeStrength(emaInd, durationTimeframe, s.getEndIndex());
-        //System.out.println("strenght : " + result);
-        //System.out.println("end determineMAStrength ");
         return result;
     }
 
