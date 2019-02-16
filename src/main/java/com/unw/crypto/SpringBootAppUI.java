@@ -42,7 +42,7 @@ import org.ta4j.core.TimeSeries;
  * the app for the UI Application
  *
  */
-//@SpringBootApplication
+@SpringBootApplication
 public class SpringBootAppUI extends Application {
 
     private ConfigurableApplicationContext context;

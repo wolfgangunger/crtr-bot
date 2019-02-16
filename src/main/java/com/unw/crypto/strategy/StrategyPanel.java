@@ -454,6 +454,7 @@ public class StrategyPanel extends AbstractPanel {
             if (time == prevTime) {
                 // we execute the strategy only once in a minute, if there are more ticks, we do nothing
             } else {
+     
                 // execute the strategy at least every minute
                 if (currentStrategy instanceof IFinalTradingStrategy) {
                     tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
@@ -545,8 +546,8 @@ public class StrategyPanel extends AbstractPanel {
                 .rule12_StoPointingDown(chkExitStoDown.isSelected()).rule21_priceFalling(chkExitPriceDown.isSelected())
                 .rule23_stopGain(chkExitStopGain.isSelected()).rule22_stopLoss(chkExitStopLoss.isSelected()).rule22b_trailingStopLoss(chkExitTrailingStopLoss.isSelected()).build();
         result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8, ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong,
-                rsiTimeframeBuy,rsiTimeframeSell,
-                rsiStoTimeframeBuy, rsiStoTimeframeSell,stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
                 priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, isRisingStrenght, isFallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;

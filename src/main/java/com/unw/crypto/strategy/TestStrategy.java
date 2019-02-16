@@ -15,6 +15,7 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
+import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
@@ -88,15 +89,16 @@ public class TestStrategy extends AbstractStrategy {
         //Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(0.18d));
         // rule 11 rsi pointing up
         //Rule entryRule3 = new IsRisingRule(rsiIndicator, 1 , 0.1d);
-        Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(20));
-        // 2  STO is crossing low threshold 
-        Rule entryRule11 = new IsRisingRule(rsiIndicator, 2, 0.5d);
-        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(0.2d));
+                // 1 - RSI is crossing low threshold 
+        Rule entryRule1 = new UnderIndicatorRule(rsiIndicator, DoubleNum.valueOf(35));
+        Rule entryRule11 = new IsRisingRule(rsiIndicator, 1, 0.5d);
+        
+        //Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(0.2d));
 
         //rule 12 sto pointing up
-        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, 2, 0.5d);
+        //Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, 2, 0.5d);
         
-        Rule entryRule = entryRule1.and(entryRule2).and(entryRule11).and(entryRule12);
+        Rule entryRule = entryRule1.and(entryRule11);
         
         
         //Rule entryRule = entryRule1.and(entryRule3);
@@ -116,7 +118,7 @@ public class TestStrategy extends AbstractStrategy {
         //Rule exitRule = new FixedRule(indexes);
         
           //Rule exitRule = new WaitForRule(Order.OrderType.BUY, 15);
-          Rule exitRule = new WaitForRule(Order.OrderType.BUY, 25);
+          Rule exitRule = new WaitForRule(Order.OrderType.BUY, 15);
         // Rule exitRule =new TrailingStopLossRule(closePrice, DoubleNum.valueOf(0.5d));
           ((TrailingStopLossRuleUnger) exitRuleStopLosss).rebuildRule(closePrice, DoubleNum.valueOf(2.5d));
         // Rule exitRule =new StopLossRule(closePrice, DoubleNum.valueOf(1.5d));
