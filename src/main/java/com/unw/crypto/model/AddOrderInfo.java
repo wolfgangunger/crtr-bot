@@ -23,6 +23,8 @@ public class AddOrderInfo {
     private double closedPriceStrenth;
     private double rsiSrength;
     private double stoStrength;
+    private double rsiSrength1;
+    private double stoStrength1;
     private double sma3;
     private double sma8;
     private double sma50;

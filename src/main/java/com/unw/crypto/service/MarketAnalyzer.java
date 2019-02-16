@@ -207,26 +207,42 @@ public class MarketAnalyzer {
 
     /**
      * determine the rise or fall strenth of RSI (- is falling, + is rising)
+     *
      * @param s
      * @param timeframe
-     * @return 
+     * @return
      */
     public double determineRSIStrength(TimeSeries s, int timeframe) {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, timeframe);
-        return determineSlopeStrength(rsiIndicator, timeframe, s.getEndIndex());
+        double result = determineSlopeStrength(rsiIndicator, timeframe, s.getEndIndex());
+        return result;
+    }
+
+    public double determineRSIStrengthForTimefame1(TimeSeries s, int timeframe) {
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
+        RSIIndicator rsiIndicator = new RSIIndicator(closePrice, timeframe);
+        double result = determineSlopeStrength(rsiIndicator, 1, s.getEndIndex());
+        return result;
     }
 
     /**
      * determine the rise or fall strenth of STO(- is falling, + is rising)
+     *
      * @param s
      * @param timeframe
-     * @return 
+     * @return
      */
     public double determineSTOStrength(TimeSeries s, int timeframe) {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
         StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, timeframe);
         return determineSlopeStrength(stochasticRSIIndicator, timeframe, s.getEndIndex());
+    }
+
+    public double determineSTOStrengthForTimeframe1(TimeSeries s, int timeframe) {
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(s);
+        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, timeframe);
+        return determineSlopeStrength(stochasticRSIIndicator, 1, s.getEndIndex());
     }
 
     /**
@@ -241,6 +257,30 @@ public class MarketAnalyzer {
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, timeFrame);
         Num result = rsiIndicator.getValue(s.getEndIndex());
         return result.intValue();
+    }
+
+    public boolean rsiRisingUp(TimeSeries s, int timeFrame, int rsiThreshold) {
+        int rsi = calculateRSI(s, timeFrame);
+        double rsiS1 = determineRSIStrengthForTimefame1(s, timeFrame);
+        return rsi < rsiThreshold && rsiS1 > 0d;
+    }
+
+    public boolean rsiPointingDown(TimeSeries s, int timeFrame, int rsiThreshold) {
+        int rsi = calculateRSI(s, timeFrame);
+        double rsiS1 = determineRSIStrengthForTimefame1(s, timeFrame);
+        return rsi > rsiThreshold && rsiS1 < 0d;
+    }
+
+    public boolean stoRisingUp(TimeSeries s, int timeFrame, double stoThreshold) {
+        double sto = calculateSTO(s, timeFrame);
+        double stoS1 = determineSTOStrengthForTimeframe1(s, timeFrame);
+        return sto < stoThreshold && stoS1 > 0d;
+    }
+
+    public boolean stoPointingDown(TimeSeries s, int timeFrame, double stoThreshold) {
+        double sto = calculateSTO(s, timeFrame);
+        double stoS1 = determineSTOStrengthForTimeframe1(s, timeFrame);
+        return sto > stoThreshold && stoS1 < 0d;
     }
 
     /**
@@ -271,6 +311,8 @@ public class MarketAnalyzer {
         double closedPriceStrenth = determineClosedPriceStrength(s, 2);
         double rsiStrenght = determineRSIStrength(s, rsiTimeframe);
         double stoStrenght = determineSTOStrength(s, stoTimeframe);
+        double rsiStrenght1 = determineRSIStrengthForTimefame1(s, rsiTimeframe);
+        double stoStrenght1 = determineSTOStrengthForTimeframe1(s, stoTimeframe);
         double sma3 = determineSMAStrength(s, 3, 2);
         double sma8 = determineSMAStrength(s, 8, 2);
         double sma50 = determineSMAStrength(s, 50, 2);
@@ -284,7 +326,8 @@ public class MarketAnalyzer {
 
         return AddOrderInfo.builder().rsi(rsi).sto(sto).closedPriceStrenth(closedPriceStrenth).sma3(sma3).sma8(sma8).sma50(sma50).
                 sma200(sma200).sma314(sma314).ema14(ema14).ema50(ema50).priceAboveSma200(priceAboveSma200).
-                priceAboveSma3141(priceAboveSma3141).isSMALongTimeBullish(isSMALongTimeBullish).rsiSrength(rsiStrenght).stoStrength(stoStrenght).build();
+                priceAboveSma3141(priceAboveSma3141).isSMALongTimeBullish(isSMALongTimeBullish).rsiSrength(rsiStrenght).stoStrength(stoStrenght).
+                rsiSrength1(rsiStrenght1).stoStrength1(stoStrenght1).build();
 
     }
 }

@@ -28,7 +28,7 @@ import org.ta4j.core.TimeSeries;
  *
  * @author UNGERW
  */
-//@Component
+@Component
 public class TradingManager implements TradeListener {
 
     // just needed for simulation of live trading
@@ -65,8 +65,8 @@ public class TradingManager implements TradeListener {
     public void minuteExecution() {
         watchBTCMarket();
         //watchBTCMarket2();
-        watchAllMarkets();
-        tradeAllMarkets();
+        //watchAllMarkets();
+        //tradeAllMarkets();
     }
 
     private void tradeAllMarkets() {
@@ -105,10 +105,36 @@ public class TradingManager implements TradeListener {
         int last = medium + counter;
         List<Bar> bars = BarUtil.createBarList(first, last, series);
         TimeSeries rollingSeries = new BaseTimeSeries("bitstamp_trades", bars);
-        log(rollingSeries);
+        //log(rollingSeries);
         analyzer.isClosedPriceRising(rollingSeries, 2, 0.1d);
         double cp = analyzer.determineClosedPriceStrength(rollingSeries, 2);
-        System.out.println("ClosedPirce : " + cp);
+        //System.out.println("ClosedPirce : " + cp);
+        // test for rsi
+
+        if (analyzer.rsiRisingUp(rollingSeries, 2, 30)) {
+            System.out.println("rsi:buy 1 " + counter);
+        }
+        if (analyzer.rsiPointingDown(rollingSeries, 2, 70)) {
+            System.out.println("rsi:sell 1 " + counter);
+        }
+        if (analyzer.stoRisingUp(rollingSeries, 4, 0.35d)) {
+            System.out.println("sto:buy 1 " + counter);
+        }
+        if (analyzer.stoPointingDown(rollingSeries, 4, 0.65d)) {
+            System.out.println("sto:sell 1 " + counter);
+        }
+
+        if (analyzer.rsiRisingUp(rollingSeries, 2, 30)&&analyzer.stoRisingUp(rollingSeries, 4, 0.35d)) {
+            System.out.println("#####rsi+sto:buy 1 " + counter);
+        }
+        if (analyzer.rsiPointingDown(rollingSeries, 2, 70)&&analyzer.stoPointingDown(rollingSeries, 4, 0.65d)) {
+            System.out.println("#####rsi+sto:sell 1 " + counter);
+        }
+        
+        counter++;
+        if (true) {
+            return;
+        }
         // sma 3
         analyzer.isSmaRising(rollingSeries, 3, 2, 0.1d);
         double sma3 = analyzer.determineSMAStrength(rollingSeries, 3, 2);
