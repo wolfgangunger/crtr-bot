@@ -14,7 +14,7 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 @EntityScan(
         basePackageClasses = {TestApplication.class, Jsr310JpaConverters.class}
 )
-//@SpringBootApplication
+@SpringBootApplication
 public class TestApplication {
 
 	public static void main(String[] args) throws BeansException, ParseException {

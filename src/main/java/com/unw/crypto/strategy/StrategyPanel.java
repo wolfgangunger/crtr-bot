@@ -86,7 +86,8 @@ public class StrategyPanel extends AbstractPanel {
     private MovingMomentumStrategyUnw mmUnger = new MovingMomentumStrategyUnw();
     private CCICorrectionStrategy cciCorrectionStrategy = new CCICorrectionStrategy();
     private GlobalExtremaStrategy globalExtremaStrategy = new GlobalExtremaStrategy();
-    private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
+    private FinalTradingStrategy finalTradingStrategyLongV1 = new FinalTradingStrategy();
+    private FinalTradingStrategyV2 finalTradingStrategyLongV2 = new FinalTradingStrategyV2();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private IFinalTradingStrategy finalTradingStrategy;
     private TestStrategy testStrategy = new TestStrategy();
@@ -356,16 +357,28 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttTestStrategy);
 
         JButton bttFinalStrategy = new JButton();
-        bttFinalStrategy.setText("Final Strategy");
+        bttFinalStrategy.setText("Final Strategy V1");
         bttFinalStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                currentStrategy = finalTradingStrategyLong;
-                finalTradingStrategy = finalTradingStrategyLong;
+                currentStrategy = finalTradingStrategyLongV1;
+                finalTradingStrategy = finalTradingStrategyLongV1;
                 executeTest();
             }
         });
         toolbarTop.add(bttFinalStrategy);
+
+        JButton bttFinalStrategyV2 = new JButton();
+        bttFinalStrategyV2.setText("Final Strategy V2");
+        bttFinalStrategyV2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = finalTradingStrategyLongV2;
+                finalTradingStrategy = finalTradingStrategyLongV2;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttFinalStrategyV2);
 
         JButton bttFinalStrategyShort = new JButton();
         bttFinalStrategyShort.setText("Final Strategy Short");
@@ -454,7 +467,7 @@ public class StrategyPanel extends AbstractPanel {
             if (time == prevTime) {
                 // we execute the strategy only once in a minute, if there are more ticks, we do nothing
             } else {
-     
+
                 // execute the strategy at least every minute
                 if (currentStrategy instanceof IFinalTradingStrategy) {
                     tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
@@ -861,7 +874,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblBelow8MA = new JLabel("5 Below 8MA");
         entryRules.add(lblBelow8MA);
         chkBelow8MA = new JCheckBox();
-        chkBelow8MA.setSelected(true);
+        chkBelow8MA.setSelected(false);
         entryRules.add(chkBelow8MA);
 
         JLabel lblMAsUp = new JLabel("7 EMA-Bands ups");

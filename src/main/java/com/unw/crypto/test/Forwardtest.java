@@ -25,6 +25,7 @@ import com.unw.crypto.model.Tick;
 import com.unw.crypto.service.MarketAnalyzer;
 import com.unw.crypto.strategy.FinalTradingStrategy;
 import com.unw.crypto.strategy.FinalTradingStrategyShort;
+import com.unw.crypto.strategy.FinalTradingStrategyV2;
 import com.unw.crypto.strategy.IFinalTradingStrategy;
 import com.unw.crypto.strategy.LogUtil;
 import com.unw.crypto.strategy.StrategyUtil;
@@ -60,7 +61,7 @@ public class Forwardtest {
 
     private List<Tick> ticks;
 
-    private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
+    private FinalTradingStrategyV2 finalTradingStrategyLong = new FinalTradingStrategyV2();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private IFinalTradingStrategy finalTradingStrategy;
     //private AbstractStrategy currentStrategy;
@@ -80,7 +81,7 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 12;
+        int testRun = 16;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
