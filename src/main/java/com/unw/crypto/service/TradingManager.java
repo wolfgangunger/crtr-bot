@@ -10,6 +10,7 @@ import com.unw.crypto.loader.TimeSeriesDBLoader;
 import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.ta4j.core.Bar;
 import org.ta4j.core.BaseTimeSeries;
 import org.ta4j.core.Order;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.num.Num;
 
 /**
  * main service class coordinating the trades
@@ -110,7 +112,11 @@ public class TradingManager implements TradeListener {
         double cp = analyzer.determineClosedPriceStrength(rollingSeries, 2);
         //System.out.println("ClosedPirce : " + cp);
         // test for rsi
-
+        int index = rollingSeries.getEndIndex();
+        Num closePrice = rollingSeries.getLastBar().getClosePrice();
+        ZonedDateTime date = rollingSeries.getLastBar().getEndTime();
+        System.out.println("Date " + date +  " Price " + closePrice);
+        
         boolean bull = analyzer.isBullish(rollingSeries);
         System.out.println("bullish " + bull);
         boolean bear = analyzer.isBearish(rollingSeries);
