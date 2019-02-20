@@ -297,6 +297,25 @@ public class MarketAnalyzer {
         return result.doubleValue();
     }
 
+    public boolean isBullish(TimeSeries s) {
+        return determineMarket(s, true);
+    }
+
+    public boolean isBearish(TimeSeries s) {
+        return determineMarket(s, false);
+    }
+
+    private boolean determineMarket(TimeSeries s, boolean bullish) {
+        int ma = 14;
+        double strenght = 0.5d;
+        double strMA = determineSMAStrength(s, ma, ma/2);
+        if (bullish) {
+            return strMA >= strenght;
+        } else {
+            return strMA <= -strenght;
+        }
+    }
+
     /**
      * create TO AddOrderInfo with current buy/sell params
      *

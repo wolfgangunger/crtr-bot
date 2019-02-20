@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -49,12 +48,9 @@ import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Order;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
-import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
-import org.ta4j.core.num.Num;
 
 /**
  *
@@ -89,6 +85,7 @@ public class StrategyPanel extends AbstractPanel {
     private FinalTradingStrategy finalTradingStrategyLongV1 = new FinalTradingStrategy();
     private FinalTradingStrategyV2 finalTradingStrategyLongV2 = new FinalTradingStrategyV2();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
+    private FinalTradingStrategyShortV2 finalTradingStrategyShortV2 = new FinalTradingStrategyShortV2();
     private IFinalTradingStrategy finalTradingStrategy;
     private TestStrategy testStrategy = new TestStrategy();
     private AbstractStrategy currentStrategy;
@@ -391,7 +388,19 @@ public class StrategyPanel extends AbstractPanel {
             }
         });
         toolbarTop.add(bttFinalStrategyShort);
-
+        
+             JButton bttFinalStrategyShortV2 = new JButton();
+        bttFinalStrategyShortV2.setText("Final Strategy Short V2");
+        bttFinalStrategyShortV2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = finalTradingStrategyShortV2;
+                finalTradingStrategy = finalTradingStrategyShortV2;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttFinalStrategyShortV2);
+        
         JLabel lblForwardTesting = new JLabel("Forward Testing");
         toolbarTop.add(lblForwardTesting);
         // false by default, takes long time you have a long period

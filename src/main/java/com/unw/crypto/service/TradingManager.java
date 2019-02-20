@@ -111,6 +111,21 @@ public class TradingManager implements TradeListener {
         //System.out.println("ClosedPirce : " + cp);
         // test for rsi
 
+        boolean bull = analyzer.isBullish(rollingSeries);
+        System.out.println("bullish " + bull);
+        boolean bear = analyzer.isBearish(rollingSeries);
+        System.out.println("bearish " + bear);
+
+        double maS7 = analyzer.determineSMAStrength(rollingSeries, 14, 7);
+        System.out.println("strength MA 14 - 7 :  " + maS7);
+        double maS28 = analyzer.determineSMAStrength(rollingSeries, 28, 14);
+        System.out.println("strength MA 18 - 14 :  " + maS28);
+
+        counter++;
+        if (true) {
+            return;
+        }
+
         if (analyzer.rsiRisingUp(rollingSeries, 2, 30)) {
             System.out.println("rsi:buy 1 " + counter);
         }
@@ -124,17 +139,13 @@ public class TradingManager implements TradeListener {
             System.out.println("sto:sell 1 " + counter);
         }
 
-        if (analyzer.rsiRisingUp(rollingSeries, 2, 30)&&analyzer.stoRisingUp(rollingSeries, 4, 0.35d)) {
+        if (analyzer.rsiRisingUp(rollingSeries, 2, 30) && analyzer.stoRisingUp(rollingSeries, 4, 0.35d)) {
             System.out.println("#####rsi+sto:buy 1 " + counter);
         }
-        if (analyzer.rsiPointingDown(rollingSeries, 2, 70)&&analyzer.stoPointingDown(rollingSeries, 4, 0.65d)) {
+        if (analyzer.rsiPointingDown(rollingSeries, 2, 70) && analyzer.stoPointingDown(rollingSeries, 4, 0.65d)) {
             System.out.println("#####rsi+sto:sell 1 " + counter);
         }
-        
-        counter++;
-        if (true) {
-            return;
-        }
+
         // sma 3
         analyzer.isSmaRising(rollingSeries, 3, 2, 0.1d);
         double sma3 = analyzer.determineSMAStrength(rollingSeries, 3, 2);
