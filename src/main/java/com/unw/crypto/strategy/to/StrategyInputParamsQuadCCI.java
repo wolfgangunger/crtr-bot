@@ -26,4 +26,10 @@ public class StrategyInputParamsQuadCCI extends AbstractStrategyInputParams {
     private int cci100Threshold;
     private int cci200Threshold;
 
+    private double stopLoss;
+    private double trStopLoss;
+
+    private boolean stopLossActive;
+    private boolean trStopLossActive;
+
 }

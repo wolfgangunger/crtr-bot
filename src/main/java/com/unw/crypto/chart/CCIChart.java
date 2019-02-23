@@ -31,10 +31,14 @@ public class CCIChart extends AbstractChartPanel {
 
     private JFreeChart chart2;
     private ChartPanel chartPanel2;
-    private int timeFrameRSI;
-    private int timeFrameSTO;
-    private NumericTextField inputTimeframeRSI;
-    private NumericTextField inputTimeframeSTO;
+    private int timeFrameCCI14;
+    private int timeFrameCCI50;
+    private int timeFrameCCI100;
+    private int timeFrameCCI200;
+    private NumericTextField inputTimeframeCCI14;
+    private NumericTextField inputTimeframeCCI50;
+    private NumericTextField inputTimeframeCCI100;
+    private NumericTextField inputTimeframeCCI200;
 
     public CCIChart(TimeSeries series, TabPane parent) {
         super(series, parent);
@@ -49,8 +53,10 @@ public class CCIChart extends AbstractChartPanel {
 
     @Override
     public void refresh() {
-        timeFrameRSI = Integer.valueOf(inputTimeframeRSI.getText());
-        timeFrameSTO = Integer.valueOf(inputTimeframeSTO.getText());
+        timeFrameCCI14 = Integer.valueOf(inputTimeframeCCI14.getText());
+        timeFrameCCI50 = Integer.valueOf(inputTimeframeCCI50.getText());
+        timeFrameCCI100 = Integer.valueOf(inputTimeframeCCI100.getText());
+        timeFrameCCI200 = Integer.valueOf(inputTimeframeCCI200.getText());
         super.refresh();
     }
 
@@ -64,22 +70,35 @@ public class CCIChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrameRSI = 2;
-        timeFrameSTO = 4;
+        timeFrameCCI14 = 14;
+        timeFrameCCI50 = 50;
+        timeFrameCCI100 = 100;
+        timeFrameCCI200 = 200;
 
     }
 
     @Override
     protected void initToolbar() {
         super.initToolbar();
-        inputTimeframeRSI = new NumericTextField();
-        inputTimeframeRSI.setText(String.valueOf(timeFrameRSI));
-        inputTimeframeRSI.setColumns(10);
-        inputTimeframeSTO = new NumericTextField();
-        inputTimeframeSTO.setText(String.valueOf(timeFrameSTO));
-        inputTimeframeSTO.setColumns(10);
-        toolbar.add(inputTimeframeRSI);
-        toolbar.add(inputTimeframeSTO);
+        inputTimeframeCCI14 = new NumericTextField();
+        inputTimeframeCCI14.setText(String.valueOf(timeFrameCCI14));
+        inputTimeframeCCI14.setColumns(5);
+        inputTimeframeCCI50 = new NumericTextField();
+        inputTimeframeCCI50.setText(String.valueOf(timeFrameCCI50));
+        inputTimeframeCCI50.setColumns(5);
+
+        inputTimeframeCCI100 = new NumericTextField();
+        inputTimeframeCCI100.setText(String.valueOf(timeFrameCCI100));
+        inputTimeframeCCI100.setColumns(5);
+
+        inputTimeframeCCI200 = new NumericTextField();
+        inputTimeframeCCI200.setText(String.valueOf(timeFrameCCI200));
+        inputTimeframeCCI200.setColumns(5);
+
+        toolbar.add(inputTimeframeCCI14);
+        toolbar.add(inputTimeframeCCI50);
+        toolbar.add(inputTimeframeCCI100);
+        toolbar.add(inputTimeframeCCI200);
     }
 
     @Override
@@ -99,10 +118,10 @@ public class CCIChart extends AbstractChartPanel {
 
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
 
-        CCIIndicator cci1 = new CCIIndicator(series, 14);
-        CCIIndicator cci2 = new CCIIndicator(series, 50);
-        CCIIndicator cci3 = new CCIIndicator(series, 100);
-        CCIIndicator cci4 = new CCIIndicator(series, 200);
+        CCIIndicator cci1 = new CCIIndicator(series, timeFrameCCI14);
+        CCIIndicator cci2 = new CCIIndicator(series, timeFrameCCI50);
+        CCIIndicator cci3 = new CCIIndicator(series, timeFrameCCI100);
+        CCIIndicator cci4 = new CCIIndicator(series, timeFrameCCI200);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
         TimeSeriesCollection dataset2 = new TimeSeriesCollection();

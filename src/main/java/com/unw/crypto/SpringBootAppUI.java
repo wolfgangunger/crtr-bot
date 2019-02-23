@@ -176,14 +176,13 @@ public class SpringBootAppUI extends Application {
         cmbCurrency.setValue(Currency.BTC);
         cmbExchange = new ComboBox();
         cmbExchange.getItems().setAll(Exchange.values());
-        cmbExchange.setValue(Exchange.COINBASE);
+        cmbExchange.setValue(Exchange.BITSTAMP);
 
         from = new DatePicker();
-        //from.setValue(LocalDate.now().minusMonths(3));
-        from.setValue(LocalDate.now().minusMonths(8));
+        from.setValue(LocalDate.now().minusMonths(16));
         until = new DatePicker();
         //until.setValue(LocalDate.now());
-        until.setValue(LocalDate.now().minusMonths(7));
+        until.setValue(LocalDate.now().minusMonths(15));
 
         barDuration = new ComboBox<>();
         barDuration.getItems().setAll(BarDuration.values());
@@ -248,7 +247,7 @@ public class SpringBootAppUI extends Application {
         bollingerChart = new BollingerBandsChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
         cciChart = new CCIChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
-        tabPane.getTabs().add(TabUtil.createChartTab(cciChart, "CCIr"));        
+        tabPane.getTabs().add(TabUtil.createChartTab(cciChart, "CCI"));        
         fibonacciChart = new FibonacciChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(fibonacciChart, "Fibonacci"));
         fibonacciResistenceChart = new FibonacciResistenceChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());

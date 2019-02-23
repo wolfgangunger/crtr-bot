@@ -1,8 +1,9 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.model.rules.StopLossRuleUnger;
+import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
 import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
-import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsQuadCCI;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,6 @@ import org.ta4j.core.num.Num;
 import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
-import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
 /**
@@ -24,6 +24,9 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  */
 @Component
 public class QuadCCIStrategy extends AbstractStrategy implements IFinalTradingStrategy {
+
+    private Rule exitRuleStopLoss = new StopLossRuleUnger(null, DoubleNum.valueOf("2"));
+    private Rule exitRuleTrStopLoss = new TrailingStopLossRuleUnger(null, DoubleNum.valueOf("5"));
 
     /**
      * @param series a time series
@@ -65,14 +68,26 @@ public class QuadCCIStrategy extends AbstractStrategy implements IFinalTradingSt
         Rule exitRule1 = new OverIndicatorRule(cci14, plus100); // Signal
         Rule exitRule1b = new IsFallingRule(cci14, 1);
         // stop loss
-        Rule exitRule10 = new StopLossRule(closePrice, DoubleNum.valueOf(5d));
+        ((StopLossRuleUnger) exitRuleStopLoss).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
+        ((TrailingStopLossRuleUnger) exitRuleTrStopLoss).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrStopLoss()));
 
-        Rule exitRule = exitRule1.and(exitRule1b).and(exitRule10);
-
+        Rule exitRule = exitRule1.and(exitRule1b);
+        exitRule = buildCompleteExitRule(exitRule, params.isStopLossActive(), params.isTrStopLossActive(), exitRuleStopLoss, exitRuleTrStopLoss);
+        
         Strategy strategy = new BaseStrategy(entryRule, exitRule);
         strategy.setUnstablePeriod(5);
         return strategy;
 
+    }
+
+    private Rule buildCompleteExitRule(Rule result, boolean stopLoss, boolean trStopLoss, Rule sl, Rule trsl) {
+        if (stopLoss) {
+            result = result.or(sl);
+        }
+        if (trStopLoss) {
+            result = result.or(trsl);
+        }
+        return result;
     }
 
     public TradingRecord execute(TimeSeries series, BarDuration barDuration) {

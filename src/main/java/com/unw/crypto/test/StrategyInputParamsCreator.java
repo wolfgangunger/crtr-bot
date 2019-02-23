@@ -2651,37 +2651,37 @@ public final class StrategyInputParamsCreator {
     //// quad cci
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
-                .cci200Threshold(100).cci100Threshold(100).cci50Threshold(0).cci14Threshold(-100).build();
+                .cci200Threshold(100).cci100Threshold(100).cci50Threshold(0).cci14Threshold(-100).stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true). build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt1(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
-                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-100).build();
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-100).stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true). build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt2(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
-                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-150).build();
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-150).stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true). build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt3(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(28).cci50(100).cci100(200).cci200(400)
-                .cci200Threshold(100).cci100Threshold(100).cci50Threshold(0).cci14Threshold(-100).build();
+                .cci200Threshold(100).cci100Threshold(100).cci50Threshold(0).cci14Threshold(-100).stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true). build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt4(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(28).cci50(100).cci100(200).cci200(400)
-                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-100).build();
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-100).stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true). build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt5(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(28).cci50(100).cci100(200).cci200(400)
-                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-150).build();
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-150).stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true). build();
         return result;
     }
 

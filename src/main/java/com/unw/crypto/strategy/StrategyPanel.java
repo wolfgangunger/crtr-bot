@@ -151,6 +151,11 @@ public class StrategyPanel extends AbstractPanel {
     private JTextField cci50Threshold;
     private JTextField cci100Threshold;
     private JTextField cci200Threshold;
+    private JTextField cciStopLoss;
+    private JTextField cciTrStopLoss;
+    private JCheckBox cciStopLossActive;
+    private JCheckBox cciTrStopLossActive;
+
     //entry rules
     private JCheckBox chkRsiLow;
     private JCheckBox chkStoLow;
@@ -252,7 +257,7 @@ public class StrategyPanel extends AbstractPanel {
             ChartUtil.addBuySellSignals(forwardTestOrders, plot);
         } else { // backward
             if (currentStrategy instanceof IFinalTradingStrategy) {
-                    tradingStrategy = ((IFinalTradingStrategy) currentStrategy).buildStrategyWithParams(series, params);
+                tradingStrategy = ((IFinalTradingStrategy) currentStrategy).buildStrategyWithParams(series, params);
             } else {
                 tradingStrategy = currentStrategy.buildStrategy(series, barDuration);
             }
@@ -524,7 +529,7 @@ public class StrategyPanel extends AbstractPanel {
                 // execute the strategy at least every minute
                 if (currentStrategy instanceof IFinalTradingStrategy) {
                     if (currentStrategy instanceof QuadCCIStrategy) {
-                        tradingStrategy = quadCCIStrategy.buildStrategyWithParams(series, params);
+                        tradingStrategy = quadCCIStrategy.buildStrategyWithParams(completeSeries, params);
                     } else {
                         tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
                     }
@@ -632,8 +637,11 @@ public class StrategyPanel extends AbstractPanel {
         int icci100T = Integer.valueOf(this.cci100Threshold.getText());
         int icci200 = Integer.valueOf(this.cci200.getText());
         int icci200T = Integer.valueOf(this.cci200Threshold.getText());
+        int iccStopLoss = Integer.valueOf(this.cciStopLoss.getText());
+        int iccTrStopLoss = Integer.valueOf(this.cciTrStopLoss.getText());
         return StrategyInputParamsQuadCCI.builder().cci14(icci14).cci14Threshold(icci14T).cci50(icci50).cci50Threshold(icci50T).cci100(icci100).cci100Threshold(icci100T)
-                .cci200(icci200).cci200Threshold(icci200T).build();
+                .cci200(icci200).cci200Threshold(icci200T).stopLoss(iccStopLoss).trStopLoss(iccTrStopLoss).stopLossActive(cciStopLossActive.isSelected())
+                .trStopLossActive(cciTrStopLossActive.isSelected()).build();
     }
 
     /**
@@ -1095,6 +1103,32 @@ public class StrategyPanel extends AbstractPanel {
         cci200Threshold.setText(String.valueOf(0));
         cci200Threshold.setColumns(4);
         quadCCI.add(cci200Threshold);
+
+        JLabel lblCCIStopLoss = new JLabel("Stop Loss");
+        quadCCI.add(lblCCIStopLoss);
+        cciStopLoss = new JTextField();
+        cciStopLoss.setText(String.valueOf(5));
+        cciStopLoss.setColumns(4);
+        quadCCI.add(cciStopLoss);
+
+        JLabel lblCCITrStopLoss = new JLabel("tr Stop Loss");
+        quadCCI.add(lblCCITrStopLoss);
+        cciTrStopLoss = new JTextField();
+        cciTrStopLoss.setText(String.valueOf(5));
+        cciTrStopLoss.setColumns(4);
+        quadCCI.add(cciTrStopLoss);
+
+        JLabel lblCCIStopLossActive = new JLabel("Stop Loss");
+        quadCCI.add(lblCCIStopLossActive);
+        cciStopLossActive = new JCheckBox();
+        cciStopLossActive.setSelected(false);
+        quadCCI.add(cciStopLossActive);
+
+        JLabel lblCCITrStopLossActive = new JLabel("Tr Stop Loss");
+        quadCCI.add(lblCCITrStopLossActive);
+        cciTrStopLossActive = new JCheckBox();
+        cciTrStopLossActive.setSelected(false);
+        quadCCI.add(cciTrStopLossActive);
 
         result.add(quadCCI);
 
