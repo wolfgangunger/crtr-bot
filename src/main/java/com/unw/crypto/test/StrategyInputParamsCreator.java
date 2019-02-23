@@ -6,10 +6,12 @@
 package com.unw.crypto.test;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
+import com.unw.crypto.strategy.to.StrategyInputParamsQuadCCI;
 
 /**
  *
@@ -20,29 +22,35 @@ public final class StrategyInputParamsCreator {
     private StrategyInputParamsCreator() {
     }
 
-    public static StrategyInputParams createStrategyInputParams(int variant, BarDuration barDuration) {
+    public static AbstractStrategyInputParams createStrategyInputParams(int variant, BarDuration barDuration) {
         switch (variant) {
             case 1:
                 //return createStrategyInputParams1(barDuration);
-                return createStrategyInputParams9(barDuration);
+                //return createStrategyInputParams9(barDuration);
+                return createStrategyInputParamsQuadCCI1(barDuration);
             case 2:
                 //return createStrategyInputParams2(barDuration);
 //                return createStrategyInputParams1Alt5(barDuration);
-                return createStrategyInputParams9Alt1(barDuration);
+                //return createStrategyInputParams9Alt1(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt1(barDuration);
             case 3:
                 //return createStrategyInputParams3(barDuration);
 //                return createStrategyInputParams1Alt6(barDuration);
-                return createStrategyInputParams9Alt2(barDuration);
+                // return createStrategyInputParams9Alt2(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt2(barDuration);
             case 4:
                 //return createStrategyInputParams4(barDuration);
 //                return createStrategyInputParams5Alt1(barDuration);
-                return createStrategyInputParams9Alt3(barDuration);
+                // return createStrategyInputParams9Alt3(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt3(barDuration);
             case 5:
 //                return createStrategyInputParams5Alt2(barDuration);
-                return createStrategyInputParams9Alt4(barDuration);
+                // return createStrategyInputParams9Alt4(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt4(barDuration);
             case 6:
 //                return createStrategyInputParams5Alt3(barDuration);
-                return createStrategyInputParams9Alt5(barDuration);
+                //return createStrategyInputParams9Alt5(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt5(barDuration);
             // short
             case -1:
                 return createStrategyInputParams1Short(barDuration);
@@ -1747,10 +1755,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-    
-    
-    
-        /**
+
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -1838,8 +1844,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-    
-        /**
+
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -1926,9 +1932,9 @@ public final class StrategyInputParamsCreator {
                 priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
-    }        
+    }
 
-        /**
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -2015,10 +2021,9 @@ public final class StrategyInputParamsCreator {
                 priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
-    }        
-    
-    
-            /**
+    }
+
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -2107,7 +2112,7 @@ public final class StrategyInputParamsCreator {
         return result;
     }
 
-            /**
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -2194,9 +2199,9 @@ public final class StrategyInputParamsCreator {
                 priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
-    }    
-    
-                /**
+    }
+
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -2284,7 +2289,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-                /**
+
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -2373,7 +2379,7 @@ public final class StrategyInputParamsCreator {
         return result;
     }
 
-                /**
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -2461,7 +2467,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-                    /**
+
+    /**
      * configuration 8
      *
      * @param barDuration
@@ -2549,6 +2556,7 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
+
     ////////////////// short strategies
     /**
      * configuration 1
@@ -2637,6 +2645,43 @@ public final class StrategyInputParamsCreator {
                 rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
                 priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    //// quad cci
+    private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1(BarDuration barDuration) {
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+                .cci200Threshold(100).cci100Threshold(100).cci50Threshold(0).cci14Threshold(-100).build();
+        return result;
+    }
+
+    private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt1(BarDuration barDuration) {
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-100).build();
+        return result;
+    }
+
+    private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt2(BarDuration barDuration) {
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-150).build();
+        return result;
+    }
+
+    private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt3(BarDuration barDuration) {
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(28).cci50(100).cci100(200).cci200(400)
+                .cci200Threshold(100).cci100Threshold(100).cci50Threshold(0).cci14Threshold(-100).build();
+        return result;
+    }
+
+    private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt4(BarDuration barDuration) {
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(28).cci50(100).cci100(200).cci200(400)
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-100).build();
+        return result;
+    }
+
+    private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt5(BarDuration barDuration) {
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(28).cci50(100).cci100(200).cci200(400)
+                .cci200Threshold(0).cci100Threshold(0).cci50Threshold(-100).cci14Threshold(-150).build();
         return result;
     }
 

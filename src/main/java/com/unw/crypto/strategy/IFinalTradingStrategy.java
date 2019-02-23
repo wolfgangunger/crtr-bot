@@ -5,7 +5,7 @@
  */
 package com.unw.crypto.strategy;
 
-import com.unw.crypto.strategy.to.StrategyInputParams;
+import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TradingRecord;
@@ -16,8 +16,8 @@ import org.ta4j.core.TradingRecord;
  */
 public interface IFinalTradingStrategy {
     
-         Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) ;
+         Strategy buildStrategyWithParams(TimeSeries series, AbstractStrategyInputParams params) ;
          
-         TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) ;
+         TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params, Strategy strategy) ;
     
 }

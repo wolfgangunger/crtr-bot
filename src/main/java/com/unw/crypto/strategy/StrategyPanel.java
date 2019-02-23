@@ -81,6 +81,7 @@ public class StrategyPanel extends AbstractPanel {
     private MovingMomentumStrategy mm = new MovingMomentumStrategy();
     private MovingMomentumStrategyUnw mmUnger = new MovingMomentumStrategyUnw();
     private CCICorrectionStrategy cciCorrectionStrategy = new CCICorrectionStrategy();
+    private QuadCCIStrategy quadCCIStrategy = new QuadCCIStrategy();
     private GlobalExtremaStrategy globalExtremaStrategy = new GlobalExtremaStrategy();
     private FinalTradingStrategy finalTradingStrategyLongV1 = new FinalTradingStrategy();
     private FinalTradingStrategyV2 finalTradingStrategyLongV2 = new FinalTradingStrategyV2();
@@ -272,11 +273,11 @@ public class StrategyPanel extends AbstractPanel {
         // input fields
         maShort = new NumericTextField();
         maShort.setText(String.valueOf(iMAShort));
-        maShort.setColumns(10);
+        maShort.setColumns(3);
 
         maLong = new NumericTextField();
         maLong.setText(String.valueOf(iMALong));
-        maLong.setColumns(10);
+        maLong.setColumns(3);
 
         JLabel lblShortMA = new JLabel("Short MA");
         JLabel lblLongMA = new JLabel("Long MA");
@@ -299,7 +300,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttRSI2);
 
         JButton bttMm = new JButton();
-        bttMm.setText("Moving Momentumg Strategy");
+        bttMm.setText("Mov Mom Strategy");
         bttMm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -310,7 +311,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttMm);
 
         JButton bttCCI = new JButton();
-        bttCCI.setText("CCI Strategy");
+        bttCCI.setText("CCI Strat");
         bttCCI.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -320,8 +321,19 @@ public class StrategyPanel extends AbstractPanel {
         });
         toolbarTop.add(bttCCI);
 
+        JButton bttQuadCCI = new JButton();
+        bttQuadCCI.setText("Quad CCI Strat");
+        bttQuadCCI.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = quadCCIStrategy;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttQuadCCI);
+
         JButton bttGE = new JButton();
-        bttGE.setText("Global Extrema Strategy");
+        bttGE.setText("Global Extrema Strat");
         bttGE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -332,7 +344,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttGE);
 
         JButton bttMmUnger = new JButton();
-        bttMmUnger.setText("Moving Momentumg Strategy Unger");
+        bttMmUnger.setText("Mov Mom Strat Unw");
         bttMmUnger.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -343,7 +355,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttMmUnger);
 
         JButton bttTestStrategy = new JButton();
-        bttTestStrategy.setText("Test Strategy");
+        bttTestStrategy.setText("Test Strat");
         bttTestStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -354,7 +366,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttTestStrategy);
 
         JButton bttFinalStrategy = new JButton();
-        bttFinalStrategy.setText("Final Strategy V1");
+        bttFinalStrategy.setText("Final Strat V1");
         bttFinalStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -366,7 +378,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttFinalStrategy);
 
         JButton bttFinalStrategyV2 = new JButton();
-        bttFinalStrategyV2.setText("Final Strategy V2");
+        bttFinalStrategyV2.setText("Final Strat V2");
         bttFinalStrategyV2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -378,7 +390,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttFinalStrategyV2);
 
         JButton bttFinalStrategyShort = new JButton();
-        bttFinalStrategyShort.setText("Final Strategy Short");
+        bttFinalStrategyShort.setText("Final Strat Short");
         bttFinalStrategyShort.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -388,9 +400,9 @@ public class StrategyPanel extends AbstractPanel {
             }
         });
         toolbarTop.add(bttFinalStrategyShort);
-        
-             JButton bttFinalStrategyShortV2 = new JButton();
-        bttFinalStrategyShortV2.setText("Final Strategy Short V2");
+
+        JButton bttFinalStrategyShortV2 = new JButton();
+        bttFinalStrategyShortV2.setText("Final Strat Short V2");
         bttFinalStrategyShortV2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -400,8 +412,8 @@ public class StrategyPanel extends AbstractPanel {
             }
         });
         toolbarTop.add(bttFinalStrategyShortV2);
-        
-        JLabel lblForwardTesting = new JLabel("Forward Testing");
+
+        JLabel lblForwardTesting = new JLabel("Forward Test");
         toolbarTop.add(lblForwardTesting);
         // false by default, takes long time you have a long period
         chkForwardTesting.setSelected(false);

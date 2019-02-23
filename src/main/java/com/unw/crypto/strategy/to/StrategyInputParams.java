@@ -22,18 +22,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StrategyInputParams {
+public class StrategyInputParams extends AbstractStrategyInputParams{
 
     // to be discussed: should timeframe values be set in days ( and multiplicated inside this cointainer ) or 
     // set with the timeframe value ( days * bar multiplicator) from outside 
     /// todo : timeframe values must be calculated with factor of barsize
     //  smaLong = smaLon * BarDurationUtil.getMAMultiplicator
     // bar / candle size
-    private BarDuration barDuration;
-
-    private boolean barMultiplikator;
-    private boolean extraMultiplikator;
-    private float extraMultiplikatorValue;
+//    private BarDuration barDuration;
+//
+//    private boolean barMultiplikator;
+//    private boolean extraMultiplikator;
+//    private float extraMultiplikatorValue;
 
     //entry and exitRuleChain
     private EntryRuleChain entryRuleChain;

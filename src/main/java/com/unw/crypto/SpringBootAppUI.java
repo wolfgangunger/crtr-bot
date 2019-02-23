@@ -2,6 +2,7 @@ package com.unw.crypto;
 
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.chart.BollingerBandsChart;
+import com.unw.crypto.chart.CCIChart;
 import com.unw.crypto.chart.CandleChart;
 import com.unw.crypto.chart.EMARsiChart;
 import com.unw.crypto.chart.EMARsiStoChart;
@@ -65,6 +66,7 @@ public class SpringBootAppUI extends Application {
     private EMARsiChart emaRsiChart;
     private EMAStoChart emaStoChart;
     private EMARsiStoChart emaRsiStoChart;
+    private CCIChart cciChart;
     private FibonacciChart fibonacciChart;
     private FibonacciResistenceChart fibonacciResistenceChart;
     private FibonacciSupportChart fibonacciSupportChart;
@@ -245,6 +247,8 @@ public class SpringBootAppUI extends Application {
         tabPane.getTabs().add(TabUtil.createChartTab(emaRsiStoChart, "EMA RSI/STO"));
         bollingerChart = new BollingerBandsChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
+        cciChart = new CCIChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        tabPane.getTabs().add(TabUtil.createChartTab(cciChart, "CCIr"));        
         fibonacciChart = new FibonacciChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(fibonacciChart, "Fibonacci"));
         fibonacciResistenceChart = new FibonacciResistenceChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
@@ -324,6 +328,9 @@ public class SpringBootAppUI extends Application {
 
         bollingerChart.setSeries(series);
         bollingerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        
+        cciChart.setSeries(series);
+        cciChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
         fibonacciChart.setSeries(series);
         fibonacciChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());

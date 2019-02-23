@@ -6,6 +6,7 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
@@ -52,8 +53,8 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
      * @param params
      * @return
      */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params) {
-        Strategy strategy = buildStrategyWithParams(series, params);
+    public TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params) {
+        Strategy strategy = buildStrategyWithParams(series, (StrategyInputParams) params);
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         TradingRecord tradingRecord = seriesManager.run(strategy);
@@ -71,7 +72,7 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
      * @param strategy
      * @return
      */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) {
+    public TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params, Strategy strategy) {
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         TradingRecord tradingRecord = seriesManager.run(strategy);
@@ -133,9 +134,9 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
                 rule4_ma8PointingUp(true).rule5_priceBelow8MA(true).rule7_emaBandsPointingUp(true).build();
         ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(true).rule2_stoHigh(true)
                 .rule3_8maDown(true).rule11_rsiPointingDown(false).rule12_StoPointingDown(false).build();
-        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, 
-                extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframeBuy,rsiTimeframeSell,
-                stoRsiTimeframeBuy,stoRsiTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframeBuy,
+        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator,
+                extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframeBuy, rsiTimeframeSell,
+                stoRsiTimeframeBuy, stoRsiTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframeBuy,
                 priceTimeframeSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
 
@@ -151,8 +152,8 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements IFina
      * params for indicators and strategies )
      * @return Strategy (BaseStrategy)
      */
-    public Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) {
-
+    public Strategy buildStrategyWithParams(TimeSeries series, AbstractStrategyInputParams p) {
+        StrategyInputParams params = (StrategyInputParams) p;
         // these rules are designed for hour candles - in case of shorter candles and bars the timeframe params (MA ...) must be adapted
 //1- RSI is low and pointing up (v) only crossed down implemented, see rule 11 for pointing up
 //2- Stochastic is low and pointing up (v) only crossed down implemented, see rule 12 for pointing up

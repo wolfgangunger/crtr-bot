@@ -6,6 +6,8 @@
 package com.unw.crypto.service;
 
 import com.unw.crypto.model.AddOrderInfo;
+import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
+import com.unw.crypto.strategy.to.StrategyInputParams;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.Rule;
@@ -316,6 +318,17 @@ public class MarketAnalyzer {
         }
     }
 
+       public AddOrderInfo analyzeOrderParams(TimeSeries s, AbstractStrategyInputParams p) {
+           if (p instanceof StrategyInputParams ){
+                StrategyInputParams params = (StrategyInputParams)p;
+               return analyzeOrderParams(s, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
+           }else{
+               // todo 
+                 return analyzeOrderParams(s, 2, 4);
+           }
+           
+       }
+    
     /**
      * create TO AddOrderInfo with current buy/sell params
      *

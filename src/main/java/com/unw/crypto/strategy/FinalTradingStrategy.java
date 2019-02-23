@@ -8,6 +8,7 @@ package com.unw.crypto.strategy;
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.model.rules.StopLossRuleUnger;
 import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
+import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
@@ -57,8 +58,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
      * @param params
      * @return
      */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params) {
-        Strategy strategy = buildStrategyWithParams(series, params);
+    public TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params) {
+        Strategy strategy = buildStrategyWithParams(series,(StrategyInputParams) params);
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         TradingRecord tradingRecord = seriesManager.run(strategy);
@@ -76,7 +77,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
      * @param strategy
      * @return
      */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) {
+    public TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params, Strategy strategy) {
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         TradingRecord tradingRecord = seriesManager.run(strategy);
@@ -157,7 +158,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements IFinalTrad
      * params for indicators and strategies )
      * @return Strategy (BaseStrategy)
      */
-    public Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) {
+    public Strategy buildStrategyWithParams(TimeSeries series, AbstractStrategyInputParams p) {
+        StrategyInputParams params = (StrategyInputParams)p;
 
         // these rules are designed for hour candles - in case of shorter candles and bars the timeframe params (MA ...) must be adapted
 //1- RSI is low and pointing up (v) only crossed down implemented, see rule 11 for pointing up

@@ -8,6 +8,7 @@ package com.unw.crypto.strategy;
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.model.rules.StopLossRuleUnger;
 import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
+import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
@@ -30,7 +31,6 @@ import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
-import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
@@ -57,8 +57,8 @@ public class FinalTradingStrategyV2 extends AbstractStrategy implements IFinalTr
      * @param params
      * @return
      */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params) {
-        Strategy strategy = buildStrategyWithParams(series, params);
+    public TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params) {
+        Strategy strategy = buildStrategyWithParams(series, (StrategyInputParams) params);
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         TradingRecord tradingRecord = seriesManager.run(strategy);
@@ -76,7 +76,7 @@ public class FinalTradingStrategyV2 extends AbstractStrategy implements IFinalTr
      * @param strategy
      * @return
      */
-    public TradingRecord executeWithParams(TimeSeries series, StrategyInputParams params, Strategy strategy) {
+    public TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params, Strategy strategy) {
         // Running the strategy
         TimeSeriesManager seriesManager = new TimeSeriesManager(series);
         TradingRecord tradingRecord = seriesManager.run(strategy);
@@ -139,9 +139,9 @@ public class FinalTradingStrategyV2 extends AbstractStrategy implements IFinalTr
                 rule4_ma8PointingUp(true).rule5_priceBelow8MA(true).rule7_emaBandsPointingUp(true).build();
         ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(true).rule2_stoHigh(true)
                 .rule3_8maDown(true).rule11_rsiPointingDown(false).rule12_StoPointingDown(false).build();
-        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, 
-                extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframeBuy,rsiTimeframeSell,
-                stoRsiTimeframeBuy,stoRsiTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframeBuy,
+        StrategyInputParams params = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator,
+                extraMultiplikatorValue, ma8, ma14, ma200, ma314, iMAShort, iMALong, iMAShort, iMALong, rsiTimeframeBuy, rsiTimeframeSell,
+                stoRsiTimeframeBuy, stoRsiTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeframeBuy,
                 priceTimeframeSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryRuleChain, exitRuleChain);
 
@@ -157,8 +157,8 @@ public class FinalTradingStrategyV2 extends AbstractStrategy implements IFinalTr
      * params for indicators and strategies )
      * @return Strategy (BaseStrategy)
      */
-    public Strategy buildStrategyWithParams(TimeSeries series, StrategyInputParams params) {
-
+    public Strategy buildStrategyWithParams(TimeSeries series, AbstractStrategyInputParams p) {
+        StrategyInputParams params = (StrategyInputParams) p;
         // these rules are designed for hour candles - in case of shorter candles and bars the timeframe params (MA ...) must be adapted
 //1- RSI is low and pointing up (v) only crossed down implemented, see rule 11 for pointing up
 //2- Stochastic is low and pointing up (v) only crossed down implemented, see rule 12 for pointing up
@@ -223,11 +223,11 @@ public class FinalTradingStrategyV2 extends AbstractStrategy implements IFinalTr
         //Rule entryRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframeBuy(), params.getRisingStrenght());
         // rising - falling timeframe always 1
         Rule entryRule11 = new IsRisingRule(rsiIndicator, 1, params.getRisingStrenght());
-        
+
         //rule 12 sto pointing up
         //Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframeBuy(), params.getRisingStrenght());
         Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, 1, params.getRisingStrenght());
-        
+
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
                 .and(new CrossedDownIndicatorRule(stochasticOscillK, DoubleNum.valueOf(params.getStoThresholdLow()))) // Signal 1
@@ -255,9 +255,9 @@ public class FinalTradingStrategyV2 extends AbstractStrategy implements IFinalTr
         //Rule exitRule11 = new IsFallingRule(rsiIndicator, params.getRsiTimeframeSell(), params.getFallingStrenght());
         // risng and falling timeframe always 1
         Rule exitRule11 = new IsFallingRule(rsiIndicator, 1, params.getFallingStrenght());
-        
+
         Rule exitRule2 = new OverIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
-       // Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframeSell(), params.getFallingStrenght());
+        // Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframeSell(), params.getFallingStrenght());
         Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, 1, params.getFallingStrenght());
         // ma 8 is falling
         Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
