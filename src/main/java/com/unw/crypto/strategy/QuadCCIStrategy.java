@@ -2,6 +2,7 @@ package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
+import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsQuadCCI;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
@@ -18,11 +19,11 @@ import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
 /**
- * 
+ *
  * @author UNGERW
  */
 @Component
-public class QuadCCIStrategy extends AbstractStrategy  implements IFinalTradingStrategy{
+public class QuadCCIStrategy extends AbstractStrategy implements IFinalTradingStrategy {
 
     /**
      * @param series a time series
@@ -90,6 +91,13 @@ public class QuadCCIStrategy extends AbstractStrategy  implements IFinalTradingS
 
     @Override
     public TradingRecord executeWithParams(TimeSeries series, AbstractStrategyInputParams params, Strategy strategy) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Strategy s = buildStrategyWithParams(series, (StrategyInputParamsQuadCCI) params);
+        // Running the strategy
+        TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+        TradingRecord tradingRecord = seriesManager.run(s);
+        System.out.println("Number of trades for the strategy: " + tradingRecord.getTradeCount());
+        // Analysis
+        System.out.println("Total profit for the strategy: " + new TotalProfitCriterion().calculate(series, tradingRecord));
+        return tradingRecord;
     }
 }

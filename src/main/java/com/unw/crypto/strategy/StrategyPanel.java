@@ -13,10 +13,12 @@ import com.unw.crypto.model.AddOrderInfo;
 import com.unw.crypto.model.ExtOrder;
 import com.unw.crypto.model.Tick;
 import com.unw.crypto.service.MarketAnalyzer;
+import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
+import com.unw.crypto.strategy.to.StrategyInputParamsQuadCCI;
 import com.unw.crypto.ui.NumericTextField;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -139,6 +141,16 @@ public class StrategyPanel extends AbstractPanel {
     private JTextField tfStopLoss;
     private JTextField tfStopGain;
     private NumericTextField tfWaitBars;
+
+    // quad cci
+    private NumericTextField cci14;
+    private NumericTextField cci50;
+    private NumericTextField cci100;
+    private NumericTextField cci200;
+    private JTextField cci14Threshold;
+    private JTextField cci50Threshold;
+    private JTextField cci100Threshold;
+    private JTextField cci200Threshold;
     //entry rules
     private JCheckBox chkRsiLow;
     private JCheckBox chkStoLow;
@@ -229,12 +241,18 @@ public class StrategyPanel extends AbstractPanel {
         plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
-        StrategyInputParams params = createStrategyInputParams();
+        AbstractStrategyInputParams params;
+        if (currentStrategy instanceof QuadCCIStrategy) {
+            params = createStrategyInputParamsQuadCCI();
+        } else {
+            params = createStrategyInputParams();
+        }
+
         if (chkForwardTesting.isSelected()) {
             ChartUtil.addBuySellSignals(forwardTestOrders, plot);
         } else { // backward
             if (currentStrategy instanceof IFinalTradingStrategy) {
-                tradingStrategy = ((IFinalTradingStrategy) currentStrategy).buildStrategyWithParams(series, params);
+                    tradingStrategy = ((IFinalTradingStrategy) currentStrategy).buildStrategyWithParams(series, params);
             } else {
                 tradingStrategy = currentStrategy.buildStrategy(series, barDuration);
             }
@@ -265,7 +283,9 @@ public class StrategyPanel extends AbstractPanel {
         JPanel toolbarComplete = new JPanel();
         JPanel toolbarTop = new JPanel();
         toolbarComplete.setLayout(new BorderLayout());
-        toolbarComplete.setPreferredSize(new Dimension(Config.WIDTH, 192));
+//        toolbarComplete.setPreferredSize(new Dimension(Config.WIDTH, 192));
+//        toolbarComplete.setMinimumSize(new Dimension(960, 160));
+        toolbarComplete.setPreferredSize(new Dimension(Config.WIDTH, 232));
         toolbarComplete.setMinimumSize(new Dimension(960, 160));
         toolbarComplete.setBorder(BorderFactory.createEtchedBorder());
         toolbarTop.setBorder(BorderFactory.createEtchedBorder());
@@ -440,10 +460,16 @@ public class StrategyPanel extends AbstractPanel {
 
     private void executeBackwardTest() {
         if (currentStrategy instanceof IFinalTradingStrategy) {
-            StrategyInputParams params = createStrategyInputParams();
-            StrategyUtil.printParams(params);
-            tradingStrategy = finalTradingStrategy.buildStrategyWithParams(series, params);
-            tradingRecord = finalTradingStrategy.executeWithParams(series, params, tradingStrategy);
+            if (currentStrategy instanceof QuadCCIStrategy) {
+                StrategyInputParamsQuadCCI params = createStrategyInputParamsQuadCCI();
+                tradingStrategy = quadCCIStrategy.buildStrategyWithParams(series, params);
+                tradingRecord = quadCCIStrategy.executeWithParams(series, params, tradingStrategy);
+            } else {
+                StrategyInputParams params = createStrategyInputParams();
+                StrategyUtil.printParams(params);
+                tradingStrategy = finalTradingStrategy.buildStrategyWithParams(series, params);
+                tradingRecord = finalTradingStrategy.executeWithParams(series, params, tradingStrategy);
+            }
         } else {
             tradingStrategy = currentStrategy.buildStrategy(series, barDuration);
             tradingRecord = currentStrategy.execute(series, getBarDuration());
@@ -453,8 +479,14 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void executeForwardTest() {
-        StrategyInputParams params = createStrategyInputParams();
-        StrategyUtil.printParams(params);
+        AbstractStrategyInputParams params;
+        if (currentStrategy instanceof QuadCCIStrategy) {
+            params = createStrategyInputParamsQuadCCI();
+        } else {
+            params = createStrategyInputParams();
+            StrategyUtil.printParams((StrategyInputParams) params);
+        }
+
         forwardTestOrders = new ArrayList<>();
         completeSeries = StrategyUtil.copySeries(preSeries);
         //completeSeries = preSeries;
@@ -491,7 +523,11 @@ public class StrategyPanel extends AbstractPanel {
 
                 // execute the strategy at least every minute
                 if (currentStrategy instanceof IFinalTradingStrategy) {
-                    tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
+                    if (currentStrategy instanceof QuadCCIStrategy) {
+                        tradingStrategy = quadCCIStrategy.buildStrategyWithParams(series, params);
+                    } else {
+                        tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
+                    }
                 } else {
                     tradingStrategy = currentStrategy.buildStrategy(completeSeries, barDuration);
                 }
@@ -501,14 +537,14 @@ public class StrategyPanel extends AbstractPanel {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
                 } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) && entered) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     tr.exit(order.getIndex());
@@ -521,7 +557,7 @@ public class StrategyPanel extends AbstractPanel {
                 System.out.println("Trade open on last tick- sell anyway");
                 ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                 order.setTradeTime(tick.getTradeTime());
-                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
+                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
                 order.setAddOrderInfo(info);
                 forwardTestOrders.add(order);
                 tr.exit(order.getIndex());
@@ -585,6 +621,19 @@ public class StrategyPanel extends AbstractPanel {
                 priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
                 stoOscKThresholdLow, stoOscKThresholdHigh, isRisingStrenght, isFallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
+    }
+
+    private StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI() {
+        int icci14 = Integer.valueOf(this.cci14.getText());
+        int icci14T = Integer.valueOf(this.cci14Threshold.getText());
+        int icci50 = Integer.valueOf(this.cci50.getText());
+        int icci50T = Integer.valueOf(this.cci50Threshold.getText());
+        int icci100 = Integer.valueOf(this.cci100.getText());
+        int icci100T = Integer.valueOf(this.cci100Threshold.getText());
+        int icci200 = Integer.valueOf(this.cci200.getText());
+        int icci200T = Integer.valueOf(this.cci200Threshold.getText());
+        return StrategyInputParamsQuadCCI.builder().cci14(icci14).cci14Threshold(icci14T).cci50(icci50).cci50Threshold(icci50T).cci100(icci100).cci100Threshold(icci100T)
+                .cci200(icci200).cci200Threshold(icci200T).build();
     }
 
     /**
@@ -984,6 +1033,70 @@ public class StrategyPanel extends AbstractPanel {
         exitRules.add(chkExitStopGain);
 
         result.add(exitRules);
+
+        /// quad cci 
+        // exit rule chain
+        JPanel quadCCI = new JPanel();
+        quadCCI.setLayout(new FlowLayout());
+        quadCCI.setBorder(BorderFactory.createEtchedBorder());
+
+        JLabel lblCCI14 = new JLabel("CCI 14");
+        quadCCI.add(lblCCI14);
+        cci14 = new NumericTextField();
+        cci14.setText(String.valueOf(14));
+        cci14.setColumns(4);
+        quadCCI.add(cci14);
+
+        JLabel lblCCI50 = new JLabel("CCI 50");
+        quadCCI.add(lblCCI50);
+        cci50 = new NumericTextField();
+        cci50.setText(String.valueOf(50));
+        cci50.setColumns(4);
+        quadCCI.add(cci50);
+
+        JLabel lblCCI100 = new JLabel("CCI 100");
+        quadCCI.add(lblCCI100);
+        cci100 = new NumericTextField();
+        cci100.setText(String.valueOf(100));
+        cci100.setColumns(4);
+        quadCCI.add(cci100);
+
+        JLabel lblCCI200 = new JLabel("CCI 200");
+        quadCCI.add(lblCCI200);
+        cci200 = new NumericTextField();
+        cci200.setText(String.valueOf(200));
+        cci200.setColumns(4);
+        quadCCI.add(cci200);
+
+        JLabel lblCCI14Thresh = new JLabel("CCI 14 Thres.");
+        quadCCI.add(lblCCI14Thresh);
+        cci14Threshold = new JTextField();
+        cci14Threshold.setText(String.valueOf(-100));
+        cci14Threshold.setColumns(4);
+        quadCCI.add(cci14Threshold);
+
+        JLabel lblCCI50Thresh = new JLabel("CCI 50 Thres.");
+        quadCCI.add(lblCCI50Thresh);
+        cci50Threshold = new JTextField();
+        cci50Threshold.setText(String.valueOf(-100));
+        cci50Threshold.setColumns(4);
+        quadCCI.add(cci50Threshold);
+
+        JLabel lblCCI100Thresh = new JLabel("CCI 100 Thres.");
+        quadCCI.add(lblCCI100Thresh);
+        cci100Threshold = new JTextField();
+        cci100Threshold.setText(String.valueOf(0));
+        cci100Threshold.setColumns(4);
+        quadCCI.add(cci100Threshold);
+
+        JLabel lblCCI200Thresh = new JLabel("CCI 200 Thres.");
+        quadCCI.add(lblCCI200Thresh);
+        cci200Threshold = new JTextField();
+        cci200Threshold.setText(String.valueOf(0));
+        cci200Threshold.setColumns(4);
+        quadCCI.add(cci200Threshold);
+
+        result.add(quadCCI);
 
         return result;
     }
