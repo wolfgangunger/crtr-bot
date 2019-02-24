@@ -5,14 +5,12 @@ import com.unw.crypto.model.rules.StopLossRuleUnger;
 import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
 import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsQuadCCI;
-import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.indicators.CCIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
@@ -37,7 +35,7 @@ public class QuadCCIStrategy extends AbstractStrategy implements IFinalTradingSt
             throw new IllegalArgumentException("Series cannot be null");
         }
         StrategyInputParamsQuadCCI params = StrategyInputParamsQuadCCI.builder().cci100(100).cci200(200).cci50(50).cci14(14)
-                .cci100Threshold(0).cci200Threshold(0).cci50(-100).cci14Threshold(-100).build();
+                .cci100ThresholdBuy(0).cci200ThresholdBuy(0).cci50ThresholdBuy(-100).cci14ThresholdBuy(-100).build();
 
         return buildStrategyWithParams(series, params);
     }
@@ -51,31 +49,35 @@ public class QuadCCIStrategy extends AbstractStrategy implements IFinalTradingSt
         CCIIndicator cci50 = new CCIIndicator(series, params.getCci50());
         CCIIndicator cci100 = new CCIIndicator(series, params.getCci100());
         CCIIndicator cci200 = new CCIIndicator(series, params.getCci200());
-        Num zero = DoubleNum.valueOf(BigDecimal.valueOf(0));
-        Num plus100 = DoubleNum.valueOf(BigDecimal.valueOf(100));
-        Num minus100 = DoubleNum.valueOf(BigDecimal.valueOf(- 100));
+//        Num zero = DoubleNum.valueOf(BigDecimal.valueOf(0));
+//        Num plus100 = DoubleNum.valueOf(BigDecimal.valueOf(100));
+//        Num minus100 = DoubleNum.valueOf(BigDecimal.valueOf(- 100));
 
-        Rule entryRule1 = new OverIndicatorRule(cci200, params.getCci200Threshold()); // Bull trend
-        Rule entryRule2 = new OverIndicatorRule(cci100, params.getCci100Threshold()); // Bull trend
-        Rule entryRule3 = new OverIndicatorRule(cci50, params.getCci50Threshold()); // Bull trend
+        //entry
+        Rule entryRule1 = new OverIndicatorRule(cci200, params.getCci200ThresholdBuy()); // Bull trend
+        Rule entryRule2 = new OverIndicatorRule(cci100, params.getCci100ThresholdBuy()); // Bull trend
+        Rule entryRule3 = new OverIndicatorRule(cci50, params.getCci50ThresholdBuy()); // Bull trend
 
-        Rule entryRule4 = new UnderIndicatorRule(cci14, params.getCci14Threshold()); // Signal
+        Rule entryRule4 = new UnderIndicatorRule(cci14, params.getCci14ThresholdBuy()); // Signal
         Rule entryRule4b = new IsRisingRule(cci14, 1); // Signal
 
         Rule entryRule = entryRule1.and(entryRule2).and(entryRule3).and(entryRule4).and(entryRule4b);
 
         /// exit
-        Rule exitRule1 = new OverIndicatorRule(cci14, plus100); // Signal
-        Rule exitRule1b = new IsFallingRule(cci14, 1);
+        Rule exitRule1 = new OverIndicatorRule(cci14, params.getCci14ThresholdSell()); // Signal
+        Rule exitRule1b = new IsFallingRule(cci14, 1, params.getFallingStrenght());
+        Rule exitRule2 = new OverIndicatorRule(cci50, params.getCci50ThresholdSell()); // confim Signal
+        Rule exitRule2b = new IsFallingRule(cci50, 1, params.getFallingStrenght());
         // stop loss
         ((StopLossRuleUnger) exitRuleStopLoss).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         ((TrailingStopLossRuleUnger) exitRuleTrStopLoss).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrStopLoss()));
 
-        Rule exitRule = exitRule1.and(exitRule1b);
+        //Rule exitRule = exitRule1.and(exitRule1b);
+        Rule exitRule = exitRule1.and(exitRule2).and(exitRule2b);
         exitRule = buildCompleteExitRule(exitRule, params.isStopLossActive(), params.isTrStopLossActive(), exitRuleStopLoss, exitRuleTrStopLoss);
         
         Strategy strategy = new BaseStrategy(entryRule, exitRule);
-        strategy.setUnstablePeriod(5);
+        //strategy.setUnstablePeriod(5);
         return strategy;
 
     }

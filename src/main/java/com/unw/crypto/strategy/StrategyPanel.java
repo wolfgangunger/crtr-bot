@@ -147,10 +147,17 @@ public class StrategyPanel extends AbstractPanel {
     private NumericTextField cci50;
     private NumericTextField cci100;
     private NumericTextField cci200;
-    private JTextField cci14Threshold;
-    private JTextField cci50Threshold;
-    private JTextField cci100Threshold;
-    private JTextField cci200Threshold;
+    private JTextField cci14ThresholdBuy;
+    private JTextField cci50ThresholdBuy;
+    private JTextField cci100ThresholdBuy;
+    private JTextField cci200ThresholdBuy;
+
+    private JTextField cci14ThresholdSell;
+    private JTextField cci50ThresholdSell;
+    
+    private JTextField cci50FallingTimeframe;
+    private JTextField cciFallingStrenght;
+
     private JTextField cciStopLoss;
     private JTextField cciTrStopLoss;
     private JCheckBox cciStopLossActive;
@@ -630,17 +637,23 @@ public class StrategyPanel extends AbstractPanel {
 
     private StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI() {
         int icci14 = Integer.valueOf(this.cci14.getText());
-        int icci14T = Integer.valueOf(this.cci14Threshold.getText());
+        int icci14TBuy = Integer.valueOf(this.cci14ThresholdBuy.getText());
+        int icci14TSell = Integer.valueOf(this.cci14ThresholdSell.getText());
         int icci50 = Integer.valueOf(this.cci50.getText());
-        int icci50T = Integer.valueOf(this.cci50Threshold.getText());
+        int icci50TBuy = Integer.valueOf(this.cci50ThresholdBuy.getText());
+        int icci50TSell = Integer.valueOf(this.cci50ThresholdSell.getText());
         int icci100 = Integer.valueOf(this.cci100.getText());
-        int icci100T = Integer.valueOf(this.cci100Threshold.getText());
+        int icci100T = Integer.valueOf(this.cci100ThresholdBuy.getText());
         int icci200 = Integer.valueOf(this.cci200.getText());
-        int icci200T = Integer.valueOf(this.cci200Threshold.getText());
+        int icci200T = Integer.valueOf(this.cci200ThresholdBuy.getText());
+        double fallingStrenght = Double.valueOf(this.cciFallingStrenght.getText());
+        int cci50FallingTimeframe = Integer.valueOf(this.cci50FallingTimeframe.getText());
         int iccStopLoss = Integer.valueOf(this.cciStopLoss.getText());
         int iccTrStopLoss = Integer.valueOf(this.cciTrStopLoss.getText());
-        return StrategyInputParamsQuadCCI.builder().cci14(icci14).cci14Threshold(icci14T).cci50(icci50).cci50Threshold(icci50T).cci100(icci100).cci100Threshold(icci100T)
-                .cci200(icci200).cci200Threshold(icci200T).stopLoss(iccStopLoss).trStopLoss(iccTrStopLoss).stopLossActive(cciStopLossActive.isSelected())
+        
+        return StrategyInputParamsQuadCCI.builder().cci14(icci14).cci14ThresholdBuy(icci14TBuy).cci50(icci50).cci50ThresholdBuy(icci50TBuy).cci100(icci100).cci100ThresholdBuy(icci100T)
+                .cci200(icci200).cci200ThresholdBuy(icci200T).cci14ThresholdSell(icci14TSell).cci50ThresholdSell(icci50TSell)
+                .cci50FallingTimeframe(cci50FallingTimeframe).fallingStrenght(fallingStrenght).stopLoss(iccStopLoss).trStopLoss(iccTrStopLoss).stopLossActive(cciStopLossActive.isSelected())
                 .trStopLossActive(cciTrStopLossActive.isSelected()).build();
     }
 
@@ -676,7 +689,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfExtraMultiplikator = new JTextField();
         tfExtraMultiplikator.setText(String.valueOf(1.0f));
-        tfExtraMultiplikator.setColumns(4);
+        tfExtraMultiplikator.setColumns(2);
         timeframes.add(tfExtraMultiplikator);
 
         result.add(timeframes);
@@ -687,7 +700,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfMA8 = new NumericTextField();
         tfMA8.setText(String.valueOf(8));
-        tfMA8.setColumns(4);
+        tfMA8.setColumns(2);
         //result.add(tfMA8);
 
         JLabel lblMA14 = new JLabel("MA14");
@@ -695,7 +708,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfMA14 = new NumericTextField();
         tfMA14.setText(String.valueOf(14));
-        tfMA14.setColumns(4);
+        tfMA14.setColumns(3);
         //result.add(tfMA14);
 
         JLabel lblMA200 = new JLabel("MA200");
@@ -719,7 +732,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfShortSMA = new NumericTextField();
         tfShortSMA.setText(String.valueOf(3));
-        tfShortSMA.setColumns(4);
+        tfShortSMA.setColumns(2);
         result.add(tfShortSMA);
 
         JLabel lblLongSMA = new JLabel("Long SMA");
@@ -727,7 +740,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfLongSMA = new NumericTextField();
         tfLongSMA.setText(String.valueOf(10));
-        tfLongSMA.setColumns(4);
+        tfLongSMA.setColumns(3);
         result.add(tfLongSMA);
 
         JLabel lblShortEMA = new JLabel("Short EMA");
@@ -735,7 +748,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfShortEMA = new NumericTextField();
         tfShortEMA.setText(String.valueOf(5));
-        tfShortEMA.setColumns(4);
+        tfShortEMA.setColumns(2);
         result.add(tfShortEMA);
 
         JLabel lblLongEMA = new JLabel("Long EMA");
@@ -743,7 +756,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfLongEMA = new NumericTextField();
         tfLongEMA.setText(String.valueOf(12));
-        tfLongEMA.setColumns(4);
+        tfLongEMA.setColumns(3);
         result.add(tfLongEMA);
 
         // RSI 
@@ -751,28 +764,28 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblRsiTimeFrameBuy);
         tfRsiTimeframeBuy = new NumericTextField();
         tfRsiTimeframeBuy.setText(String.valueOf(2));
-        tfRsiTimeframeBuy.setColumns(4);
+        tfRsiTimeframeBuy.setColumns(2);
         result.add(tfRsiTimeframeBuy);
 
         JLabel lblRsiTimeFrameSell = new JLabel("RSI Timeframe Sell");
         result.add(lblRsiTimeFrameSell);
         tfRsiTimeframeSell = new NumericTextField();
         tfRsiTimeframeSell.setText(String.valueOf(2));
-        tfRsiTimeframeSell.setColumns(4);
+        tfRsiTimeframeSell.setColumns(2);
         result.add(tfRsiTimeframeSell);
 
         JLabel lblStoRsiTimeframeBuy = new JLabel("RSI-STO Timeframe Buy");
         result.add(lblStoRsiTimeframeBuy);
         tfRsiStoTimeframeBuy = new NumericTextField();
         tfRsiStoTimeframeBuy.setText(String.valueOf(4));
-        tfRsiStoTimeframeBuy.setColumns(4);
+        tfRsiStoTimeframeBuy.setColumns(2);
         result.add(tfRsiStoTimeframeBuy);
 
         JLabel lblStoRsiTimeframeSell = new JLabel("RSI-STO Timeframe Sell");
         result.add(lblStoRsiTimeframeSell);
         tfRsiStoTimeframeSell = new NumericTextField();
         tfRsiStoTimeframeSell.setText(String.valueOf(4));
-        tfRsiStoTimeframeSell.setColumns(4);
+        tfRsiStoTimeframeSell.setColumns(2);
         result.add(tfRsiStoTimeframeSell);
 
         JLabel lblStoOscKTimeframe = new JLabel("STO-OscK Timeframe");
@@ -780,7 +793,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfStoOscKTimeframe = new NumericTextField();
         tfStoOscKTimeframe.setText(String.valueOf(4));
-        tfStoOscKTimeframe.setColumns(4);
+        tfStoOscKTimeframe.setColumns(2);
         result.add(tfStoOscKTimeframe);
 
         //SMAIndicator
@@ -789,7 +802,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfSmaIndicatorTimeframe = new NumericTextField();
         tfSmaIndicatorTimeframe.setText(String.valueOf(4));
-        tfSmaIndicatorTimeframe.setColumns(4);
+        tfSmaIndicatorTimeframe.setColumns(2);
         result.add(tfSmaIndicatorTimeframe);
 
         //EMAIndicator
@@ -797,7 +810,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblEmaIndicatorTimeframe);
         tfEmaIndicatorTimeframe = new NumericTextField();
         tfEmaIndicatorTimeframe.setText(String.valueOf(4));
-        tfEmaIndicatorTimeframe.setColumns(4);
+        tfEmaIndicatorTimeframe.setColumns(2);
         result.add(tfEmaIndicatorTimeframe);
 
         //Closed Price
@@ -805,14 +818,14 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblPriceTimeframeBuy);
         tfPriceTimeframeBuy = new NumericTextField();
         tfPriceTimeframeBuy.setText(String.valueOf(1));
-        tfPriceTimeframeBuy.setColumns(4);
+        tfPriceTimeframeBuy.setColumns(2);
         result.add(tfPriceTimeframeBuy);
 
         JLabel lblPriceTimeframeSell = new JLabel("Price Timeframe Sell");
         result.add(lblPriceTimeframeSell);
         tfPriceTimeframeSell = new NumericTextField();
         tfPriceTimeframeSell.setText(String.valueOf(1));
-        tfPriceTimeframeSell.setColumns(4);
+        tfPriceTimeframeSell.setColumns(2);
         result.add(tfPriceTimeframeSell);
 
         //RSI threshold
@@ -821,7 +834,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfRsiThresholdLow = new NumericTextField();
         tfRsiThresholdLow.setText(String.valueOf(30));
-        tfRsiThresholdLow.setColumns(4);
+        tfRsiThresholdLow.setColumns(3);
         result.add(tfRsiThresholdLow);
 
         JLabel lblRsiThresholdHigh = new JLabel("RSI Threshold High");
@@ -829,7 +842,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfRsiThresholdHigh = new NumericTextField();
         tfRsiThresholdHigh.setText(String.valueOf(70));
-        tfRsiThresholdHigh.setColumns(4);
+        tfRsiThresholdHigh.setColumns(3);
         result.add(tfRsiThresholdHigh);
         // sto
         JLabel lblStoThresholdLow = new JLabel("STO Threshold Low");
@@ -854,7 +867,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfStoOscKThresholdLow = new NumericTextField();
         tfStoOscKThresholdLow.setText(String.valueOf(30));
-        tfStoOscKThresholdLow.setColumns(4);
+        tfStoOscKThresholdLow.setColumns(3);
         result.add(tfStoOscKThresholdLow);
 
         JLabel lblStoOscKThresholdHigh = new JLabel("STO OscK Threshold HIgh");
@@ -862,7 +875,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfStoOscKThresholdHigh = new NumericTextField();
         tfStoOscKThresholdHigh.setText(String.valueOf(70));
-        tfStoOscKThresholdHigh.setColumns(4);
+        tfStoOscKThresholdHigh.setColumns(3);
         result.add(tfStoOscKThresholdHigh);
 
         // is rising and is falling strenthg
@@ -887,14 +900,14 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblstopLoss);
         tfStopLoss = new JTextField();
         tfStopLoss.setText(String.valueOf(2));
-        tfStopLoss.setColumns(4);
+        tfStopLoss.setColumns(2);
         result.add(tfStopLoss);
 
         JLabel lblsTralingtopLoss = new JLabel("Tr. Stop Loss");
         result.add(lblsTralingtopLoss);
         tfTrailingStopLoss = new JTextField();
         tfTrailingStopLoss.setText(String.valueOf(5));
-        tfTrailingStopLoss.setColumns(4);
+        tfTrailingStopLoss.setColumns(2);
         result.add(tfTrailingStopLoss);
 
         // stop gain
@@ -903,7 +916,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfStopGain = new JTextField();
         tfStopGain.setText(String.valueOf(5));
-        tfStopGain.setColumns(5);
+        tfStopGain.setColumns(2);
         result.add(tfStopGain);
         // wait rule
         JLabel lblWaitBars = new JLabel("Wait Bars");
@@ -911,7 +924,7 @@ public class StrategyPanel extends AbstractPanel {
 
         tfWaitBars = new NumericTextField();
         tfWaitBars.setText(String.valueOf(35));
-        tfWaitBars.setColumns(4);
+        tfWaitBars.setColumns(2);
         result.add(tfWaitBars);
 
         // entry rule chain
@@ -1052,70 +1065,99 @@ public class StrategyPanel extends AbstractPanel {
         quadCCI.add(lblCCI14);
         cci14 = new NumericTextField();
         cci14.setText(String.valueOf(14));
-        cci14.setColumns(4);
+        cci14.setColumns(2);
         quadCCI.add(cci14);
 
         JLabel lblCCI50 = new JLabel("CCI 50");
         quadCCI.add(lblCCI50);
         cci50 = new NumericTextField();
         cci50.setText(String.valueOf(50));
-        cci50.setColumns(4);
+        cci50.setColumns(2);
         quadCCI.add(cci50);
 
         JLabel lblCCI100 = new JLabel("CCI 100");
         quadCCI.add(lblCCI100);
         cci100 = new NumericTextField();
         cci100.setText(String.valueOf(100));
-        cci100.setColumns(4);
+        cci100.setColumns(3);
         quadCCI.add(cci100);
 
         JLabel lblCCI200 = new JLabel("CCI 200");
         quadCCI.add(lblCCI200);
         cci200 = new NumericTextField();
         cci200.setText(String.valueOf(200));
-        cci200.setColumns(4);
+        cci200.setColumns(3);
         quadCCI.add(cci200);
 
-        JLabel lblCCI14Thresh = new JLabel("CCI 14 Thres.");
-        quadCCI.add(lblCCI14Thresh);
-        cci14Threshold = new JTextField();
-        cci14Threshold.setText(String.valueOf(-100));
-        cci14Threshold.setColumns(4);
-        quadCCI.add(cci14Threshold);
+        JLabel lblCCI14ThreshBuy = new JLabel("CCI 14 Thres. B");
+        quadCCI.add(lblCCI14ThreshBuy);
+        cci14ThresholdBuy = new JTextField();
+        cci14ThresholdBuy.setText(String.valueOf(-100));
+        cci14ThresholdBuy.setColumns(4);
+        quadCCI.add(cci14ThresholdBuy);
 
-        JLabel lblCCI50Thresh = new JLabel("CCI 50 Thres.");
-        quadCCI.add(lblCCI50Thresh);
-        cci50Threshold = new JTextField();
-        cci50Threshold.setText(String.valueOf(-100));
-        cci50Threshold.setColumns(4);
-        quadCCI.add(cci50Threshold);
+        JLabel lblCCI14ThreshSell = new JLabel("CCI 14 Thres. S");
+        quadCCI.add(lblCCI14ThreshSell);
+        cci14ThresholdSell = new JTextField();
+        cci14ThresholdSell.setText(String.valueOf(100));
+        cci14ThresholdSell.setColumns(4);
+        quadCCI.add(cci14ThresholdSell);
+
+        JLabel lblCCI50ThreshBuy = new JLabel("CCI 50 Thres. B");
+        quadCCI.add(lblCCI50ThreshBuy);
+        cci50ThresholdBuy = new JTextField();
+        cci50ThresholdBuy.setText(String.valueOf(-20));
+        cci50ThresholdBuy.setColumns(4);
+        quadCCI.add(cci50ThresholdBuy);
+
+        JLabel lblCCI50ThreshSell = new JLabel("CCI 50 Thres. S");
+        quadCCI.add(lblCCI50ThreshSell);
+        cci50ThresholdSell = new JTextField();
+        cci50ThresholdSell.setText(String.valueOf(100));
+        cci50ThresholdSell.setColumns(4);
+        quadCCI.add(cci50ThresholdSell);
 
         JLabel lblCCI100Thresh = new JLabel("CCI 100 Thres.");
         quadCCI.add(lblCCI100Thresh);
-        cci100Threshold = new JTextField();
-        cci100Threshold.setText(String.valueOf(0));
-        cci100Threshold.setColumns(4);
-        quadCCI.add(cci100Threshold);
+        cci100ThresholdBuy = new JTextField();
+        cci100ThresholdBuy.setText(String.valueOf(0));
+        cci100ThresholdBuy.setColumns(4);
+        quadCCI.add(cci100ThresholdBuy);
 
         JLabel lblCCI200Thresh = new JLabel("CCI 200 Thres.");
         quadCCI.add(lblCCI200Thresh);
-        cci200Threshold = new JTextField();
-        cci200Threshold.setText(String.valueOf(0));
-        cci200Threshold.setColumns(4);
-        quadCCI.add(cci200Threshold);
+        cci200ThresholdBuy = new JTextField();
+        cci200ThresholdBuy.setText(String.valueOf(0));
+        cci200ThresholdBuy.setColumns(4);
+        quadCCI.add(cci200ThresholdBuy);
+        
+        JLabel lblcci50FallingTimeframe = new JLabel("TF Falling");
+        quadCCI.add(lblcci50FallingTimeframe);
+        cci50FallingTimeframe = new JTextField();
+        cci50FallingTimeframe.setText(String.valueOf(1));
+        cci50FallingTimeframe.setColumns(1);
+        quadCCI.add(cci50FallingTimeframe);
+        
+        JLabel lblfallingStrenght = new JLabel("Falling Str");
+        quadCCI.add(lblfallingStrenght);
+        cciFallingStrenght = new JTextField();
+        cciFallingStrenght.setText(String.valueOf(0.5d));
+        cciFallingStrenght.setColumns(4);
+        quadCCI.add(cciFallingStrenght);
+        
 
         JLabel lblCCIStopLoss = new JLabel("Stop Loss");
         quadCCI.add(lblCCIStopLoss);
         cciStopLoss = new JTextField();
         cciStopLoss.setText(String.valueOf(5));
-        cciStopLoss.setColumns(4);
+        cciStopLoss.setColumns(2);
         quadCCI.add(cciStopLoss);
 
         JLabel lblCCITrStopLoss = new JLabel("tr Stop Loss");
         quadCCI.add(lblCCITrStopLoss);
         cciTrStopLoss = new JTextField();
         cciTrStopLoss.setText(String.valueOf(5));
-        cciTrStopLoss.setColumns(4);
+        cciTrStopLoss.setColumns(2);
         quadCCI.add(cciTrStopLoss);
 
         JLabel lblCCIStopLossActive = new JLabel("Stop Loss");
@@ -1127,7 +1169,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblCCITrStopLossActive = new JLabel("Tr Stop Loss");
         quadCCI.add(lblCCITrStopLossActive);
         cciTrStopLossActive = new JCheckBox();
-        cciTrStopLossActive.setSelected(false);
+        cciTrStopLossActive.setSelected(true);
         quadCCI.add(cciTrStopLossActive);
 
         result.add(quadCCI);

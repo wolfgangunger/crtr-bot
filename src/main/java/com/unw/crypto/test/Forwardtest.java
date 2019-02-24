@@ -69,7 +69,7 @@ public class Forwardtest {
     private Strategy tradingStrategy;
 
     // month to load  before the period, should be 2 to be able to build MA200 for 10 Min Bar, for faster testing it is reduced to one 
-    private static final int PRE_MONTH = 1;
+    private static final int PRE_MONTH = 2;
 
     @Autowired
     public Forwardtest(TickRepository tickRepository, ForwardtestService forwardtestService,

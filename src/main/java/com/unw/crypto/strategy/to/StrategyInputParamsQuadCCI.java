@@ -21,10 +21,20 @@ public class StrategyInputParamsQuadCCI extends AbstractStrategyInputParams {
     private int cci100;
     private int cci200;
 
-    private int cci14Threshold;
-    private int cci50Threshold;
-    private int cci100Threshold;
-    private int cci200Threshold;
+    private int cci14ThresholdBuy;
+    private int cci50ThresholdBuy;
+    private int cci100ThresholdBuy;
+    private int cci200ThresholdBuy;
+
+    private int cci14ThresholdSell;
+    private int cci50ThresholdSell;
+
+    @Builder.Default
+    private int cci14FallingTimeframe = 1;
+    @Builder.Default
+    private int cci50FallingTimeframe = 1;
+    @Builder.Default    
+    private double fallingStrenght = 0.5d;
 
     private double stopLoss;
     private double trStopLoss;

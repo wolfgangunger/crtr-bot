@@ -43,7 +43,7 @@ import org.ta4j.core.TimeSeries;
  * the app for the UI Application
  *
  */
-@SpringBootApplication
+//@SpringBootApplication
 public class SpringBootAppUI extends Application {
 
     private ConfigurableApplicationContext context;
@@ -81,7 +81,7 @@ public class SpringBootAppUI extends Application {
     // series for live testing, 2 month before series 
     private TimeSeries preSeries;
     // month to load  before the period, should be 2 to be able to build MA200 for 10 Min Bar, for faster testing it is reduced to one 
-    private static final int PRE_MONTH = 1;
+    private static final int PRE_MONTH = 2;
 
     public static void main(String[] args) {
         launch(SpringBootAppUI.class, args);
