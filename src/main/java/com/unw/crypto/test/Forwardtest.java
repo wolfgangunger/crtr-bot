@@ -25,7 +25,6 @@ import com.unw.crypto.model.Tick;
 import com.unw.crypto.service.MarketAnalyzer;
 import com.unw.crypto.strategy.FinalTradingStrategyShort;
 import com.unw.crypto.strategy.FinalTradingStrategyV2;
-import com.unw.crypto.strategy.IFinalTradingStrategy;
 import com.unw.crypto.strategy.LogUtil;
 import com.unw.crypto.strategy.QuadCCIStrategy;
 import com.unw.crypto.strategy.StrategyUtil;
@@ -34,6 +33,7 @@ import java.time.LocalDate;
 import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TradingRecord;
+import com.unw.crypto.strategy.ITradingStrategy;
 
 @Component
 public class Forwardtest {
@@ -64,7 +64,7 @@ public class Forwardtest {
     private FinalTradingStrategyV2 finalTradingStrategyLong = new FinalTradingStrategyV2();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private QuadCCIStrategy quadCCIStrategy = new QuadCCIStrategy();
-    private IFinalTradingStrategy finalTradingStrategy;
+    private ITradingStrategy finalTradingStrategy;
     //private AbstractStrategy currentStrategy;
     private Strategy tradingStrategy;
 
@@ -82,7 +82,7 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 18;
+        int testRun = 26;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
@@ -118,14 +118,14 @@ public class Forwardtest {
         System.out.println("Loading preseriesF");
         preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from, currency, exchange, barDurationInMinutes);
         if (tradeLong) {
-            //finalTradingStrategy = finalTradingStrategyLong;
-            finalTradingStrategy = quadCCIStrategy;
+            finalTradingStrategy = finalTradingStrategyLong;
+            //finalTradingStrategy = quadCCIStrategy;
         } else {
             finalTradingStrategy = finalTradingStrategyShort;
         }
 
         AbstractStrategyInputParams params;
-        for (int i = 1; i <= 6; i++) {
+        for (int i = 1; i <= 2; i++) {
             params = StrategyInputParamsCreator.createStrategyInputParams(i, barDuration);
             System.out.println("-Run test for configuration " + i);
             executeForwardTest(barDurationInMinutes, params, i, currency, exchange, testRun);

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.Rule;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.indicators.CCIIndicator;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.RSIIndicator;
 import org.ta4j.core.indicators.SMAIndicator;
@@ -299,18 +300,60 @@ public class MarketAnalyzer {
         return result.doubleValue();
     }
 
+    /**
+     * analyzes if the market is long term bullish
+     * @param s
+     * @return 
+     */
     public boolean isBullish(TimeSeries s) {
-        return determineMarket(s, true);
+        return isBullishOrBearish(s, true);
     }
 
+    /**
+     * analyzes if the market is long term bearish
+     * @param s
+     * @return 
+     */
     public boolean isBearish(TimeSeries s) {
-        return determineMarket(s, false);
+        return isBullishOrBearish(s, false);
     }
 
-    private boolean determineMarket(TimeSeries s, boolean bullish) {
-        int ma = 14;
-        double strenght = 0.5d;
-        double strMA = determineSMAStrength(s, ma, ma/2);
+    /**
+     * analyzes if the market is long term bullish or bearish
+     * @param s
+     * @param bullish
+     * @return 
+     */
+    public boolean isBullishOrBearish(TimeSeries s, boolean bullish) {
+        boolean result = true;
+        boolean ma = true;
+        boolean cci = true;
+        int cciTimeframe = 100;
+        int cciThreshold = 0;
+        int maTimeframe = 28;
+        double maStrenght = 0.5d;
+        if (ma) {
+            result &= isMABullish(s, maTimeframe, maStrenght, bullish);
+        }
+        if (cci) {
+            result &= isCCIBullish(s, cciTimeframe, cciThreshold, bullish);
+        }
+        if(!ma && !cci){
+            result = false;
+        }
+        return result;
+    }
+
+    /**
+     * analyzes if the market is long term bullish or bearish based on the MA data
+     * @param s
+     * @param maTimeframe
+     * @param strenght rising or falling strength of MA
+     * @param bullish
+     * @return 
+     */
+    public boolean isMABullish(TimeSeries s, int maTimeframe, double strenght, boolean bullish) {
+        double strMA = determineSMAStrength(s, maTimeframe, maTimeframe / 2);
         if (bullish) {
             return strMA >= strenght;
         } else {
@@ -318,17 +361,42 @@ public class MarketAnalyzer {
         }
     }
 
-       public AddOrderInfo analyzeOrderParams(TimeSeries s, AbstractStrategyInputParams p) {
-           if (p instanceof StrategyInputParams ){
-                StrategyInputParams params = (StrategyInputParams)p;
-               return analyzeOrderParams(s, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
-           }else{
-               // todo 
-                 return analyzeOrderParams(s, 2, 4);
-           }
-           
-       }
-    
+    /**
+     * analyzes if the market is long term bullish or bearish based on the CCI data
+     * @param s
+     * @param timeframe the CCI timeframe
+     * @param threshold the CCI threshold
+     * @param bullish
+     * @return 
+     */
+    public boolean isCCIBullish(TimeSeries s, int timeframe, int threshold, boolean bullish) {
+        int cci = determineCCI(s, timeframe);
+        return bullish ? cci > threshold : cci < threshold;
+    }
+
+    /**
+     * determine the value of the CCI 
+     * @param s
+     * @param timeframe
+     * @return 
+     */
+    public int determineCCI(TimeSeries s, int timeframe) {
+        CCIIndicator cci = new CCIIndicator(s, timeframe);
+        Num result = cci.getValue(s.getEndIndex());
+        return result.intValue();
+    }
+
+    public AddOrderInfo analyzeOrderParams(TimeSeries s, AbstractStrategyInputParams p) {
+        if (p instanceof StrategyInputParams) {
+            StrategyInputParams params = (StrategyInputParams) p;
+            return analyzeOrderParams(s, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
+        } else {
+            // todo 
+            return analyzeOrderParams(s, 2, 4);
+        }
+
+    }
+
     /**
      * create TO AddOrderInfo with current buy/sell params
      *

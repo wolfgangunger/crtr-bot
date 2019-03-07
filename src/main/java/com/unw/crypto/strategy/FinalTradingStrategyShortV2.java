@@ -41,7 +41,7 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  * @author UNGERW
  */
 @Component
-public class FinalTradingStrategyShortV2 extends AbstractStrategy implements IFinalTradingStrategy {
+public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITradingStrategy {
 
     private int iMAShort = 9;
     private int iMALong = 26;

@@ -14,7 +14,7 @@ import org.ta4j.core.TradingRecord;
  *
  * @author UNGERW
  */
-public interface IFinalTradingStrategy {
+public interface ITradingStrategy {
     
          Strategy buildStrategyWithParams(TimeSeries series, AbstractStrategyInputParams params) ;
          

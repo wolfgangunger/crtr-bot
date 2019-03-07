@@ -21,7 +21,7 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  * @author UNGERW
  */
 @Component
-public class QuadCCIStrategy extends AbstractStrategy implements IFinalTradingStrategy {
+public class QuadCCIStrategy extends AbstractStrategy implements ITradingStrategy {
 
     private Rule exitRuleStopLoss = new StopLossRuleUnger(null, DoubleNum.valueOf("2"));
     private Rule exitRuleTrStopLoss = new TrailingStopLossRuleUnger(null, DoubleNum.valueOf("5"));

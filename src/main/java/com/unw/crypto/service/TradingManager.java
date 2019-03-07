@@ -115,17 +115,30 @@ public class TradingManager implements TradeListener {
         int index = rollingSeries.getEndIndex();
         Num closePrice = rollingSeries.getLastBar().getClosePrice();
         ZonedDateTime date = rollingSeries.getLastBar().getEndTime();
-        System.out.println("Date " + date +  " Price " + closePrice);
-        
-        boolean bull = analyzer.isBullish(rollingSeries);
-        System.out.println("bullish " + bull);
-        boolean bear = analyzer.isBearish(rollingSeries);
-        System.out.println("bearish " + bear);
+        System.out.println("Date " + date + " Price " + closePrice);
+
+        boolean bullMA = analyzer.isMABullish(rollingSeries, 28, 0.6d, true);
+        System.out.println("MA bullish " + bullMA);
+        boolean bearMA = analyzer.isMABullish(rollingSeries, 28, 0.6d, false);
+        System.out.println("MA bearish " + bearMA);
 
         double maS7 = analyzer.determineSMAStrength(rollingSeries, 14, 7);
         System.out.println("strength MA 14 - 7 :  " + maS7);
         double maS28 = analyzer.determineSMAStrength(rollingSeries, 28, 14);
-        System.out.println("strength MA 18 - 14 :  " + maS28);
+        System.out.println("strength MA 28 - 14 :  " + maS28);
+
+        boolean bullCCI = analyzer.isCCIBullish(rollingSeries, 50, 0, true);
+        System.out.println("CCI bullish " + bullCCI);
+        boolean bearCCI = analyzer.isCCIBullish(rollingSeries, 50, 0, false);
+        System.out.println("CCI bearish " + bearCCI);
+
+        int cci = analyzer.determineCCI(rollingSeries, 50);
+        System.out.println("CCI  " + cci);
+
+        boolean bull = analyzer.isBullish(rollingSeries);
+        System.out.println("Market bullish  " + bull);
+        boolean bear = analyzer.isBearish(rollingSeries);
+        System.out.println("Market bearish  " + bear);
 
         counter++;
         if (true) {

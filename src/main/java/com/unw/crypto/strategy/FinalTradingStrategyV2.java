@@ -43,7 +43,7 @@ import org.ta4j.core.trading.rules.WaitForRule;
  * @author UNGERW
  */
 @Component
-public class FinalTradingStrategyV2 extends AbstractStrategy implements IFinalTradingStrategy {
+public class FinalTradingStrategyV2 extends AbstractStrategy implements ITradingStrategy {
 
     private int iMAShort = 9;
     private int iMALong = 26;

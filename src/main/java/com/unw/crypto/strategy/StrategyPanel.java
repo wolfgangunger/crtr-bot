@@ -89,7 +89,7 @@ public class StrategyPanel extends AbstractPanel {
     private FinalTradingStrategyV2 finalTradingStrategyLongV2 = new FinalTradingStrategyV2();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private FinalTradingStrategyShortV2 finalTradingStrategyShortV2 = new FinalTradingStrategyShortV2();
-    private IFinalTradingStrategy finalTradingStrategy;
+    private ITradingStrategy finalTradingStrategy;
     private TestStrategy testStrategy = new TestStrategy();
     private AbstractStrategy currentStrategy;
     // the trading record for the output
@@ -263,8 +263,8 @@ public class StrategyPanel extends AbstractPanel {
         if (chkForwardTesting.isSelected()) {
             ChartUtil.addBuySellSignals(forwardTestOrders, plot);
         } else { // backward
-            if (currentStrategy instanceof IFinalTradingStrategy) {
-                tradingStrategy = ((IFinalTradingStrategy) currentStrategy).buildStrategyWithParams(series, params);
+            if (currentStrategy instanceof ITradingStrategy) {
+                tradingStrategy = ((ITradingStrategy) currentStrategy).buildStrategyWithParams(series, params);
             } else {
                 tradingStrategy = currentStrategy.buildStrategy(series, barDuration);
             }
@@ -471,7 +471,7 @@ public class StrategyPanel extends AbstractPanel {
     }
 
     private void executeBackwardTest() {
-        if (currentStrategy instanceof IFinalTradingStrategy) {
+        if (currentStrategy instanceof ITradingStrategy) {
             if (currentStrategy instanceof QuadCCIStrategy) {
                 StrategyInputParamsQuadCCI params = createStrategyInputParamsQuadCCI();
                 tradingStrategy = quadCCIStrategy.buildStrategyWithParams(series, params);
@@ -534,7 +534,7 @@ public class StrategyPanel extends AbstractPanel {
             } else {
 
                 // execute the strategy at least every minute
-                if (currentStrategy instanceof IFinalTradingStrategy) {
+                if (currentStrategy instanceof ITradingStrategy) {
                     if (currentStrategy instanceof QuadCCIStrategy) {
                         tradingStrategy = quadCCIStrategy.buildStrategyWithParams(completeSeries, params);
                     } else {
@@ -696,36 +696,36 @@ public class StrategyPanel extends AbstractPanel {
 
         // ma - fix MAs - removed by now - wont be changed
         JLabel lblMA8 = new JLabel("MA8");
-        //result.add(lblMA8);
+        result.add(lblMA8);
 
         tfMA8 = new NumericTextField();
         tfMA8.setText(String.valueOf(8));
         tfMA8.setColumns(2);
-        //result.add(tfMA8);
+        result.add(tfMA8);
 
         JLabel lblMA14 = new JLabel("MA14");
-        //result.add(lblMA14);
+        result.add(lblMA14);
 
         tfMA14 = new NumericTextField();
         tfMA14.setText(String.valueOf(14));
         tfMA14.setColumns(3);
-        //result.add(tfMA14);
+        result.add(tfMA14);
 
         JLabel lblMA200 = new JLabel("MA200");
-        //result.add(lblMA200);
+        result.add(lblMA200);
 
         tfMA200 = new NumericTextField();
         tfMA200.setText(String.valueOf(200));
         tfMA200.setColumns(4);
-        //result.add(tfMA200);
+        result.add(tfMA200);
 
         JLabel lblMA314 = new JLabel("MA314");
-        //result.add(lblMA314);
+        result.add(lblMA314);
 
         tfMA314 = new NumericTextField();
         tfMA314.setText(String.valueOf(314));
         tfMA314.setColumns(4);
-        //result.add(tfMA314);
+        result.add(tfMA314);
         //ma
         JLabel lblShortSMA = new JLabel("Short SMA");
         result.add(lblShortSMA);
