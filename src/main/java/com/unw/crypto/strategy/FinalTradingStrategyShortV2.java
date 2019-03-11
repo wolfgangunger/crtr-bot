@@ -13,6 +13,7 @@ import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.BaseStrategy;
+import org.ta4j.core.Order;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
@@ -28,13 +29,12 @@ import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
-import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.TrailingStopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
+import org.ta4j.core.trading.rules.WaitForRule;
 
 /**
  *
@@ -43,8 +43,7 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
 @Component
 public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITradingStrategy {
 
-    private int iMAShort = 9;
-    private int iMALong = 26;
+   
 
     /**
      * use this method to execute strategy from outside with params
@@ -278,8 +277,10 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
 
+        Rule exitRule26 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
+
         Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
-                exitRule12, exitRule21, exitRule21b, exitRule22, exitRule23);
+                exitRule12, exitRule21, exitRule21b, exitRule22, exitRule23, exitRule26);
 
         return new BaseStrategy(entryRule, exitRule);
     }
@@ -350,7 +351,7 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
      * @return the complete Rule Chain
      */
     private Rule buildCompleteExitRule(ClosePriceIndicator closePrice, ExitRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3,
-            Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22, Rule rule23) {
+            Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22, Rule rule23, Rule rule26) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(0));
 
@@ -378,9 +379,10 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
             result = result.or(rule22);
         }
         if (ruleChain.isRule23_stopGain()) {
-            // or / and ? to be checked
-            //result = result.or(rule23);
-            result = result.and(rule23);
+            result = result.or(rule23);
+        }
+        if (ruleChain.isRule26_waitbars()) {
+            result = result.or(rule26);
         }
         // strict price falling rule
         // result = result.or(rule21b);

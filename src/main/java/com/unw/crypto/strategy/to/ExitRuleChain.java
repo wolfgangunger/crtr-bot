@@ -31,4 +31,5 @@ public class ExitRuleChain {
     private boolean rule23_stopGain;
     private boolean rule24_macdFalling;
     private boolean rule25_shortEmaFalling;
+    private boolean rule26_waitbars;
 }

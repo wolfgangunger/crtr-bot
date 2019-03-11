@@ -5,6 +5,7 @@
  */
 package com.unw.crypto.strategy;
 
+
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.model.rules.StopLossRuleUnger;
 import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
@@ -46,8 +47,7 @@ import org.ta4j.core.trading.rules.WaitForRule;
 @Component
 public class FinalTradingStrategy extends AbstractStrategy implements ITradingStrategy {
 
-    private int iMAShort = 9;
-    private int iMALong = 26;
+  
     private Rule exitRule22 = new StopLossRuleUnger(null, DoubleNum.valueOf("2"));
     private Rule exitRule22b = new TrailingStopLossRuleUnger(null, DoubleNum.valueOf("5"));
 
@@ -275,9 +275,11 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         ((TrailingStopLossRuleUnger) exitRule22b).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrailingStopLoss()));
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
+        
+        Rule exitRule26 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 
         Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
-                exitRule12, exitRule21, exitRule21b, exitRule22, exitRule22b, exitRule23);
+                exitRule12, exitRule21, exitRule21b, exitRule22, exitRule22b, exitRule23, exitRule26);
 
         return new BaseStrategy(entryRule, exitRule);
     }
@@ -351,7 +353,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
      * @return the complete Rule Chain
      */
     private Rule buildCompleteExitRule(ClosePriceIndicator closePrice, ExitRuleChain ruleChain, Rule rule1, Rule rule2, Rule rule3,
-            Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22, Rule rule22b, Rule rule23) {
+            Rule rule11, Rule rule12, Rule rule21, Rule rule21b, Rule rule22, Rule rule22b, Rule rule23, Rule rule26) {
         // first create a rule, which will always be chained and is always true
         Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(0));
 
@@ -382,12 +384,12 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
             result = result.or(rule22b);
         }
         if (ruleChain.isRule23_stopGain()) {
-            // or / and ? to be checked
-            //result = result.or(rule23);
-            result = result.and(rule23);
+            result = result.or(rule23);
+        }
+        if(ruleChain.isRule26_waitbars()){
+           result = result.or(rule26);
         }
         // strict price falling rule
-        // result = result.or(rule21b);
 
         return result;
     }
