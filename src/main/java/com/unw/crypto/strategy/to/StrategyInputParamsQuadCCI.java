@@ -33,7 +33,7 @@ public class StrategyInputParamsQuadCCI extends AbstractStrategyInputParams {
     private int cci14FallingTimeframe = 1;
     @Builder.Default
     private int cci50FallingTimeframe = 1;
-    @Builder.Default    
+    @Builder.Default
     private double fallingStrenght = 0.5d;
 
     private double stopLoss;
@@ -41,5 +41,7 @@ public class StrategyInputParamsQuadCCI extends AbstractStrategyInputParams {
 
     private boolean stopLossActive;
     private boolean trStopLossActive;
+    private boolean cci14SellActive;
+    private boolean cci50SellActive;
 
 }

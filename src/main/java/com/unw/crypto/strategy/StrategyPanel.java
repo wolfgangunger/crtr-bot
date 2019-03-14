@@ -154,7 +154,7 @@ public class StrategyPanel extends AbstractPanel {
 
     private JTextField cci14ThresholdSell;
     private JTextField cci50ThresholdSell;
-    
+
     private JTextField cci50FallingTimeframe;
     private JTextField cciFallingStrenght;
 
@@ -162,6 +162,8 @@ public class StrategyPanel extends AbstractPanel {
     private JTextField cciTrStopLoss;
     private JCheckBox cciStopLossActive;
     private JCheckBox cciTrStopLossActive;
+    private JCheckBox cci14SellActive;
+    private JCheckBox cci50SellActive;
 
     //entry rules
     private JCheckBox chkRsiLow;
@@ -650,11 +652,11 @@ public class StrategyPanel extends AbstractPanel {
         int cci50FallingTimeframe = Integer.valueOf(this.cci50FallingTimeframe.getText());
         int iccStopLoss = Integer.valueOf(this.cciStopLoss.getText());
         int iccTrStopLoss = Integer.valueOf(this.cciTrStopLoss.getText());
-        
+
         return StrategyInputParamsQuadCCI.builder().cci14(icci14).cci14ThresholdBuy(icci14TBuy).cci50(icci50).cci50ThresholdBuy(icci50TBuy).cci100(icci100).cci100ThresholdBuy(icci100T)
                 .cci200(icci200).cci200ThresholdBuy(icci200T).cci14ThresholdSell(icci14TSell).cci50ThresholdSell(icci50TSell)
                 .cci50FallingTimeframe(cci50FallingTimeframe).fallingStrenght(fallingStrenght).stopLoss(iccStopLoss).trStopLoss(iccTrStopLoss).stopLossActive(cciStopLossActive.isSelected())
-                .trStopLossActive(cciTrStopLossActive.isSelected()).build();
+                .trStopLossActive(cciTrStopLossActive.isSelected()).cci14SellActive(cci14SellActive.isSelected()).cci50SellActive(cci50SellActive.isSelected()).build();
     }
 
     /**
@@ -1130,21 +1132,20 @@ public class StrategyPanel extends AbstractPanel {
         cci200ThresholdBuy.setText(String.valueOf(0));
         cci200ThresholdBuy.setColumns(4);
         quadCCI.add(cci200ThresholdBuy);
-        
+
         JLabel lblcci50FallingTimeframe = new JLabel("TF Falling");
         quadCCI.add(lblcci50FallingTimeframe);
         cci50FallingTimeframe = new JTextField();
         cci50FallingTimeframe.setText(String.valueOf(1));
         cci50FallingTimeframe.setColumns(1);
         quadCCI.add(cci50FallingTimeframe);
-        
+
         JLabel lblfallingStrenght = new JLabel("Falling Str");
         quadCCI.add(lblfallingStrenght);
         cciFallingStrenght = new JTextField();
         cciFallingStrenght.setText(String.valueOf(0.5d));
         cciFallingStrenght.setColumns(4);
         quadCCI.add(cciFallingStrenght);
-        
 
         JLabel lblCCIStopLoss = new JLabel("Stop Loss");
         quadCCI.add(lblCCIStopLoss);
@@ -1171,6 +1172,18 @@ public class StrategyPanel extends AbstractPanel {
         cciTrStopLossActive = new JCheckBox();
         cciTrStopLossActive.setSelected(true);
         quadCCI.add(cciTrStopLossActive);
+
+        JLabel lblCCITrCCI14SellActive = new JLabel("CCI 14 Sell");
+        quadCCI.add(lblCCITrCCI14SellActive);
+        cci14SellActive = new JCheckBox();
+        cci14SellActive.setSelected(false);
+        quadCCI.add(cci14SellActive);
+
+        JLabel lblCCITrCCI50SellActive = new JLabel("CCI 50 Sell");
+        quadCCI.add(lblCCITrCCI50SellActive);
+        cci50SellActive = new JCheckBox();
+        cci50SellActive.setSelected(false);
+        quadCCI.add(cci50SellActive);
 
         result.add(quadCCI);
 

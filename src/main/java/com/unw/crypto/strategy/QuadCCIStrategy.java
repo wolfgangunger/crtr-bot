@@ -73,21 +73,32 @@ public class QuadCCIStrategy extends AbstractStrategy implements ITradingStrateg
         ((TrailingStopLossRuleUnger) exitRuleTrStopLoss).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrStopLoss()));
 
         //Rule exitRule = exitRule1.and(exitRule1b);
-        Rule exitRule = exitRule1.and(exitRule2).and(exitRule2b);
-        exitRule = buildCompleteExitRule(exitRule, params.isStopLossActive(), params.isTrStopLossActive(), exitRuleStopLoss, exitRuleTrStopLoss);
-        
+        Rule exitRule =  buildCompleteExitRule(closePrice, params.isCci14SellActive(), params.isCci50SellActive(), 
+                params.isStopLossActive(), params.isTrStopLossActive(), exitRule1, exitRule2, exitRuleStopLoss, exitRuleTrStopLoss);
+
         Strategy strategy = new BaseStrategy(entryRule, exitRule);
         //strategy.setUnstablePeriod(5);
         return strategy;
 
     }
 
-    private Rule buildCompleteExitRule(Rule result, boolean stopLoss, boolean trStopLoss, Rule sl, Rule trsl) {
+    private Rule buildCompleteExitRule(ClosePriceIndicator closePrice, boolean cc14Sell, boolean cc50Sell, boolean stopLoss,
+            boolean trStopLoss, Rule cci14, Rule cc50, Rule stopLossRule, Rule trStopLossRule) {
+
+        // first create a rule, which will ever be chained and is never true (because we have or rules)
+        Rule result = new OverIndicatorRule(closePrice, DoubleNum.valueOf(Double.MAX_VALUE));
+        
+        if (cc14Sell) {
+            result = result.or(cci14);
+        }
+        if (cc50Sell) {
+            result = result.or(cc50);
+        }
         if (stopLoss) {
-            result = result.or(sl);
+            result = result.or(stopLossRule);
         }
         if (trStopLoss) {
-            result = result.or(trsl);
+            result = result.or(trStopLossRule);
         }
         return result;
     }

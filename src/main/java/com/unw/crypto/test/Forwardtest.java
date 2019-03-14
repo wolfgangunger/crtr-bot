@@ -82,7 +82,7 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 26;
+        int testRun = 28;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
@@ -118,14 +118,14 @@ public class Forwardtest {
         System.out.println("Loading preseriesF");
         preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from, currency, exchange, barDurationInMinutes);
         if (tradeLong) {
-            finalTradingStrategy = finalTradingStrategyLong;
-            //finalTradingStrategy = quadCCIStrategy;
+           // finalTradingStrategy = finalTradingStrategyLong;
+            finalTradingStrategy = quadCCIStrategy;
         } else {
             finalTradingStrategy = finalTradingStrategyShort;
         }
 
         AbstractStrategyInputParams params;
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 1; i <= 4; i++) {
             params = StrategyInputParamsCreator.createStrategyInputParams(i, barDuration);
             System.out.println("-Run test for configuration " + i);
             executeForwardTest(barDurationInMinutes, params, i, currency, exchange, testRun);

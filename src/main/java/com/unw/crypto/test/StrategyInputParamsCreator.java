@@ -26,24 +26,24 @@ public final class StrategyInputParamsCreator {
         switch (variant) {
             case 1:
                 //return createStrategyInputParams1(barDuration);
-                return createStrategyInputParams5(barDuration);
+                return createStrategyInputParamsQuadCCI1(barDuration);
 //                return createStrategyInputParamsQuadCCI1(barDuration);
                 //return createStrategyInputParams23_1(barDuration);
             case 2:
                 //return createStrategyInputParams2(barDuration);
-                return createStrategyInputParams5Alt1(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt1(barDuration);
                 //return createStrategyInputParams9Alt1(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt1(barDuration);
                 //return createStrategyInputParams23_2(barDuration);
             case 3:
                 //return createStrategyInputParams3(barDuration);
-                return createStrategyInputParams5Alt2(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt2(barDuration);
                 // return createStrategyInputParams9Alt2(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt2(barDuration);
                // return createStrategyInputParams23_3(barDuration);
             case 4:
                 //return createStrategyInputParams4(barDuration);
-                return createStrategyInputParams5Alt3(barDuration);
+                return createStrategyInputParamsQuadCCI1Alt3(barDuration);
                 // return createStrategyInputParams9Alt3(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt3(barDuration);
 //                return createStrategyInputParams23_4(barDuration);
@@ -3585,29 +3585,29 @@ public final class StrategyInputParamsCreator {
     //// quad cci
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
-                .cci200ThresholdBuy(0).cci100ThresholdBuy(0).cci50ThresholdBuy(-20).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
-                .stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true).build();
+                .cci200ThresholdBuy(0).cci100ThresholdBuy(-25).cci50ThresholdBuy(-50).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
+                .stopLoss(6).trStopLoss(2).stopLossActive(false).trStopLossActive(true).cci14SellActive(false).cci50SellActive(false).build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt1(BarDuration barDuration) {
-        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
-                .cci200ThresholdBuy(40).cci100ThresholdBuy(40).cci50ThresholdBuy(0).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
-                .stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true).build();
+          StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+                .cci200ThresholdBuy(0).cci100ThresholdBuy(-25).cci50ThresholdBuy(-50).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
+                .stopLoss(6).trStopLoss(4).stopLossActive(false).trStopLossActive(true).cci14SellActive(false).cci50SellActive(false).build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt2(BarDuration barDuration) {
-        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
-                .cci200ThresholdBuy(100).cci100ThresholdBuy(100).cci50ThresholdBuy(0).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
-                .stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true).build();
+            StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+                .cci200ThresholdBuy(0).cci100ThresholdBuy(-25).cci50ThresholdBuy(-50).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
+                .stopLoss(6).trStopLoss(6).stopLossActive(false).trStopLossActive(true).cci14SellActive(false).cci50SellActive(false).build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt3(BarDuration barDuration) {
-        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
-                .cci200ThresholdBuy(0).cci100ThresholdBuy(0).cci50ThresholdBuy(-20).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
-                .fallingStrenght(0.9d).cci50FallingTimeframe(2).stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true).build();
+           StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+                .cci200ThresholdBuy(0).cci100ThresholdBuy(-25).cci50ThresholdBuy(-50).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
+                .stopLoss(6).trStopLoss(8).stopLossActive(false).trStopLossActive(true).cci14SellActive(false).cci50SellActive(false).build();
         return result;
     }
 
