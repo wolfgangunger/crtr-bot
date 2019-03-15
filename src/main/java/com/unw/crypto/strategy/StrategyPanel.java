@@ -1085,18 +1085,18 @@ public class StrategyPanel extends AbstractPanel {
         quadCCI.add(cci100);
 
         JLabel lblCCI200 = new JLabel("CCI 200");
-        quadCCI.add(lblCCI200);
+//        quadCCI.add(lblCCI200);
         cci200 = new NumericTextField();
         cci200.setText(String.valueOf(200));
         cci200.setColumns(3);
-        quadCCI.add(cci200);
+//        quadCCI.add(cci200);
 
         JLabel lblCCI14ThreshBuy = new JLabel("CCI 14 Thres. B");
-        quadCCI.add(lblCCI14ThreshBuy);
+//        quadCCI.add(lblCCI14ThreshBuy);
         cci14ThresholdBuy = new JTextField();
         cci14ThresholdBuy.setText(String.valueOf(-100));
         cci14ThresholdBuy.setColumns(4);
-        quadCCI.add(cci14ThresholdBuy);
+//        quadCCI.add(cci14ThresholdBuy);
 
         JLabel lblCCI14ThreshSell = new JLabel("CCI 14 Thres. S");
         quadCCI.add(lblCCI14ThreshSell);
