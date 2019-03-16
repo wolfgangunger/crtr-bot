@@ -61,6 +61,13 @@ public class MarketAnalyzer {
         return satisfied;
     }
 
+    /**
+     * check if the price is falling strict <br>
+     * this means: falling more from the last to the pre-last bar as the given percent value 
+     * @param s timeSeries
+     * @param percent
+     * @return true if falling strict
+     */
     public boolean isFallingStrict(TimeSeries s, double percent) {
         double lastPrice = s.getLastBar().getClosePrice().doubleValue();
         double preLastPrice = s.getBar(s.getEndIndex() - 1).getClosePrice().doubleValue();
