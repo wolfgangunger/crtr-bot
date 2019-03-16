@@ -108,8 +108,23 @@ public class TradingManager implements TradeListener {
         List<Bar> bars = BarUtil.createBarList(first, last, series);
         TimeSeries rollingSeries = new BaseTimeSeries("bitstamp_trades", bars);
         //log(rollingSeries);
-        analyzer.isClosedPriceRising(rollingSeries, 2, 0.1d);
-        double cp = analyzer.determineClosedPriceStrength(rollingSeries, 2);
+        boolean rise = analyzer.isClosedPriceRising(rollingSeries, 1, 0.1d);
+        double cp = analyzer.determineClosedPriceStrength(rollingSeries, 1);
+        double cp20 = analyzer.determineClosedPriceStrength(rollingSeries, 20);
+        double cp50 = analyzer.determineClosedPriceStrength(rollingSeries, 50);
+//        System.out.println(rollingSeries.getLastBar().getClosePrice().doubleValue());
+//        System.out.println(rise);
+//        System.out.println(cp);
+//        System.out.println(cp20);
+//        System.out.println(cp50);
+        System.out.println("---");
+        boolean strict = analyzer.isFallingStrict(rollingSeries, 1d);
+        System.out.println(strict);
+        counter++;
+        if (true) {
+            return;
+        }
+
         //System.out.println("ClosedPirce : " + cp);
         // test for rsi
         int index = rollingSeries.getEndIndex();
@@ -139,11 +154,6 @@ public class TradingManager implements TradeListener {
         System.out.println("Market bullish  " + bull);
         boolean bear = analyzer.isBearish(rollingSeries);
         System.out.println("Market bearish  " + bear);
-
-        counter++;
-        if (true) {
-            return;
-        }
 
         if (analyzer.rsiRisingUp(rollingSeries, 2, 30)) {
             System.out.println("rsi:buy 1 " + counter);

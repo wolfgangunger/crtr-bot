@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * main timer service
  * @author UNGERW
  */
-//@Component
+@Component
 public class TimerService {
 
     private int counter = 0;
@@ -28,7 +28,7 @@ public class TimerService {
     private TradingManager tradingManager;
 
     // delay in ms
-    @Scheduled(fixedDelay = 200)
+    @Scheduled(fixedDelay = 600)
     public void scheduledSecond() {
         //System.out.println("second timer ..");
         tradingManager.minuteExecution();

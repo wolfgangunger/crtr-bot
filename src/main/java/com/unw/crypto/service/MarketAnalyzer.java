@@ -61,6 +61,16 @@ public class MarketAnalyzer {
         return satisfied;
     }
 
+    public boolean isFallingStrict(TimeSeries s, double percent) {
+        double lastPrice = s.getLastBar().getClosePrice().doubleValue();
+        double preLastPrice = s.getBar(s.getEndIndex() - 1).getClosePrice().doubleValue();
+        if (lastPrice > preLastPrice) {
+            return false;
+        }
+        double d = (1d - lastPrice / preLastPrice) * 100;
+        return d >= percent;
+    }
+
     /**
      * determine if the Simple MA is rising
      *
@@ -302,8 +312,9 @@ public class MarketAnalyzer {
 
     /**
      * analyzes if the market is long term bullish
+     *
      * @param s
-     * @return 
+     * @return
      */
     public boolean isBullish(TimeSeries s) {
         return isBullishOrBearish(s, true);
@@ -311,8 +322,9 @@ public class MarketAnalyzer {
 
     /**
      * analyzes if the market is long term bearish
+     *
      * @param s
-     * @return 
+     * @return
      */
     public boolean isBearish(TimeSeries s) {
         return isBullishOrBearish(s, false);
@@ -320,40 +332,46 @@ public class MarketAnalyzer {
 
     /**
      * analyzes if the market is long term bullish or bearish
+     *
      * @param s
      * @param bullish
-     * @return 
+     * @return
      */
     public boolean isBullishOrBearish(TimeSeries s, boolean bullish) {
         boolean result = true;
+        // default values 
         boolean ma = true;
         boolean cci = true;
         int cciTimeframe = 100;
         int cciThreshold = 0;
-        int maTimeframe = 28;
+        int maTimeframe = 40;
         double maStrenght = 0.5d;
+
         if (ma) {
             result &= isMABullish(s, maTimeframe, maStrenght, bullish);
         }
         if (cci) {
             result &= isCCIBullish(s, cciTimeframe, cciThreshold, bullish);
         }
-        if(!ma && !cci){
+        if (!ma && !cci) {
             result = false;
         }
         return result;
     }
 
     /**
-     * analyzes if the market is long term bullish or bearish based on the MA data
+     * analyzes if the market is long term bullish or bearish based on the MA
+     * data
+     *
      * @param s
      * @param maTimeframe
      * @param strenght rising or falling strength of MA
      * @param bullish
-     * @return 
+     * @return
      */
     public boolean isMABullish(TimeSeries s, int maTimeframe, double strenght, boolean bullish) {
-        double strMA = determineSMAStrength(s, maTimeframe, maTimeframe / 2);
+        int timeframe = 1;
+        double strMA = determineSMAStrength(s, maTimeframe, timeframe);
         if (bullish) {
             return strMA >= strenght;
         } else {
@@ -362,12 +380,14 @@ public class MarketAnalyzer {
     }
 
     /**
-     * analyzes if the market is long term bullish or bearish based on the CCI data
+     * analyzes if the market is long term bullish or bearish based on the CCI
+     * data
+     *
      * @param s
      * @param timeframe the CCI timeframe
      * @param threshold the CCI threshold
      * @param bullish
-     * @return 
+     * @return
      */
     public boolean isCCIBullish(TimeSeries s, int timeframe, int threshold, boolean bullish) {
         int cci = determineCCI(s, timeframe);
@@ -375,10 +395,11 @@ public class MarketAnalyzer {
     }
 
     /**
-     * determine the value of the CCI 
+     * determine the value of the CCI
+     *
      * @param s
      * @param timeframe
-     * @return 
+     * @return
      */
     public int determineCCI(TimeSeries s, int timeframe) {
         CCIIndicator cci = new CCIIndicator(s, timeframe);
@@ -406,6 +427,7 @@ public class MarketAnalyzer {
      * @return AddOrderInfo
      */
     public AddOrderInfo analyzeOrderParams(TimeSeries s, int rsiTimeframe, int stoTimeframe) {
+        int timeframe = 2;
         int rsi = calculateRSI(s, rsiTimeframe);
         double sto = calculateSTO(s, stoTimeframe);
         double closedPriceStrenth = determineClosedPriceStrength(s, 2);
@@ -413,21 +435,25 @@ public class MarketAnalyzer {
         double stoStrenght = determineSTOStrength(s, stoTimeframe);
         double rsiStrenght1 = determineRSIStrengthForTimefame1(s, rsiTimeframe);
         double stoStrenght1 = determineSTOStrengthForTimeframe1(s, stoTimeframe);
-        double sma3 = determineSMAStrength(s, 3, 2);
-        double sma8 = determineSMAStrength(s, 8, 2);
-        double sma50 = determineSMAStrength(s, 50, 2);
-        double sma200 = determineSMAStrength(s, 200, 2);
-        double sma314 = determineSMAStrength(s, 314, 2);
-        double ema14 = determineEMAStrength(s, 14, 2);
-        double ema50 = determineEMAStrength(s, 50, 2);
+        double sma3 = determineSMAStrength(s, 3, timeframe);
+        double sma8 = determineSMAStrength(s, 8, timeframe);
+        double sma14 = determineSMAStrength(s, 14, timeframe);
+        double sma50 = determineSMAStrength(s, 50, timeframe);
+        double sma200 = determineSMAStrength(s, 200, timeframe);
+        double sma314 = determineSMAStrength(s, 314, timeframe);
+        double ema14 = determineEMAStrength(s, 14, timeframe);
+        double ema50 = determineEMAStrength(s, 50, timeframe);
+        double cci14 = determineCCI(s, 14);
+        double cci50 = determineCCI(s, 50);
         boolean priceAboveSma200 = isPriceAboveSMA(s, 200);
         boolean priceAboveSma3141 = isPriceAboveSMA(s, 314);
-        boolean isSMALongTimeBullish = isSMALongTimeBullish(s, 3, 80, 2);
+        boolean isSMALongTimeBullish = isSMALongTimeBullish(s, 3, 80, timeframe);
 
-        return AddOrderInfo.builder().rsi(rsi).sto(sto).closedPriceStrenth(closedPriceStrenth).sma3(sma3).sma8(sma8).sma50(sma50).
+        return AddOrderInfo.builder().rsi(rsi).sto(sto).closedPriceStrenth(closedPriceStrenth).sma3(sma3).sma14(sma14).sma8(sma8).sma50(sma50).
                 sma200(sma200).sma314(sma314).ema14(ema14).ema50(ema50).priceAboveSma200(priceAboveSma200).
-                priceAboveSma3141(priceAboveSma3141).isSMALongTimeBullish(isSMALongTimeBullish).rsiSrength(rsiStrenght).stoStrength(stoStrenght).
-                rsiSrength1(rsiStrenght1).stoStrength1(stoStrenght1).build();
+                priceAboveSma3141(priceAboveSma3141).isSMALongTimeBullish(isSMALongTimeBullish).
+                rsiStrength(rsiStrenght).stoStrength(stoStrenght).
+                rsiStrength1(rsiStrenght1).stoStrength1(stoStrenght1).cci14(cci14).cci50(cci50).build();
 
     }
 }
