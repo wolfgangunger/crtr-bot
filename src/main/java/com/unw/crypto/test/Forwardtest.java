@@ -23,8 +23,8 @@ import com.unw.crypto.model.Exchange;
 import com.unw.crypto.model.ExtOrder;
 import com.unw.crypto.model.Tick;
 import com.unw.crypto.service.MarketAnalyzer;
+import com.unw.crypto.strategy.FinalTradingStrategy;
 import com.unw.crypto.strategy.FinalTradingStrategyShort;
-import com.unw.crypto.strategy.FinalTradingStrategyV2;
 import com.unw.crypto.strategy.LogUtil;
 import com.unw.crypto.strategy.QuadCCIStrategy;
 import com.unw.crypto.strategy.StrategyUtil;
@@ -61,7 +61,8 @@ public class Forwardtest {
 
     private List<Tick> ticks;
 
-    private FinalTradingStrategyV2 finalTradingStrategyLong = new FinalTradingStrategyV2();
+//    private FinalTradingStrategyV2 finalTradingStrategyLong = new FinalTradingStrategyV2();
+    private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private QuadCCIStrategy quadCCIStrategy = new QuadCCIStrategy();
     private ITradingStrategy finalTradingStrategy;
@@ -82,7 +83,7 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 28;
+        int testRun = 32;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
@@ -118,14 +119,14 @@ public class Forwardtest {
         System.out.println("Loading preseriesF");
         preSeries = timeSeriesDBLoader.loadSeriesWithParams(preFrom, from, currency, exchange, barDurationInMinutes);
         if (tradeLong) {
-           // finalTradingStrategy = finalTradingStrategyLong;
-            finalTradingStrategy = quadCCIStrategy;
+            finalTradingStrategy = finalTradingStrategyLong;
+//           finalTradingStrategy = quadCCIStrategy;
         } else {
             finalTradingStrategy = finalTradingStrategyShort;
         }
 
         AbstractStrategyInputParams params;
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= 5; i++) {
             params = StrategyInputParamsCreator.createStrategyInputParams(i, barDuration);
             System.out.println("-Run test for configuration " + i);
             executeForwardTest(barDurationInMinutes, params, i, currency, exchange, testRun);
@@ -177,14 +178,14 @@ public class Forwardtest {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
                 } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) && entered) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries,params);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     tr.exit(order.getIndex());
@@ -196,7 +197,7 @@ public class Forwardtest {
                 // if there is still a trade open in last tick, sell anyway
                 ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                 order.setTradeTime(tick.getTradeTime());
-                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
+                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
                 order.setAddOrderInfo(info);
                 forwardTestOrders.add(order);
                 tr.exit(order.getIndex());

@@ -551,14 +551,14 @@ public class StrategyPanel extends AbstractPanel {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries,2,2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
                 } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) && entered) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     tr.exit(order.getIndex());
@@ -571,7 +571,7 @@ public class StrategyPanel extends AbstractPanel {
                 System.out.println("Trade open on last tick- sell anyway");
                 ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                 order.setTradeTime(tick.getTradeTime());
-                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, params);
+                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
                 order.setAddOrderInfo(info);
                 forwardTestOrders.add(order);
                 tr.exit(order.getIndex());

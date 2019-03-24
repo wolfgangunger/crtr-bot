@@ -17,6 +17,10 @@ import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.indicators.RSIIndicator;
+import org.ta4j.core.indicators.SMAIndicator;
+import org.ta4j.core.indicators.StochasticOscillatorDIndicator;
+import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 
@@ -47,7 +51,7 @@ public class EMAStoChart extends AbstractChartPanel {
         timeFrame = Integer.valueOf(inputTimeframe.getText());
         super.refresh();
     }
-    
+
     @Override
     public void reload(String currency, String exchange) {
         this.currency = currency;
@@ -89,12 +93,21 @@ public class EMAStoChart extends AbstractChartPanel {
 
         //test
         // EMAIndicator avg14 = new EMAIndicator(closePrice, 180);
-        StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(closePrice, timeFrame);
+        RSIIndicator rsi = new RSIIndicator(closePrice, timeFrame);
+        SMAIndicator sma = new SMAIndicator(closePrice, timeFrame);
+//        StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(closePrice, timeFrame);
+//        StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(rsi, timeFrame);
+        StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(series, timeFrame);
+        StochasticOscillatorDIndicator stoD = new StochasticOscillatorDIndicator(sma);
+        StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, timeFrame);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
         TimeSeriesCollection dataset2 = new TimeSeriesCollection();
+//        TimeSeriesCollection dataset3 = new TimeSeriesCollection();
         dataset1.addSeries(buildChartTimeSeries(series, closePrice, legend));
-        dataset2.addSeries(buildChartTimeSeries(series, stoRsi, "Sto RSI"));
+//        dataset2.addSeries(buildChartTimeSeries(series, stoRsi, "Sto RSI"));
+//        dataset2.addSeries(buildChartTimeSeries(series, stoD, "Sto D"));
+        dataset2.addSeries(buildChartTimeSeries(series, stoK, "Sto K"));
 
         chart = createChart(dataset1, legend, "Date", "Price", true);
         chart2 = createChart(dataset2, "Stochastik", "Date", "100", true);

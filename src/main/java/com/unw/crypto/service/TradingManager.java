@@ -30,7 +30,7 @@ import org.ta4j.core.num.Num;
  *
  * @author UNGERW
  */
-@Component
+//@Component
 public class TradingManager implements TradeListener {
 
     // just needed for simulation of live trading

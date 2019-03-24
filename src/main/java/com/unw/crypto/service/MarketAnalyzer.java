@@ -5,9 +5,8 @@
  */
 package com.unw.crypto.service;
 
+
 import com.unw.crypto.model.AddOrderInfo;
-import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
-import com.unw.crypto.strategy.to.StrategyInputParams;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.Rule;
@@ -30,6 +29,8 @@ import org.ta4j.core.trading.rules.OverIndicatorRule;
  */
 @Component
 public class MarketAnalyzer {
+
+
 
     /**
      * determine if the price is rising
@@ -63,7 +64,9 @@ public class MarketAnalyzer {
 
     /**
      * check if the price is falling strict <br>
-     * this means: falling more from the last to the pre-last bar as the given percent value 
+     * this means: falling more from the last to the pre-last bar as the given
+     * percent value
+     *
      * @param s timeSeries
      * @param percent
      * @return true if falling strict
@@ -79,7 +82,8 @@ public class MarketAnalyzer {
     }
 
     /**
-     * determine if the Simple MA is rising
+     * determine if the Simple MA is rising - simple method with no additional
+     * logic
      *
      * @param s TimeSeries
      * @param sma (sma8, sma14, sma200 , pass the value you want )
@@ -97,7 +101,8 @@ public class MarketAnalyzer {
     }
 
     /**
-     * determine if the Expotential MA is rising
+     * determine if the Expotential MA is rising - simple method with no
+     * additional logic
      *
      * @param s TimeSeries
      * @param ema (ema8, ema14, ema200 , pass the value you want )
@@ -162,8 +167,189 @@ public class MarketAnalyzer {
     }
 
     /**
+     * calculate a Strenght value (-1 to 1)for the longterm CCI (50,100,200)
+     *
+     * @param series
+     * @return
+     */
+    public double getMarketCCIStrenght(TimeSeries series) {
+        double cci50 = calculateCCIStrenght(determineCCI(series, 50));
+        double cci100 = calculateCCIStrenght(determineCCI(series, 100));
+        double cci200 = calculateCCIStrenght(determineCCI(series, 200));
+        return cci50 + cci100 + cci200;
+    }
+
+    private double calculateCCIStrenght(int cci) {
+        // TODO this logic must be enhanced
+        if (cci > 0) {
+            return 0.3;
+        } else {
+            return -0.3;
+        }
+    }
+
+  
+    /**
+     * determine the SMA strenght for the given MA. returns a value between -1
+     * and 1 logic to calculate the MA strength is to be enhanced
+     *
+     * @param series
+     * @param sma the lenght of the MA for example 14 or 50
+     * @return double between -1 and 1
+     */
+    public double getMarketSMAStrength(TimeSeries series, int sma) {
+        double result = 0d;
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
+        SMAIndicator smaInd = new SMAIndicator(closePrice, sma);
+        // check the last trend + final result must be positiv or negativ dependig on this value
+//        boolean rising = isLastBarRising(smaInd);
+        // only last bar is no good, check last  bars, for longer MAs max 10
+        int lastBars = sma / 5;
+//        if (lastBars > 10) {
+//            lastBars = 10;
+//        }
+        boolean rising = isLastTrendRising(smaInd, lastBars);
+        int barCount = series.getBarCount();
+        // smaIndicator has always one bar less than closePirce
+        barCount = barCount - 1;
+        // cut down to a even number of bars
+        if (barCount % 2 != 0) {
+            barCount = barCount - 1;
+        }
+        double totalStrength = determineSlopeStrength(smaInd, barCount, barCount - 1);
+//        System.out.println("total strengh t" + totalStrength);
+        if ((rising && totalStrength < 0) || (!rising && totalStrength > 0)) {
+            // last direction diametral to allover direction, return a small strenght
+            // TODO value must be advanced - not just 0.1
+            return rising ? 0.1 : -0.1;
+
+        }
+        double mediumStrength = 0d;
+        int count = 0;
+        for (int i = barCount; i > 1; i = i / 2) {
+            double strength = determineSlopeStrength(smaInd, i, barCount);
+            mediumStrength += strength;
+            count++;
+        }
+        mediumStrength = mediumStrength / count;
+//        System.out.println("medium strenght " + mediumStrength);
+//        double percentDiffTotal = calculateLastToFirstDiff(series, rising);
+//        System.out.println("percent all " + percentDiffTotal);
+// weighted method will weight second half percentage double
+        double percentDiff = calculateWeightedLastToFirstDiff(series, rising);
+        double percentDiff2 = calculateLastToFirstDiff(smaInd, sma);
+//        System.out.println("percent weighted " + percentDiff);
+        System.out.println("percent " + percentDiff2);
+        double percentDiffAbs = Math.abs(percentDiff);
+        double mediumStrengthAbs = Math.abs(mediumStrength);
+        result = calculateMediumFromStrenghtAndPercent(mediumStrengthAbs, percentDiffAbs);
+        return rising ? result : -result;
+    }
+
+    private void printSMA(Indicator<Num> ind) {
+        // just helper method for debugging
+        TimeSeries s = ind.getTimeSeries();
+        for (int i = 0; i <= s.getEndIndex(); i++) {
+            System.out.println(s.getBar(i).getClosePrice().doubleValue());
+            System.out.println(ind.getValue(i));
+        }
+    }
+
+    private double calculateMediumFromStrenghtAndPercent(double mediumStrenght, double percent) {
+        // if percent is higher than 100% return 1.0 ( maximum strenght)
+        double medium = 0d;
+        if (percent > 100) {
+            return 1.0d;
+        }
+        // convert to a value between 0 and 1
+        percent = percent / 100;
+        // medium value from percent and strenght; percent is double weighted
+        medium = (mediumStrenght + (2 * percent)) / 3;
+        return medium;
+    }
+
+    private double calculateLastToFirstDiff(Indicator<Num> indicator, int barCount) {
+        TimeSeries s = indicator.getTimeSeries();
+        System.out.println(indicator.getValue(barCount -1 ));
+        System.out.println(indicator.getValue(0));
+
+        System.out.println(s.getBar(s.getEndIndex()).getDateName() + " " + s.getBar(s.getEndIndex()).getClosePrice());        
+        System.out.println(s.getBar(s.getEndIndex() - barCount).getDateName() + " " + s.getBar(s.getEndIndex() - barCount).getClosePrice());
+        return 0d;
+    }
+
+    /**
+     * calculate the percentual diff between the last and the first bar
+     *
+     * @param series
+     * @param rising
+     * @return
+     */
+    private double calculateLastToFirstDiff(TimeSeries series, boolean rising) {
+        double lastPrice = series.getLastBar().getClosePrice().doubleValue();
+        double firstPrice = series.getFirstBar().getClosePrice().doubleValue();
+//        System.out.println("first price " + firstPrice + " date " + series.getFirstBar().getDateName());
+//        System.out.println("last price " + lastPrice + " date " + series.getLastBar().getDateName());
+        double diff;
+        double percent;
+        if (rising) {
+            diff = lastPrice - firstPrice;
+            percent = diff / firstPrice * 100;
+        } else {
+            diff = firstPrice - lastPrice;
+            percent = diff / lastPrice * 100;
+        }
+        return rising ? percent : -percent;
+    }
+
+    /**
+     * see method above, but this method will weight the second half of the
+     * series higher than the allover percent
+     *
+     * @param series
+     * @param rising
+     * @return
+     */
+    private double calculateWeightedLastToFirstDiff(TimeSeries series, boolean rising) {
+        double lastPrice = series.getLastBar().getClosePrice().doubleValue();
+        double firstPrice = series.getFirstBar().getClosePrice().doubleValue();
+        int midIndex = series.getEndIndex() / 2;
+        double midPrice = series.getBar(midIndex).getClosePrice().doubleValue();
+//        System.out.println("first price " + firstPrice + " date " + series.getFirstBar().getDateName());
+//        System.out.println("last price " + lastPrice + " date " + series.getLastBar().getDateName());
+//        System.out.println("mid price " + midPrice + " date " + series.getBar(midIndex).getDateName());
+
+        double diffComplete;
+        double diffMid;
+        double percentComplete;
+        double percentMid;
+        double weightedPercentage;
+        if (rising) {
+            diffComplete = lastPrice - firstPrice;
+            diffMid = lastPrice - midPrice;
+            percentComplete = diffComplete / firstPrice * 100;
+            percentMid = diffMid / midPrice * 100;
+        } else {
+            diffComplete = firstPrice - lastPrice;
+            diffMid = midPrice - lastPrice;
+            percentComplete = diffComplete / lastPrice * 100;
+            percentMid = diffMid / midPrice * 100;
+        }
+        weightedPercentage = calculateMediumPercent(percentComplete, percentMid);
+        return rising ? weightedPercentage : -weightedPercentage;
+    }
+
+    private double calculateMediumPercent(double percentComplete, double percentMid) {
+        // mid percent is half of period, therefore must be doubled 
+        percentMid = percentMid * 2;
+        // now weight the percentage of the second half of the period with double weight
+        return (percentComplete + percentMid) / 3;
+    }
+
+    /**
      * determine the rise or fall strenth (- is falling, + is rising)
      *
+     * @deprecated use determineSMAStrength(TimeSeries s, int sma)
      * @param s TimeSeries
      * @param sma
      * @param durationTimeframe
@@ -207,7 +393,30 @@ public class MarketAnalyzer {
         return result;
     }
 
-    private double determineSlopeStrength(Indicator<Num> ind, int durationTimeframe, int endIndex) {
+    /**
+     * return true if the last bar is rising ( short trend)
+     *
+     * @param ind
+     * @return
+     */
+    private boolean isLastBarRising(Indicator<Num> ind) {
+        Rule rule = new IsRisingRule(ind, 1, 0.1d);
+        return rule.isSatisfied(ind.getTimeSeries().getEndIndex());
+    }
+
+    /**
+     * returns true if the last bars are rising - number of bars is parameter 2
+     *
+     * @param ind
+     * @param barcount
+     * @return
+     */
+    private boolean isLastTrendRising(Indicator<Num> ind, int barcount) {
+        Rule rule = new IsRisingRule(ind, barcount, 0.1d);
+        return rule.isSatisfied(ind.getTimeSeries().getEndIndex());
+    }
+
+    public double determineSlopeStrength(Indicator<Num> ind, int durationTimeframe, int endIndex) {
         Rule rule = new IsRisingRule(ind, durationTimeframe, 0.1d);
         boolean rising = rule.isSatisfied(endIndex);
         Rule rule1;
@@ -354,6 +563,7 @@ public class MarketAnalyzer {
         int maTimeframe = 40;
         double maStrenght = 0.5d;
 
+
         if (ma) {
             result &= isMABullish(s, maTimeframe, maStrenght, bullish);
         }
@@ -362,6 +572,27 @@ public class MarketAnalyzer {
         }
         if (!ma && !cci) {
             result = false;
+        }
+        return result;
+    }
+
+    public double getMarketStrenght(TimeSeries s) {
+        double result = 0d;
+        boolean ma = true;
+        boolean cci = true;
+        int maTimeframe = 40;
+
+        double strMA = getMarketSMAStrength(s, maTimeframe);
+        double strCCI = getMarketCCIStrenght(s);
+        if (ma && !cci) {
+            result = strMA;
+        } else if (cci && !ma) {
+            result = strCCI;
+        } else if (ma && cci) {
+            // medium of ma & cci - to be enhanced
+            result = (strMA + strCCI) / 2;
+        } else {
+            return 0d;
         }
         return result;
     }
@@ -377,8 +608,7 @@ public class MarketAnalyzer {
      * @return
      */
     public boolean isMABullish(TimeSeries s, int maTimeframe, double strenght, boolean bullish) {
-        int timeframe = 1;
-        double strMA = determineSMAStrength(s, maTimeframe, timeframe);
+        double strMA = getMarketSMAStrength(s, maTimeframe);
         if (bullish) {
             return strMA >= strenght;
         } else {
@@ -414,16 +644,8 @@ public class MarketAnalyzer {
         return result.intValue();
     }
 
-    public AddOrderInfo analyzeOrderParams(TimeSeries s, AbstractStrategyInputParams p) {
-        if (p instanceof StrategyInputParams) {
-            StrategyInputParams params = (StrategyInputParams) p;
-            return analyzeOrderParams(s, params.getRsiTimeframeBuy(), params.getStoRsiTimeframeBuy());
-        } else {
-            // todo 
-            return analyzeOrderParams(s, 2, 4);
-        }
 
-    }
+
 
     /**
      * create TO AddOrderInfo with current buy/sell params

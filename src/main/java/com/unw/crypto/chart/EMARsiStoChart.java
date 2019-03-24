@@ -19,6 +19,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.RSIIndicator;
+import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 
@@ -102,12 +103,15 @@ public class EMARsiStoChart extends AbstractChartPanel {
         EMAIndicator avg14 = new EMAIndicator(closePrice, 180); // 180 = 14 tage ?
         RSIIndicator rsi = new RSIIndicator(closePrice, timeFrameRSI);
         StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(closePrice, timeFrameSTO);
+        StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, timeFrameSTO);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
         TimeSeriesCollection dataset2 = new TimeSeriesCollection();
         dataset1.addSeries(buildChartTimeSeries(series, closePrice, legend));
         dataset2.addSeries(buildChartTimeSeries(series, rsi, "RSI"));
-        dataset2.addSeries(buildChartTimeSeriesWithFactor(series, stoRsi, "Sto RSI", 100d));
+//        dataset2.addSeries(buildChartTimeSeriesWithFactor(series, stoRsi, "Sto RSI", 100d));
+//        dataset2.addSeries(buildChartTimeSeriesWithFactor(series, stoK, "Sto K", 100d));
+          dataset2.addSeries(buildChartTimeSeries(series, stoK, "Sto K"));
 
         chart = createChart(dataset1, legend, "Date", "Price", true);
         chart2 = createChart(dataset2, "RSI/STO", "Date", "100", true);

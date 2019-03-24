@@ -65,31 +65,35 @@ public class MovingAverageChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrameLong = 8;
-        timeFrameShort = 3;
+        timeFrameLong = 14;
+        timeFrameShort = 8;
     }
 
     @Override
     protected void initData() {
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         // multiplicator depends on candle size : candle size 60 min = 1 ; 5 min candle = 12
-        int shortMa =  (int)(timeFrameShort * getMAMultiplicator());
-        int longMa = (int)(timeFrameLong * getMAMultiplicator());
+//        int shortMa =  (int)(timeFrameShort * getMAMultiplicator());
+//        int longMa = (int)(timeFrameLong * getMAMultiplicator());
+        int shortMa = timeFrameShort;
+        int longMa = timeFrameLong;
         SMAIndicator avgShort = new SMAIndicator(closePrice, shortMa);
-        SMAIndicator avgLong = new SMAIndicator(closePrice, longMa);        
+        SMAIndicator avgLong = new SMAIndicator(closePrice, longMa);
         // time frame
-        int ma200 = (int)(200 * getMAMultiplicator());
-        int ma314 = (int)(314 * getMAMultiplicator());
-        SMAIndicator avg200 = new SMAIndicator(closePrice, ma200);
-        SMAIndicator avg314 = new SMAIndicator(closePrice, ma314);
-        
+//        int ma50 = (int)(50 * getMAMultiplicator());
+//        int ma100 = (int)(100 * getMAMultiplicator());
+        int ma50 = 50;
+        int ma100 = 100;
+        SMAIndicator avg50 = new SMAIndicator(closePrice, ma50);
+        SMAIndicator avg100 = new SMAIndicator(closePrice, ma100);
+
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(buildChartTimeSeries(series, closePrice, legend));
         dataset.addSeries(buildChartTimeSeries(series, avgShort, "MA Short" + timeFrameShort));
         dataset.addSeries(buildChartTimeSeries(series, avgLong, "MA Long" + timeFrameLong));
         // fix ma
-        dataset.addSeries(buildChartTimeSeries(series, avg200, "MA 200"));
-        dataset.addSeries(buildChartTimeSeries(series, avg314, "MA 314"));
+        dataset.addSeries(buildChartTimeSeries(series, avg50, "MA 50"));
+        dataset.addSeries(buildChartTimeSeries(series, avg100, "MA 100"));
 
         chart = createChart(dataset, legend, "Date", "Price", true);
         XYPlot plot = (XYPlot) chart.getPlot();
