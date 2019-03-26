@@ -272,8 +272,8 @@ public class FinalTradingStrategyV2 extends AbstractStrategy implements ITrading
         //Rule exitRule22 = new TrailingStopLossRuleUnger(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         ((StopLossRuleUnger) exitRule22).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         ((TrailingStopLossRuleUnger) exitRule22b).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrailingStopLoss()));
-        //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
-        Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
+             //stop gain in combination with price is falling
+        Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain())).and(exitRule21);
 
         Rule exitRule26 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 

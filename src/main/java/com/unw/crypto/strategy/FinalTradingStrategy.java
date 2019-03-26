@@ -267,7 +267,7 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         // ma 8 is falling
         Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
 
-        // prive is falling
+        // price is falling
         Rule exitRule21 = new IsFallingRule(closePrice, params.getPriceTimeFrameSell(), params.getFallingStrenght());
         // strict falling ruing
         Rule exitRule21b = new IsFallingRule(closePrice, 1, 1d);
@@ -276,8 +276,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         //Rule exitRule22 = new TrailingStopLossRuleUnger(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         ((StopLossRuleUnger) exitRule22).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         ((TrailingStopLossRuleUnger) exitRule22b).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrailingStopLoss()));
-        //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
-        Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
+        //stop gain in combination with price is falling
+        Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain())).and(exitRule21);
 
         Rule exitRule26 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 

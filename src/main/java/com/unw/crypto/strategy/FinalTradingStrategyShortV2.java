@@ -33,6 +33,7 @@ import org.ta4j.core.trading.rules.IsFallingRule;
 import org.ta4j.core.trading.rules.IsRisingRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.StopGainRule;
+import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 import org.ta4j.core.trading.rules.WaitForRule;
 
@@ -275,7 +276,8 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
         Rule exitRule22 = new StopGainRule(closePrice, params.getStopGain());
         // TODO
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
-        Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain()));
+              // stop gain is stop loss in short version - in combination with rule 21
+        Rule exitRule23 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopGain())).and(exitRule21);
 
         Rule exitRule26 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
 

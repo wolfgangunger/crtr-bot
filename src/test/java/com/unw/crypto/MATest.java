@@ -49,6 +49,7 @@ public class MATest {
 //    private AbstractStrategyParamsRepository abstractStrategyParamsRepository;
     @Test
     public void test1() {
+     
         System.out.println("run");
         Assert.assertNotNull(timeSeriesDBLoader);
         LocalDate from = LocalDate.of(2017, 8, 1);
