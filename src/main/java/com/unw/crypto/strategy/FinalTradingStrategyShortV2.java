@@ -44,8 +44,6 @@ import org.ta4j.core.trading.rules.WaitForRule;
 @Component
 public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITradingStrategy {
 
-   
-
     /**
      * use this method to execute strategy from outside with params
      *
@@ -188,7 +186,8 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframeBuy());
         // stochastik
-        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframeBuy());
+//        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframeBuy());
+        StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, params.getStoRsiTimeframeBuy());
         StochasticOscillatorKIndicator stochasticOscillK = new StochasticOscillatorKIndicator(series, params.getStoOscKTimeFrame());
         //MACD
         MACDIndicator macd = new MACDIndicator(closePrice, params.getSmaShort(), params.getSmaLong());
@@ -201,7 +200,7 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
         Rule entryRule1 = new OverIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdHigh()));
         // 2  STO is crossing low threshold 
         //Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
-        Rule entryRule2 = new OverIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
+        Rule entryRule2 = new OverIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdHigh()));
         // 3 - to be done - does it make sense ?
         //Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         Rule entryRule3 = new UnderIndicatorRule(closePrice, sma200);
@@ -226,7 +225,7 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
 
         //rule 12 sto pointing up
         //Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
-        Rule entryRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframeBuy(), params.getFallingStrenght());
+        Rule entryRule12 = new IsFallingRule(stoK, params.getStoRsiTimeframeBuy(), params.getFallingStrenght());
 
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -257,10 +256,10 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
         Rule exitRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframeSell(), params.getRisingStrenght());
 
         // Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule2 = new UnderIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
+        Rule exitRule2 = new UnderIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdLow()));
 
         //Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
-        Rule exitRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframeSell(), params.getFallingStrenght());
+        Rule exitRule12 = new IsRisingRule(stoK, params.getStoRsiTimeframeSell(), params.getFallingStrenght());
         // ma 8 is falling
         //Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
         Rule exitRule3 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
@@ -276,7 +275,7 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
         Rule exitRule22 = new StopGainRule(closePrice, params.getStopGain());
         // TODO
         //.and(new StopGainRule(closePrice, Decimal.valueOf(-1))); // works
-              // stop gain is stop loss in short version - in combination with rule 21
+        // stop gain is stop loss in short version - in combination with rule 21
         Rule exitRule23 = new StopLossRule(closePrice, DoubleNum.valueOf(params.getStopGain())).and(exitRule21);
 
         Rule exitRule26 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());

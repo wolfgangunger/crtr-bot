@@ -45,8 +45,6 @@ import org.ta4j.core.trading.rules.WaitForRule;
 @Component
 public class FinalTradingStrategyShort extends AbstractStrategy implements ITradingStrategy {
 
-
-
     /**
      * use this method to execute strategy from outside with params
      *
@@ -189,7 +187,8 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements ITrad
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframeBuy());
         // stochastik
-        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframeBuy());
+//        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframeBuy());
+        StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, params.getStoRsiTimeframeBuy());
         StochasticOscillatorKIndicator stochasticOscillK = new StochasticOscillatorKIndicator(series, params.getStoOscKTimeFrame());
         //MACD
         MACDIndicator macd = new MACDIndicator(closePrice, params.getSmaShort(), params.getSmaLong());
@@ -202,7 +201,7 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements ITrad
         Rule entryRule1 = new CrossedUpIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdHigh()));
         // 2  STO is crossing low threshold 
         //Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
-        Rule entryRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
+        Rule entryRule2 = new CrossedUpIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdHigh()));
         // 3 - to be done - does it make sense ?
         //Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         Rule entryRule3 = new UnderIndicatorRule(closePrice, sma200);
@@ -227,7 +226,7 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements ITrad
 
         //rule 12 sto pointing up
         //Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getRisingStrenght());
-        Rule entryRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframeBuy(), params.getFallingStrenght());
+        Rule entryRule12 = new IsFallingRule(stoK, params.getStoRsiTimeframeBuy(), params.getFallingStrenght());
 
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -259,10 +258,10 @@ public class FinalTradingStrategyShort extends AbstractStrategy implements ITrad
         Rule exitRule11 = new IsRisingRule(rsiIndicator, params.getRsiTimeframeSell(), params.getRisingStrenght());
 
         // Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
+        Rule exitRule2 = new CrossedDownIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdLow()));
 
         //Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, params.getStoRsiTimeframe(), params.getFallingStrenght());
-        Rule exitRule12 = new IsRisingRule(stochasticRSIIndicator, params.getStoRsiTimeframeSell(), params.getFallingStrenght());
+        Rule exitRule12 = new IsRisingRule(stoK, params.getStoRsiTimeframeSell(), params.getFallingStrenght());
         // ma 8 is falling
         //Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
         Rule exitRule3 = new IsRisingRule(sma8, params.getSmaIndicatorTimeframe(), params.getRisingStrenght());
