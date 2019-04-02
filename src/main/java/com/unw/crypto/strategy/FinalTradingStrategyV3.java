@@ -8,6 +8,7 @@ package com.unw.crypto.strategy;
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.model.rules.StopLossRuleUnger;
 import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
+import com.unw.crypto.strategy.ta4j.UnwBaseStrategy;
 import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
@@ -226,7 +227,7 @@ public class FinalTradingStrategyV3 extends AbstractStrategy implements ITrading
         //rule 12 sto pointing up
 //        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, 1, params.getRisingStrenght());
         Rule entryRule12 = new IsRisingRule(stoK, 1, params.getRisingStrenght());
-        
+
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
                 .and(new CrossedDownIndicatorRule(stochasticOscillK, DoubleNum.valueOf(params.getStoThresholdLow()))) // Signal 1
@@ -258,7 +259,7 @@ public class FinalTradingStrategyV3 extends AbstractStrategy implements ITrading
 //        Rule exitRule2 = new OverIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
         Rule exitRule2 = new OverIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdHigh()));
 //        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, 1, params.getFallingStrenght());
-         Rule exitRule12 = new IsFallingRule(stoK, 1, params.getFallingStrenght());
+        Rule exitRule12 = new IsFallingRule(stoK, 1, params.getFallingStrenght());
         // ma 8 is falling
         Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
 
@@ -271,7 +272,7 @@ public class FinalTradingStrategyV3 extends AbstractStrategy implements ITrading
         //Rule exitRule22 = new TrailingStopLossRuleUnger(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         ((StopLossRuleUnger) exitRule22).rebuildRule(closePrice, DoubleNum.valueOf(params.getStopLoss()));
         ((TrailingStopLossRuleUnger) exitRule22b).rebuildRule(closePrice, DoubleNum.valueOf(params.getTrailingStopLoss()));
-             //stop gain in combination with price is falling
+        //stop gain in combination with price is falling
         Rule exitRule23 = new StopGainRule(closePrice, DoubleNum.valueOf(params.getStopGain())).and(exitRule21);
 
         Rule exitRule26 = new WaitForRule(Order.OrderType.BUY, params.getWaitBars());
@@ -279,7 +280,8 @@ public class FinalTradingStrategyV3 extends AbstractStrategy implements ITrading
         Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
                 exitRule12, exitRule21, exitRule21b, exitRule22, exitRule22b, exitRule23, exitRule26);
 
-        return new BaseStrategy(entryRule, exitRule);
+//        return new BaseStrategy(entryRule, exitRule);
+        return new UnwBaseStrategy(entryRule, exitRule);
     }
 
     /**

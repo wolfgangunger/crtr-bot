@@ -8,13 +8,13 @@ package com.unw.crypto.strategy;
 import com.unw.crypto.model.BarDuration;
 import com.unw.crypto.model.rules.StopLossRuleUnger;
 import com.unw.crypto.model.rules.TrailingStopLossRuleUnger;
+import com.unw.crypto.strategy.ta4j.UnwBaseStrategy;
 import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
 import com.unw.crypto.strategy.to.StrategyInputParams;
 import com.unw.crypto.strategy.to.StrategyInputParamsBuilder;
 import org.springframework.stereotype.Component;
-import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.Order;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
@@ -27,7 +27,6 @@ import org.ta4j.core.indicators.MACDIndicator;
 import org.ta4j.core.indicators.RSIIndicator;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
-import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
@@ -284,7 +283,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
                 exitRule12, exitRule21, exitRule21b, exitRule22, exitRule22b, exitRule23, exitRule26);
 
-        return new BaseStrategy(entryRule, exitRule);
+//        return new BaseStrategy(entryRule, exitRule);
+        return new UnwBaseStrategy(entryRule, exitRule);
     }
 
     /**

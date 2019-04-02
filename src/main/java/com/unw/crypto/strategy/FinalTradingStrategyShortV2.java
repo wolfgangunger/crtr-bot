@@ -6,6 +6,7 @@
 package com.unw.crypto.strategy;
 
 import com.unw.crypto.model.BarDuration;
+import com.unw.crypto.strategy.ta4j.UnwBaseStrategy;
 import com.unw.crypto.strategy.to.AbstractStrategyInputParams;
 import com.unw.crypto.strategy.to.EntryRuleChain;
 import com.unw.crypto.strategy.to.ExitRuleChain;
@@ -283,7 +284,8 @@ public class FinalTradingStrategyShortV2 extends AbstractStrategy implements ITr
         Rule exitRule = buildCompleteExitRule(closePrice, params.getExitRuleChain(), exitRule1, exitRule2, exitRule3, exitRule11,
                 exitRule12, exitRule21, exitRule21b, exitRule22, exitRule23, exitRule26);
 
-        return new BaseStrategy(entryRule, exitRule);
+//        return new BaseStrategy(entryRule, exitRule);
+        return new UnwBaseStrategy(entryRule, exitRule);
     }
 
     /**

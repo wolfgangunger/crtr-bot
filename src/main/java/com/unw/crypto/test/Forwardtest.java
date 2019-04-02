@@ -174,7 +174,7 @@ public class Forwardtest {
                 tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
                 // needed for stop loss
 
-                if (tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr) && !entered) {
+                if (!entered && tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr) ) {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
@@ -182,7 +182,7 @@ public class Forwardtest {
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
-                } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) && entered) {
+                } else if (entered && tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) ) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);

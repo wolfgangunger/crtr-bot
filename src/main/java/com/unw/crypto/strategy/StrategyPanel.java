@@ -547,7 +547,7 @@ public class StrategyPanel extends AbstractPanel {
                 }
                 // needed for stop loss
 
-                if (tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr) && !entered) {
+                if (!entered && tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr) ) {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
@@ -555,7 +555,7 @@ public class StrategyPanel extends AbstractPanel {
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
-                } else if (tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) && entered) {
+                } else if (entered && tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) ) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
@@ -851,7 +851,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoThresholdLow);
 
         tfStoThresholdLow = new JTextField();
-        tfStoThresholdLow.setText(String.valueOf(0.3f));
+        tfStoThresholdLow.setText(String.valueOf(30f));
         tfStoThresholdLow.setColumns(4);
         result.add(tfStoThresholdLow);
 
@@ -859,7 +859,7 @@ public class StrategyPanel extends AbstractPanel {
         result.add(lblStoThresholdHigh);
 
         tfStoThresholdHigh = new JTextField();
-        tfStoThresholdHigh.setText(String.valueOf(0.7f));
+        tfStoThresholdHigh.setText(String.valueOf(70f));
         tfStoThresholdHigh.setColumns(4);
         result.add(tfStoThresholdHigh);
 
@@ -908,7 +908,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblsTralingtopLoss = new JLabel("Tr. Stop Loss");
         result.add(lblsTralingtopLoss);
         tfTrailingStopLoss = new JTextField();
-        tfTrailingStopLoss.setText(String.valueOf(5));
+        tfTrailingStopLoss.setText(String.valueOf(6));
         tfTrailingStopLoss.setColumns(2);
         result.add(tfTrailingStopLoss);
 
@@ -985,7 +985,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblStoUp = new JLabel("12 Sto ->up");
         entryRules.add(lblStoUp);
         chkStoUp = new JCheckBox();
-        chkStoUp.setSelected(true);
+        chkStoUp.setSelected(false);
         entryRules.add(chkStoUp);
 
         JLabel lblMovingMom = new JLabel("13 MovMom");
@@ -1028,7 +1028,7 @@ public class StrategyPanel extends AbstractPanel {
         JLabel lblRuleStoPontingDown = new JLabel("11 Sto ->Down");
         exitRules.add(lblRuleStoPontingDown);
         chkExitStoDown = new JCheckBox();
-        chkExitStoDown.setSelected(true);
+        chkExitStoDown.setSelected(false);
         exitRules.add(chkExitStoDown);
 
         JLabel lblRulePriceDown = new JLabel("21 Price ->Down");
