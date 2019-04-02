@@ -99,15 +99,15 @@ public class EMAStoChart extends AbstractChartPanel {
 //        StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(rsi, timeFrame);
         StochasticRSIIndicator stoRsi = new StochasticRSIIndicator(series, timeFrame);
         StochasticOscillatorDIndicator stoD = new StochasticOscillatorDIndicator(sma);
-        StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, timeFrame);
+       // StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, timeFrame);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
         TimeSeriesCollection dataset2 = new TimeSeriesCollection();
 //        TimeSeriesCollection dataset3 = new TimeSeriesCollection();
         dataset1.addSeries(buildChartTimeSeries(series, closePrice, legend));
-//        dataset2.addSeries(buildChartTimeSeries(series, stoRsi, "Sto RSI"));
+        dataset2.addSeries(buildChartTimeSeries(series, stoRsi, "Sto RSI"));
 //        dataset2.addSeries(buildChartTimeSeries(series, stoD, "Sto D"));
-        dataset2.addSeries(buildChartTimeSeries(series, stoK, "Sto K"));
+//        dataset2.addSeries(buildChartTimeSeries(series, stoK, "Sto K"));
 
         chart = createChart(dataset1, legend, "Date", "Price", true);
         chart2 = createChart(dataset2, "Stochastik", "Date", "100", true);
