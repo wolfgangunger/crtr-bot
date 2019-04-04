@@ -23,8 +23,8 @@ import com.unw.crypto.model.Exchange;
 import com.unw.crypto.model.ExtOrder;
 import com.unw.crypto.model.Tick;
 import com.unw.crypto.service.MarketAnalyzer;
-import com.unw.crypto.strategy.FinalTradingStrategy;
 import com.unw.crypto.strategy.FinalTradingStrategyShort;
+import com.unw.crypto.strategy.FinalTradingStrategyV2;
 import com.unw.crypto.strategy.LogUtil;
 import com.unw.crypto.strategy.QuadCCIStrategy;
 import com.unw.crypto.strategy.StrategyUtil;
@@ -61,8 +61,8 @@ public class Forwardtest {
 
     private List<Tick> ticks;
 
-//    private FinalTradingStrategyV2 finalTradingStrategyLong = new FinalTradingStrategyV2();
-    private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
+    private FinalTradingStrategyV2 finalTradingStrategyLong = new FinalTradingStrategyV2();
+//    private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private QuadCCIStrategy quadCCIStrategy = new QuadCCIStrategy();
     private ITradingStrategy finalTradingStrategy;
@@ -83,15 +83,15 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 36;
+        int testRun = 39;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
         Exchange exchange = Exchange.BITSTAMP;
         // iterate over 12 month
-        for (int i = 1; i <= 12; i++) {
+        for (int i = 2; i <= 12; i++) {
             // for (int i = 1; i <= 12; i++) {
-            LocalDate from = LocalDate.of(2018, i, 1);
+            LocalDate from = LocalDate.of(2017, i, 1);
             LocalDate until = from.plusMonths(1);
             //LocalDate until = from.plusWeeks(1);
             //execute test
@@ -126,7 +126,7 @@ public class Forwardtest {
         }
 
         AbstractStrategyInputParams params;
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 6; i++) {
             params = StrategyInputParamsCreator.createStrategyInputParams(i, barDuration);
             System.out.println("-Run test for configuration " + i);
             executeForwardTest(barDurationInMinutes, params, i, currency, exchange, testRun);

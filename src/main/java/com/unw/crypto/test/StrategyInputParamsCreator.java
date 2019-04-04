@@ -26,37 +26,37 @@ public final class StrategyInputParamsCreator {
         switch (variant) {
             case 1:
                 //return createStrategyInputParams1(barDuration);
-                return createStrategyInputParams30_1(barDuration);
+                return createStrategyInputParams39_1(barDuration);
 //                return createStrategyInputParamsQuadCCI1(barDuration);
-                //return createStrategyInputParams23_1(barDuration);
+            //return createStrategyInputParams23_1(barDuration);
             case 2:
                 //return createStrategyInputParams2(barDuration);
-                return createStrategyInputParams30_2(barDuration);
-                //return createStrategyInputParams9Alt1(barDuration);
+                return createStrategyInputParams39_2(barDuration);
+            //return createStrategyInputParams9Alt1(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt1(barDuration);
-                //return createStrategyInputParams23_2(barDuration);
+            //return createStrategyInputParams23_2(barDuration);
             case 3:
                 //return createStrategyInputParams3(barDuration);
-                return createStrategyInputParams30_3(barDuration);
-                // return createStrategyInputParams9Alt2(barDuration);
+                return createStrategyInputParams39_3(barDuration);
+            // return createStrategyInputParams9Alt2(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt2(barDuration);
-               // return createStrategyInputParams23_3(barDuration);
+            // return createStrategyInputParams23_3(barDuration);
             case 4:
                 //return createStrategyInputParams4(barDuration);
-            return createStrategyInputParams30_4(barDuration);
-                // return createStrategyInputParams9Alt3(barDuration);
+                return createStrategyInputParams39_4(barDuration);
+            // return createStrategyInputParams9Alt3(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt3(barDuration);
 //                return createStrategyInputParams23_4(barDuration);
             case 5:
 //                return createStrategyInputParams5Alt2(barDuration);
                 // return createStrategyInputParams9Alt4(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt4(barDuration);
-                return createStrategyInputParams30_5(barDuration);
+                return createStrategyInputParams39_5(barDuration);
             case 6:
 //                return createStrategyInputParams5Alt3(barDuration);
                 //return createStrategyInputParams9Alt5(barDuration);
 //                return createStrategyInputParamsQuadCCI1Alt5(barDuration);
-                return createStrategyInputParams23_6(barDuration);
+                return createStrategyInputParams39_6(barDuration);
             // short
             case -1:
                 return createStrategyInputParams1Short(barDuration);
@@ -3337,8 +3337,8 @@ public final class StrategyInputParamsCreator {
         return result;
     }
 
-        ////
-        private static StrategyInputParams createStrategyInputParams23_5(BarDuration barDuration) {
+    ////
+    private static StrategyInputParams createStrategyInputParams23_5(BarDuration barDuration) {
 
         StrategyInputParams result;
         boolean barMultiplikator = false;
@@ -3414,8 +3414,9 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-            ////
-        private static StrategyInputParams createStrategyInputParams23_6(BarDuration barDuration) {
+    ////
+
+    private static StrategyInputParams createStrategyInputParams23_6(BarDuration barDuration) {
 
         StrategyInputParams result;
         boolean barMultiplikator = false;
@@ -3491,6 +3492,7 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
+
     ////////////////// short strategies
     /**
      * configuration 1
@@ -3582,6 +3584,1004 @@ public final class StrategyInputParamsCreator {
         return result;
     }
 
+    private static StrategyInputParams createStrategyInputParams37_1(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 20;
+        int rsiThresholdHigh = 80;
+        double stoThresholdLow = 20d;
+        double stoThresholdHigh = 80d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = true;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams37_2(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 24;
+        int rsiThresholdHigh = 76;
+        double stoThresholdLow = 24d;
+        double stoThresholdHigh = 76d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = true;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams37_3(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 28;
+        int rsiThresholdHigh = 72;
+        double stoThresholdLow = 28d;
+        double stoThresholdHigh = 72d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = true;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams37_4(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 32;
+        int rsiThresholdHigh = 68;
+        double stoThresholdLow = 32d;
+        double stoThresholdHigh = 68d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = true;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams37_5(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 22;
+        int rsiThresholdHigh = 78;
+        double stoThresholdLow = 30d;
+        double stoThresholdHigh = 70d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = true;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams37_6(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 24;
+        int rsiThresholdHigh = 76;
+        double stoThresholdLow = 30d;
+        double stoThresholdHigh = 70d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = true;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    ///
+    private static StrategyInputParams createStrategyInputParams39_1(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 24;
+        int rsiThresholdHigh = 76;
+        double stoThresholdLow = 24d;
+        double stoThresholdHigh = 76d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = false;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+    ///
+
+    private static StrategyInputParams createStrategyInputParams39_2(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 28;
+        int rsiThresholdHigh = 72;
+        double stoThresholdLow = 28d;
+        double stoThresholdHigh = 72d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = false;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams39_3(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 26;
+        int rsiThresholdHigh = 74;
+        double stoThresholdLow = 26d;
+        double stoThresholdHigh = 74d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = false;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams39_4(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 24;
+        int rsiThresholdHigh = 76;
+        double stoThresholdLow = 30d;
+        double stoThresholdHigh = 70d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = false;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams39_5(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 26;
+        int rsiThresholdHigh = 74;
+        double stoThresholdLow = 30d;
+        double stoThresholdHigh = 70d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = false;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
+    private static StrategyInputParams createStrategyInputParams39_6(BarDuration barDuration) {
+        // config 1: no stop loss
+        // time frames rsi 1 ; sto 2
+        // buy
+        // rsi low, sto low, above sma200, 8ma pointin up, ema bands up
+        //sell
+        // rsi high, sto high, 8ma down
+
+        StrategyInputParams result;
+        boolean barMultiplikator = false;
+        boolean extraMultiplikator = false;
+        float extraMultiplikatorValue = 1f;
+        int ma8 = 8;
+        int ma14 = 14;
+        int ma200 = 200;
+        int ma314 = 314;
+        int smaShort = 3;
+        int smaLong = 10;
+        int emaShort = 5;
+        int emaLong = 12;
+        int rsiTimeframeBuy = 2;
+        int rsiStoTimeframeBuy = 4;
+        int rsiTimeframeSell = 2;
+        int rsiStoTimeframeSell = 4;
+        int stoOscKTimeFrame = 4;
+        int emaIndicatorTimeframe = 4;
+        int smaIndicatorTimeframe = 4;
+        int priceTimeFrameBuy = 1;
+        int priceTimeFrameSell = 1;
+        int rsiThresholdLow = 28;
+        int rsiThresholdHigh = 72;
+        double stoThresholdLow = 30d;
+        double stoThresholdHigh = 70d;
+        int stoOscKThresholdLow = 20;
+        int stoOscKThresholdHigh = 80;
+        double risingStrenght = 0.5d;
+        double fallingStrenght = 0.5d;
+        double stopLoss = 2;
+        double trailingStopLoss = 6;
+        double stopGain = 5d;
+        int waitBars = 35;
+
+        //entry rules
+        boolean rule1_rsiLow = true;
+        boolean rule2_stoLow = true;
+        boolean rule3_priceAboveSMA200 = true;
+        boolean rule3b_priceAboveSMA314 = false;
+        boolean rule4_ma8PointingUp = true;
+        boolean rule5_priceBelow8MA = false;
+        boolean rule7_emaBandsPointingUp = true;
+        boolean rule11_isRsiPointingUp = false;
+        boolean rule12_isStoPointingUp = true;
+        boolean rule13_movingMomentum = false;
+
+        //exit rules
+        boolean rule1_rsiHigh = true;
+        boolean rule2_stoHigh = true;
+        boolean rule3_8maDown = true;
+        boolean rule11_rsiPointingDown = false;
+        boolean rule12_StoPointingDown = true;
+        boolean rule21_priceFalling = false;
+        boolean rule22_stopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
+        boolean rule23_stopGain = false;
+        boolean rule24_macdFalling = false;
+        boolean rule25_shortEmaFalling = false;
+
+        EntryRuleChain entryruleChain = EntryRuleChain.builder().rule1_rsiLow(rule1_rsiLow).rule2_stoLow(rule2_stoLow).
+                rule3_priceAboveSMA200(rule3_priceAboveSMA200).rule3b_priceAboveSMA314(rule3b_priceAboveSMA314).
+                rule4_ma8PointingUp(rule4_ma8PointingUp).rule5_priceBelow8MA(rule5_priceBelow8MA).rule7_emaBandsPointingUp(rule7_emaBandsPointingUp)
+                .rule11_isRsiPointingUp(rule11_isRsiPointingUp).rule12_isStoPointingUp(rule12_isStoPointingUp).rule13_movingMomentum(rule13_movingMomentum).build();
+        ExitRuleChain exitRuleChain = ExitRuleChain.builder().rule1_rsiHigh(rule1_rsiHigh).rule2_stoHigh(rule2_stoHigh)
+                .rule3_8maDown(rule3_8maDown).rule11_rsiPointingDown(rule11_rsiPointingDown)
+                .rule12_StoPointingDown(rule12_StoPointingDown).rule21_priceFalling(rule21_priceFalling)
+                .rule23_stopGain(rule23_stopGain).rule22_stopLoss(rule22_stopLoss).rule22b_trailingStopLoss(rule22b_trailingStopLoss).build();
+        result = StrategyInputParamsBuilder.createStrategyInputParams(barDuration, barMultiplikator, extraMultiplikator, extraMultiplikatorValue, ma8,
+                ma14, ma200, ma314, smaShort, smaLong, emaShort, emaLong, rsiTimeframeBuy, rsiTimeframeSell,
+                rsiStoTimeframeBuy, rsiStoTimeframeSell, stoOscKTimeFrame, emaIndicatorTimeframe, smaIndicatorTimeframe, priceTimeFrameBuy,
+                priceTimeFrameSell, rsiThresholdLow, rsiThresholdHigh, stoThresholdLow, stoThresholdHigh,
+                stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
+        return result;
+    }
+
     //// quad cci
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1(BarDuration barDuration) {
         StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
@@ -3591,21 +4591,21 @@ public final class StrategyInputParamsCreator {
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt1(BarDuration barDuration) {
-          StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
                 .cci200ThresholdBuy(0).cci100ThresholdBuy(-25).cci50ThresholdBuy(-50).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
                 .stopLoss(6).trStopLoss(4).stopLossActive(false).trStopLossActive(true).cci14SellActive(false).cci50SellActive(false).build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt2(BarDuration barDuration) {
-            StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
                 .cci200ThresholdBuy(0).cci100ThresholdBuy(-25).cci50ThresholdBuy(-50).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
                 .stopLoss(6).trStopLoss(6).stopLossActive(false).trStopLossActive(true).cci14SellActive(false).cci50SellActive(false).build();
         return result;
     }
 
     private static StrategyInputParamsQuadCCI createStrategyInputParamsQuadCCI1Alt3(BarDuration barDuration) {
-           StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
+        StrategyInputParamsQuadCCI result = StrategyInputParamsQuadCCI.builder().cci14(14).cci50(50).cci100(100).cci200(200)
                 .cci200ThresholdBuy(0).cci100ThresholdBuy(-25).cci50ThresholdBuy(-50).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
                 .stopLoss(6).trStopLoss(8).stopLossActive(false).trStopLossActive(true).cci14SellActive(false).cci50SellActive(false).build();
         return result;
@@ -3624,10 +4624,11 @@ public final class StrategyInputParamsCreator {
                 .cci200ThresholdBuy(100).cci100ThresholdBuy(100).cci50ThresholdBuy(0).cci14ThresholdBuy(-100).cci14ThresholdSell(100).cci50ThresholdSell(100)
                 .stopLoss(5).trStopLoss(5).stopLossActive(false).trStopLossActive(true).build();
         return result;
-    
+
     }
-        //
-            /**
+    //
+
+    /**
      * configuration 1
      *
      * @param barDuration
@@ -3715,8 +4716,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-    
-       private static StrategyInputParams createStrategyInputParams28_2(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams28_2(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
@@ -3798,7 +4799,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-   private static StrategyInputParams createStrategyInputParams28_3(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams28_3(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
@@ -3880,7 +4882,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-      private static StrategyInputParams createStrategyInputParams28_4(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams28_4(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
@@ -3962,8 +4965,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-      
-      private static StrategyInputParams createStrategyInputParams30_1(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams30_1(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
@@ -4045,8 +5048,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-      
-          private static StrategyInputParams createStrategyInputParams30_2(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams30_2(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
@@ -4128,8 +5131,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-          
-     private static StrategyInputParams createStrategyInputParams30_3(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams30_3(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
@@ -4211,8 +5214,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-     
-     private static StrategyInputParams createStrategyInputParams30_4(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams30_4(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
@@ -4294,8 +5297,8 @@ public final class StrategyInputParamsCreator {
                 stoOscKThresholdLow, stoOscKThresholdHigh, risingStrenght, fallingStrenght, stopLoss, trailingStopLoss, stopGain, waitBars, entryruleChain, exitRuleChain);
         return result;
     }
-     
-      private static StrategyInputParams createStrategyInputParams30_5(BarDuration barDuration) {
+
+    private static StrategyInputParams createStrategyInputParams30_5(BarDuration barDuration) {
         // config 1: no stop loss
         // time frames rsi 1 ; sto 2
         // buy
