@@ -109,7 +109,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.6d;
         double fallingStrenght = 0.6d;
         double stopLoss = 2;
-        double trailingStopLoss = 5;
+        double trailingStopLoss = 7;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -133,7 +133,7 @@ public final class StrategyInputParamsCreator {
         boolean rule12_StoPointingDown = false;
         boolean rule21_priceFalling = false;
         boolean rule22_stopLoss = false;
-        boolean rule22b_trailingStopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
         boolean rule23_stopGain = false;
         boolean rule24_macdFalling = false;
         boolean rule25_shortEmaFalling = false;
@@ -200,7 +200,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.5d;
         double fallingStrenght = 0.5d;
         double stopLoss = 2;
-        double trailingStopLoss = 5;
+        double trailingStopLoss = 7;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -224,7 +224,7 @@ public final class StrategyInputParamsCreator {
         boolean rule12_StoPointingDown = false;
         boolean rule21_priceFalling = false;
         boolean rule22_stopLoss = false;
-        boolean rule22b_trailingStopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
         boolean rule23_stopGain = false;
         boolean rule24_macdFalling = false;
         boolean rule25_shortEmaFalling = false;
@@ -292,7 +292,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.6d;
         double fallingStrenght = 0.6d;
         double stopLoss = 2;
-        double trailingStopLoss = 5;
+        double trailingStopLoss = 7;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -316,7 +316,7 @@ public final class StrategyInputParamsCreator {
         boolean rule12_StoPointingDown = false;
         boolean rule21_priceFalling = false;
         boolean rule22_stopLoss = false;
-        boolean rule22b_trailingStopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
         boolean rule23_stopGain = false;
         boolean rule24_macdFalling = false;
         boolean rule25_shortEmaFalling = false;
@@ -1047,7 +1047,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.5d;
         double fallingStrenght = 0.5d;
         double stopLoss = 2;
-        double trailingStopLoss = 5;
+        double trailingStopLoss = 7;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -1071,7 +1071,7 @@ public final class StrategyInputParamsCreator {
         boolean rule12_StoPointingDown = false;
         boolean rule21_priceFalling = false;
         boolean rule22_stopLoss = false;
-        boolean rule22b_trailingStopLoss = false;
+        boolean rule22b_trailingStopLoss = true;
         boolean rule23_stopGain = false;
         boolean rule24_macdFalling = false;
         boolean rule25_shortEmaFalling = false;
@@ -1130,7 +1130,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.5d;
         double fallingStrenght = 0.5d;
         double stopLoss = 2;
-        double trailingStopLoss = 5;
+        double trailingStopLoss = 7;
         double stopGain = -1d;
         int waitBars = 50;
 
