@@ -27,6 +27,7 @@ import org.ta4j.core.indicators.MACDIndicator;
 import org.ta4j.core.indicators.RSIIndicator;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
+import org.ta4j.core.indicators.StochasticRSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.DoubleNum;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
@@ -192,9 +193,9 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         // RSI
         RSIIndicator rsiIndicator = new RSIIndicator(closePrice, params.getRsiTimeframeBuy());
         // stochastik
-//        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframeBuy());
+        StochasticRSIIndicator stochasticRSIIndicator = new StochasticRSIIndicator(closePrice, params.getStoRsiTimeframeBuy());
         //new:
-        StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, params.getStoRsiTimeframeBuy());
+//        StochasticOscillatorKIndicator stoK = new StochasticOscillatorKIndicator(series, params.getStoRsiTimeframeBuy());
 
         StochasticOscillatorKIndicator stochasticOscillK = new StochasticOscillatorKIndicator(series, params.getStoOscKTimeFrame());
         //MACD
@@ -206,8 +207,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         // 1 - RSI is under  low threshold 
         Rule entryRule1 = new CrossedDownIndicatorRule(rsiIndicator, DoubleNum.valueOf(params.getRsiThresholdLow()));
         // 2  STO is under low threshold 
-//        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
-        Rule entryRule2 = new CrossedDownIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdLow()));
+        Rule entryRule2 = new CrossedDownIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdLow()));
+//        Rule entryRule2 = new CrossedDownIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdLow()));
         // 3 - prive over SMA 200 (and 314)
         Rule entryRule3 = new OverIndicatorRule(closePrice, sma200);
         Rule entryRule3b = new OverIndicatorRule(closePrice, sma2314);
@@ -228,8 +229,8 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         Rule entryRule11 = new IsRisingRule(rsiIndicator, 1, params.getRisingStrenght());
 
         //rule 12 sto pointing up
-//        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, 1, params.getRisingStrenght());
-        Rule entryRule12 = new IsRisingRule(stoK, 1, params.getRisingStrenght());
+        Rule entryRule12 = new IsRisingRule(stochasticRSIIndicator, 1, params.getRisingStrenght());
+//        Rule entryRule12 = new IsRisingRule(stoK, 1, params.getRisingStrenght());
         
         // rule 13 - moving momentung
         Rule entryRule13 = new OverIndicatorRule(shortEma, longEma) // Trend
@@ -259,10 +260,10 @@ public class FinalTradingStrategy extends AbstractStrategy implements ITradingSt
         // risng and falling timeframe always 1
         Rule exitRule11 = new IsFallingRule(rsiIndicator, 1, params.getFallingStrenght());
 
-//        Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
-        Rule exitRule2 = new CrossedUpIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdHigh()));        
-//        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, 1, params.getFallingStrenght());
-        Rule exitRule12 = new IsFallingRule(stoK, 1, params.getFallingStrenght());
+        Rule exitRule2 = new CrossedUpIndicatorRule(stochasticRSIIndicator, DoubleNum.valueOf(params.getStoThresholdHigh()));
+//        Rule exitRule2 = new CrossedUpIndicatorRule(stoK, DoubleNum.valueOf(params.getStoThresholdHigh()));        
+        Rule exitRule12 = new IsFallingRule(stochasticRSIIndicator, 1, params.getFallingStrenght());
+//        Rule exitRule12 = new IsFallingRule(stoK, 1, params.getFallingStrenght());
         // ma 8 is falling
         Rule exitRule3 = new IsFallingRule(sma8, params.getSmaIndicatorTimeframe(), params.getFallingStrenght());
 
