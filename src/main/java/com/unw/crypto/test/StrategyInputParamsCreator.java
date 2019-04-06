@@ -109,7 +109,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.6d;
         double fallingStrenght = 0.6d;
         double stopLoss = 2;
-        double trailingStopLoss = 7;
+        double trailingStopLoss = 10;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -200,7 +200,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.5d;
         double fallingStrenght = 0.5d;
         double stopLoss = 2;
-        double trailingStopLoss = 7;
+        double trailingStopLoss = 10;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -292,7 +292,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.6d;
         double fallingStrenght = 0.6d;
         double stopLoss = 2;
-        double trailingStopLoss = 7;
+        double trailingStopLoss = 10;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -964,7 +964,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.5d;
         double fallingStrenght = 0.5d;
         double stopLoss = 2;
-        double trailingStopLoss = 7;
+        double trailingStopLoss = 10;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -1047,7 +1047,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.5d;
         double fallingStrenght = 0.5d;
         double stopLoss = 2;
-        double trailingStopLoss = 7;
+        double trailingStopLoss = 10;
         double stopGain = -1d;
         int waitBars = 50;
 
@@ -1130,7 +1130,7 @@ public final class StrategyInputParamsCreator {
         double risingStrenght = 0.5d;
         double fallingStrenght = 0.5d;
         double stopLoss = 2;
-        double trailingStopLoss = 7;
+        double trailingStopLoss = 10;
         double stopGain = -1d;
         int waitBars = 50;
 

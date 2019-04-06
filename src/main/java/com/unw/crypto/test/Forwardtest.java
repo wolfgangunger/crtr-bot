@@ -83,7 +83,7 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 47;
+        int testRun = 48;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
