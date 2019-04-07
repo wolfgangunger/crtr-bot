@@ -86,6 +86,7 @@ public class StrategyPanel extends AbstractPanel {
     private QuadCCIStrategy quadCCIStrategy = new QuadCCIStrategy();
     private GlobalExtremaStrategy globalExtremaStrategy = new GlobalExtremaStrategy();
     private FinalTradingStrategy finalTradingStrategyLongV1 = new FinalTradingStrategy();
+    private FinalTradingStrategyV1b finalTradingStrategyLongV1b = new FinalTradingStrategyV1b();
     private FinalTradingStrategyV2 finalTradingStrategyLongV2 = new FinalTradingStrategyV2();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private FinalTradingStrategyShortV2 finalTradingStrategyShortV2 = new FinalTradingStrategyShortV2();
@@ -323,7 +324,7 @@ public class StrategyPanel extends AbstractPanel {
 
         // buttons for strategies
         JButton bttRSI2 = new JButton();
-        bttRSI2.setText("RSI2 Strategy");
+        bttRSI2.setText("RSI2");
         bttRSI2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -334,7 +335,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttRSI2);
 
         JButton bttMm = new JButton();
-        bttMm.setText("Mov Mom Strategy");
+        bttMm.setText("Mov Mom");
         bttMm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -345,7 +346,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttMm);
 
         JButton bttCCI = new JButton();
-        bttCCI.setText("CCI Strat");
+        bttCCI.setText("CCI ");
         bttCCI.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -356,7 +357,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttCCI);
 
         JButton bttQuadCCI = new JButton();
-        bttQuadCCI.setText("Quad CCI Strat");
+        bttQuadCCI.setText("Quad CCI");
         bttQuadCCI.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -367,7 +368,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttQuadCCI);
 
         JButton bttGE = new JButton();
-        bttGE.setText("Global Extrema Strat");
+        bttGE.setText("Global Extrema");
         bttGE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -378,7 +379,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttGE);
 
         JButton bttMmUnger = new JButton();
-        bttMmUnger.setText("Mov Mom Strat Unw");
+        bttMmUnger.setText("Mov Mom  Unw");
         bttMmUnger.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -400,7 +401,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttTestStrategy);
 
         JButton bttFinalStrategy = new JButton();
-        bttFinalStrategy.setText("Final Strat V1");
+        bttFinalStrategy.setText("Final V1");
         bttFinalStrategy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -411,8 +412,20 @@ public class StrategyPanel extends AbstractPanel {
         });
         toolbarTop.add(bttFinalStrategy);
 
+        JButton bttFinalStrategyV1b = new JButton();
+        bttFinalStrategyV1b.setText("Final V1b");
+        bttFinalStrategyV1b.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                currentStrategy = finalTradingStrategyLongV1b;
+                finalTradingStrategy = finalTradingStrategyLongV1b;
+                executeTest();
+            }
+        });
+        toolbarTop.add(bttFinalStrategyV1b);
+
         JButton bttFinalStrategyV2 = new JButton();
-        bttFinalStrategyV2.setText("Final Strat V2");
+        bttFinalStrategyV2.setText("Final V2");
         bttFinalStrategyV2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -424,7 +437,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttFinalStrategyV2);
 
         JButton bttFinalStrategyShort = new JButton();
-        bttFinalStrategyShort.setText("Final Strat Short");
+        bttFinalStrategyShort.setText("Final Short");
         bttFinalStrategyShort.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -436,7 +449,7 @@ public class StrategyPanel extends AbstractPanel {
         toolbarTop.add(bttFinalStrategyShort);
 
         JButton bttFinalStrategyShortV2 = new JButton();
-        bttFinalStrategyShortV2.setText("Final Strat Short V2");
+        bttFinalStrategyShortV2.setText("Final Short V2");
         bttFinalStrategyShortV2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -547,18 +560,18 @@ public class StrategyPanel extends AbstractPanel {
                 }
                 // needed for stop loss
 
-                if (!entered && tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr) ) {
+                if (!entered && tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr)) {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries,2,2);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2, 2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
-                } else if (entered && tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) ) {
+                } else if (entered && tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr)) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2, 2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     tr.exit(order.getIndex());
@@ -571,7 +584,7 @@ public class StrategyPanel extends AbstractPanel {
                 System.out.println("Trade open on last tick- sell anyway");
                 ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                 order.setTradeTime(tick.getTradeTime());
-                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
+                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2, 2);
                 order.setAddOrderInfo(info);
                 forwardTestOrders.add(order);
                 tr.exit(order.getIndex());

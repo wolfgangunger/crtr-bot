@@ -25,6 +25,7 @@ import com.unw.crypto.model.Tick;
 import com.unw.crypto.service.MarketAnalyzer;
 import com.unw.crypto.strategy.FinalTradingStrategy;
 import com.unw.crypto.strategy.FinalTradingStrategyShort;
+import com.unw.crypto.strategy.FinalTradingStrategyV1b;
 import com.unw.crypto.strategy.LogUtil;
 import com.unw.crypto.strategy.QuadCCIStrategy;
 import com.unw.crypto.strategy.StrategyUtil;
@@ -62,7 +63,8 @@ public class Forwardtest {
     private List<Tick> ticks;
 
     //private FinalTradingStrategyV2 finalTradingStrategyLong = new FinalTradingStrategyV2();
-    private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
+//    private FinalTradingStrategy finalTradingStrategyLong = new FinalTradingStrategy();
+    private FinalTradingStrategyV1b finalTradingStrategyLong = new FinalTradingStrategyV1b();
     private FinalTradingStrategyShort finalTradingStrategyShort = new FinalTradingStrategyShort();
     private QuadCCIStrategy quadCCIStrategy = new QuadCCIStrategy();
     private ITradingStrategy finalTradingStrategy;
@@ -83,7 +85,7 @@ public class Forwardtest {
     public void forwardtest() {
 
         // increase this number
-        int testRun = 48;
+        int testRun = 53;
         // set this to false for short strategy
         boolean tradeLong = true;
         Currency currency = Currency.BTC;
@@ -174,18 +176,18 @@ public class Forwardtest {
                 tradingStrategy = finalTradingStrategy.buildStrategyWithParams(completeSeries, params);
                 // needed for stop loss
 
-                if (!entered && tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr) ) {
+                if (!entered && tradingStrategy.shouldEnter(completeSeries.getEndIndex(), tr)) {
                     ExtOrder order = new ExtOrder(Order.buyAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
                     tr.enter(order.getIndex(), order.getPrice(), order.getAmount());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2, 2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     entered = true;
-                } else if (entered && tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr) ) {
+                } else if (entered && tradingStrategy.shouldExit(completeSeries.getEndIndex(), tr)) {
                     ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                     order.setTradeTime(tick.getTradeTime());
-                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
+                    AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2, 2);
                     order.setAddOrderInfo(info);
                     forwardTestOrders.add(order);
                     tr.exit(order.getIndex());
@@ -197,7 +199,7 @@ public class Forwardtest {
                 // if there is still a trade open in last tick, sell anyway
                 ExtOrder order = new ExtOrder(Order.sellAt(completeSeries.getEndIndex(), completeSeries));
                 order.setTradeTime(tick.getTradeTime());
-                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2,2);
+                AddOrderInfo info = marketAnalyzer.analyzeOrderParams(completeSeries, 2, 2);
                 order.setAddOrderInfo(info);
                 forwardTestOrders.add(order);
                 tr.exit(order.getIndex());
