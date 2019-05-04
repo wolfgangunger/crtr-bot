@@ -13,6 +13,9 @@ import com.unw.crypto.chart.FibonacciSupportChart;
 import com.unw.crypto.chart.MovingAverageChart;
 import com.unw.crypto.chart.SimpleClosedPriceChart;
 import com.unw.crypto.chart.TickUtil;
+import com.unw.crypto.chart.VWAPChart;
+import com.unw.crypto.chart.WavePMChart;
+import com.unw.crypto.chart.WhistlerChart;
 import com.unw.crypto.loader.TimeSeriesDBLoader;
 import com.unw.crypto.model.Currency;
 import com.unw.crypto.model.Exchange;
@@ -43,7 +46,7 @@ import org.ta4j.core.TimeSeries;
  * the app for the UI Application
  *
  */
-//@SpringBootApplication
+@SpringBootApplication
 public class SpringBootAppUI extends Application {
 
     private ConfigurableApplicationContext context;
@@ -71,6 +74,9 @@ public class SpringBootAppUI extends Application {
     private FibonacciResistenceChart fibonacciResistenceChart;
     private FibonacciSupportChart fibonacciSupportChart;
     private BollingerBandsChart bollingerChart;
+    private WavePMChart wavePMChart;
+    private VWAPChart vwapChart;
+    private WhistlerChart whistlerChart;
     //strategy
     private StrategyPanel strategyPanel;
     //
@@ -247,13 +253,19 @@ public class SpringBootAppUI extends Application {
         bollingerChart = new BollingerBandsChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(bollingerChart, "Bollinger"));
         cciChart = new CCIChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
-        tabPane.getTabs().add(TabUtil.createChartTab(cciChart, "CCI"));        
+        tabPane.getTabs().add(TabUtil.createChartTab(cciChart, "CCI"));
         fibonacciChart = new FibonacciChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(fibonacciChart, "Fibonacci"));
         fibonacciResistenceChart = new FibonacciResistenceChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(fibonacciResistenceChart, "Fibonacci Res"));
         fibonacciSupportChart = new FibonacciSupportChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
         tabPane.getTabs().add(TabUtil.createChartTab(fibonacciSupportChart, "Fibonacci Sup"));
+        vwapChart = new VWAPChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        tabPane.getTabs().add(TabUtil.createChartTab(vwapChart, "VWAP"));
+        wavePMChart = new WavePMChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        tabPane.getTabs().add(TabUtil.createChartTab(wavePMChart, "WAVE PM"));
+        whistlerChart = new WhistlerChart(series, tabPane, cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        tabPane.getTabs().add(TabUtil.createChartTab(whistlerChart, "Whistler"));
         //strategy
         strategyPanel = new StrategyPanel(ticks, series, preSeries, progressBar, context);
         strategyPanel.setBarDuration(barDuration.getValue());
@@ -327,7 +339,7 @@ public class SpringBootAppUI extends Application {
 
         bollingerChart.setSeries(series);
         bollingerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
-        
+
         cciChart.setSeries(series);
         cciChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 

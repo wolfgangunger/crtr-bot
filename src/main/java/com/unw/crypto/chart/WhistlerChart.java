@@ -18,30 +18,27 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.indicators.CCIIndicator;
+import org.ta4j.core.indicators.EMAIndicator;
+import org.ta4j.core.indicators.RSIIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.indicators.volume.VWAPIndicator;
 
 /**
  *
  * @author UNGERW
  */
-public class CCIChart extends AbstractChartPanel {
+public class WhistlerChart extends AbstractChartPanel {
 
     private JFreeChart chart2;
     private ChartPanel chartPanel2;
-    private int timeFrameCCI14;
-    private int timeFrameCCI50;
-    private int timeFrameCCI100;
-    private int timeFrameCCI200;
-    private NumericTextField inputTimeframeCCI14;
-    private NumericTextField inputTimeframeCCI50;
-    private NumericTextField inputTimeframeCCI100;
-    private NumericTextField inputTimeframeCCI200;
+    private int timeFrame;
+    private NumericTextField inputTimeframe;
 
-    public CCIChart(TimeSeries series, TabPane parent) {
+    public WhistlerChart(TimeSeries series, TabPane parent) {
         super(series, parent);
     }
 
-    public CCIChart(TimeSeries series, TabPane parent, String currency, String exchange) {
+    public WhistlerChart(TimeSeries series, TabPane parent, String currency, String exchange) {
         super(series, parent);
         this.currency = currency;
         this.exchange = exchange;
@@ -50,10 +47,7 @@ public class CCIChart extends AbstractChartPanel {
 
     @Override
     public void refresh() {
-        timeFrameCCI14 = Integer.valueOf(inputTimeframeCCI14.getText());
-        timeFrameCCI50 = Integer.valueOf(inputTimeframeCCI50.getText());
-        timeFrameCCI100 = Integer.valueOf(inputTimeframeCCI100.getText());
-        timeFrameCCI200 = Integer.valueOf(inputTimeframeCCI200.getText());
+        timeFrame = Integer.valueOf(inputTimeframe.getText());
         super.refresh();
     }
 
@@ -67,35 +61,16 @@ public class CCIChart extends AbstractChartPanel {
 
     @Override
     protected void init() {
-        timeFrameCCI14 = 14;
-        timeFrameCCI50 = 50;
-        timeFrameCCI100 = 100;
-        timeFrameCCI200 = 200;
-
+        timeFrame = 2;
     }
 
     @Override
     protected void initToolbar() {
         super.initToolbar();
-        inputTimeframeCCI14 = new NumericTextField();
-        inputTimeframeCCI14.setText(String.valueOf(timeFrameCCI14));
-        inputTimeframeCCI14.setColumns(5);
-        inputTimeframeCCI50 = new NumericTextField();
-        inputTimeframeCCI50.setText(String.valueOf(timeFrameCCI50));
-        inputTimeframeCCI50.setColumns(5);
-
-        inputTimeframeCCI100 = new NumericTextField();
-        inputTimeframeCCI100.setText(String.valueOf(timeFrameCCI100));
-        inputTimeframeCCI100.setColumns(5);
-
-        inputTimeframeCCI200 = new NumericTextField();
-        inputTimeframeCCI200.setText(String.valueOf(timeFrameCCI200));
-        inputTimeframeCCI200.setColumns(5);
-
-        toolbar.add(inputTimeframeCCI14);
-        toolbar.add(inputTimeframeCCI50);
-        toolbar.add(inputTimeframeCCI100);
-        toolbar.add(inputTimeframeCCI200);
+        inputTimeframe = new NumericTextField();
+        inputTimeframe.setText(String.valueOf(timeFrame));
+        inputTimeframe.setColumns(10);
+        toolbar.add(inputTimeframe);
     }
 
     @Override
@@ -114,23 +89,29 @@ public class CCIChart extends AbstractChartPanel {
     protected void initData() {
 
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
+        //test
+//        EMAIndicator avg14 = new EMAIndicator(closePrice, 180); // 180 = 14 tage ?
 
-        CCIIndicator cci1 = new CCIIndicator(series, timeFrameCCI14);
-        CCIIndicator cci2 = new CCIIndicator(series, timeFrameCCI50);
-        CCIIndicator cci3 = new CCIIndicator(series, timeFrameCCI100);
-        CCIIndicator cci4 = new CCIIndicator(series, timeFrameCCI200);
+        VWAPIndicator vwap1 = new VWAPIndicator(series, 500);
+        VWAPIndicator vwap2 = new VWAPIndicator(series, 1000);
+
+        CCIIndicator cci14 = new CCIIndicator(series, 14);
+        CCIIndicator cci50 = new CCIIndicator(series, 50);
+        CCIIndicator cci100 = new CCIIndicator(series, 100);
+        CCIIndicator cci200 = new CCIIndicator(series, 200);
 
         TimeSeriesCollection dataset1 = new TimeSeriesCollection();
         TimeSeriesCollection dataset2 = new TimeSeriesCollection();
         dataset1.addSeries(buildChartTimeSeries(series, closePrice, legend));
+        dataset1.addSeries(buildChartTimeSeries(series, vwap1, "VWAP 500"));
+        dataset1.addSeries(buildChartTimeSeries(series, vwap2, "VWAP 1000"));
 
-        dataset2.addSeries(buildChartTimeSeries(series, cci1, "CCI 14"));
-        dataset2.addSeries(buildChartTimeSeries(series, cci2, "CCI 50"));
-        dataset2.addSeries(buildChartTimeSeries(series, cci3, "CCI 100"));
-        dataset2.addSeries(buildChartTimeSeries(series, cci4, "CCI 200"));
+        dataset2.addSeries(buildChartTimeSeries(series, cci14, "CCI 14"));
+        dataset2.addSeries(buildChartTimeSeries(series, cci50, "CCI 50"));
+        dataset2.addSeries(buildChartTimeSeries(series, cci100, "CCI 100"));
+        dataset2.addSeries(buildChartTimeSeries(series, cci200, "CCI 200"));
 
-//dataset2.addSeries(buildChartTimeSeriesWithFactor(series, stoRsi, "Sto RSI", 100d));
-        chart = createChart(dataset1, legend, "Date", "Price", true);
+        chart = createChart(dataset1, legend, "Date", "Price & VWAP", true);
         chart2 = createChart(dataset2, "CCI", "Date", "100", true);
         XYPlot plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();
