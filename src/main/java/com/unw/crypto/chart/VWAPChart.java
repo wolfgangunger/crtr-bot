@@ -51,6 +51,7 @@ public class VWAPChart extends AbstractChartPanel {
 
         VWAPIndicator vwap1 = new VWAPIndicator(series, 500);
         VWAPIndicator vwap2 = new VWAPIndicator(series, 1000);
+
         /*
           Building chart dataset
          */
