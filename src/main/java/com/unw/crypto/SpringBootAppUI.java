@@ -352,6 +352,16 @@ public class SpringBootAppUI extends Application {
         fibonacciSupportChart.setSeries(series);
         fibonacciSupportChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
 
+        vwapChart.setSeries(series);
+        vwapChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+
+        wavePMChart.setSeries(series);
+        wavePMChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        
+        whistlerChart.setSeries(series);
+        whistlerChart.reload(cmbCurrency.getValue().getStringValue(), cmbExchange.getValue().getStringValue());
+        
+
         strategyPanel.setBarDuration(barDuration.getValue());
         strategyPanel.setSeries(series);
         strategyPanel.setPreSeries(preSeries);
