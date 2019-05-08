@@ -70,7 +70,7 @@ public final class ChartUtil {
             volumes[i] = bar.getVolume().doubleValue();
         }
 
-        return new DefaultHighLowDataset("btc", dates, highs, lows, opens, closes, volumes);
+        return new DefaultHighLowDataset("", dates, highs, lows, opens, closes, volumes);
     }
 
     /**
