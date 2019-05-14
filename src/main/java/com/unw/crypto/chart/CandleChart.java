@@ -14,6 +14,7 @@ import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.OHLCDataset;
+import org.ta4j.core.Bar;
 import org.ta4j.core.TimeSeries;
 
 /**
@@ -36,6 +37,18 @@ public class CandleChart extends AbstractChartPanel {
     @Override
     protected void initData() {
 
+//        int last = series.getEndIndex();
+//        int first = last - 100;
+//        for (int i = first; i <= last; i++) {
+//            Bar b = series.getBar(i);
+//            System.out.print(b.getOpenPrice() + " , ");
+//            System.out.print(b.getMaxPrice()+ " , ");
+//            System.out.print(b.getMinPrice()+ " , ");
+//            System.out.print(b.getClosePrice()+ " , ");
+//            System.out.print(b.getVolume() + "  ");
+//            System.out.println("---");
+//        }
+        
         OHLCDataset ohlcDataset = ChartUtil.createOHLCDataset(series);
         TimeSeriesCollection xyDataset = ChartUtil.createAdditionalDataset(series, legend);
 
